@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    >
+
+    <data>
+        <variable
+            name="comment"
+            type="com.example.database.entities.CommentEntity" />
+        <variable
+            name="ifPadding"
+            type="Boolean" />
+    </data>
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp"
+        card_view:strokeColor="@color/darker"
+        card_view:strokeWidth="3dp"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/darker"
+            android:layout_marginStart="@{ifPadding? 100 : 0}"
+            >
+
+        <TextView
+            android:id="@+id/currentTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comment"
+            app:setHtmlText="@{comment.text}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/buttonReply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="reply"
+            android:textSize="@dimen/small_text_item"
+            app:layout_constraintStart_toEndOf="@id/commentEditText"
+            app:layout_constraintTop_toBottomOf="@id/currentTextView" />
+
+        <EditText
+            android:id="@+id/commentEditText"
+            android:layout_width="100dp"
+            android:layout_height="24dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/commentEditText"
+            />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</layout>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="project"
+            type="com.example.database.entities.ProjectEntity" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/item_padding"
+        android:paddingTop="@dimen/item_padding"
+        android:paddingEnd="@dimen/item_padding"
+        android:paddingBottom="@dimen/item_padding">
+
+        <ImageView
+            android:id="@+id/imageProjectStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="@dimen/min_project_status_width"
+            app:layout_constraintBottom_toBottomOf="@id/textProjectTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textProjectTitle"
+            app:setStatusImage="@{project}" />
+
+
+        <TextView
+            android:id="@+id/textProjectTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/item_padding"
+            android:text="@{project.title}"
+            android:textSize="@dimen/project_title_text_size"
+            app:layout_constraintStart_toEndOf="@id/imageProjectStatus"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageIfPrivate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@{project.isPrivate() ? @drawable/ic_project_is_private: null}"
+            app:layout_constraintStart_toStartOf="@id/textProjectTitle"
+            app:layout_constraintTop_toBottomOf="@id/textProjectTitle" />
+
+        <TextView
+            android:id="@+id/textProjectTeam"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/item_padding"
+            android:textSize="@dimen/small_text_item"
+            app:layout_constraintStart_toEndOf="@id/imageIfPrivate"
+            app:layout_constraintTop_toBottomOf="@id/textProjectTitle"
+            app:showProjectTeam="@{project}" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@id/buttonProjectDetail"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textNumberOfTasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{project.taskCount.toString()}"
+                android:textSize="@dimen/small_text_item" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tasks"
+                android:textSize="@dimen/small_text_item" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/buttonProjectDetail"
+            android:layout_width="@dimen/button_project_detail_width"
+            android:layout_height="16dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_project_detail"
+            app:layout_constraintBottom_toTopOf="@+id/imageIfPrivate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textProjectTitle" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>

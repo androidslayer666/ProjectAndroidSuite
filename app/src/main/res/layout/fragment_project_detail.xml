@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.projectandroidsuite.viewmodel.ProjectDetailViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/layout_padding">
+
+        <com.example.projectandroidsuite.ui.dialogs.CustomConstraintLayout
+            android:id="@+id/layoutCustomProjectDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/projectName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/item_height"
+            android:text="@{viewModel.currentProject.title}"
+            android:textSize="@dimen/large_text_item"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/projectManagerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/item_padding"
+            android:text="Project manager"
+            app:layout_constraintStart_toStartOf="@id/projectManagerText"
+            app:layout_constraintTop_toBottomOf="@id/projectName" />
+
+        <include
+            android:id="@+id/project_manager_holder"
+            layout="@layout/team_member_holder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/projectManagerText"
+            app:layout_constraintTop_toBottomOf="@id/projectName" />
+
+        <HorizontalScrollView
+            android:id="@+id/teamLayoutScroll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/projectManagerText">
+
+            <GridLayout
+                android:id="@+id/teamLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/pagerTaskMilestones"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/teamLayoutScroll"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+        </com.example.projectandroidsuite.ui.dialogs.CustomConstraintLayout>
+
+
+        <include
+            android:id="@+id/expendableActions"
+            layout="@layout/expandable_actions" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

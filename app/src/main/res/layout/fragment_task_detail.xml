@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.example.projectandroidsuite.viewmodel.TaskDetailViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <com.example.projectandroidsuite.ui.dialogs.CustomConstraintLayout
+            android:id="@+id/layoutCustomProjectDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/textTaskDetailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:text="@{viewModel.currentTask.title}"
+            android:textSize="@dimen/large_text_item"
+            android:layout_marginEnd="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/textTaskDetailStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@{viewModel.currentTask.status == 1 ? @drawable/ic_task_is_active : @drawable/ic_project_status_paused}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textTaskDetailTitle" />
+
+        <TextView
+            android:id="@+id/textTaskDetailProjectText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingEnd="@dimen/item_padding"
+            android:text="Project"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textTaskDetailStatus"
+
+            />
+
+        <TextView
+            android:id="@+id/textTaskDetailProject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingEnd="@dimen/item_padding"
+            android:text="@{viewModel.currentTask.projectOwner.title}"
+            app:layout_constraintStart_toEndOf="@id/textTaskDetailProjectText"
+            app:layout_constraintTop_toBottomOf="@id/textTaskDetailStatus"
+
+            />
+
+        <TextView
+            android:id="@+id/textTaskDetailStartDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingEnd="@dimen/item_padding"
+            android:text="Created"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textTaskDetailProjectText" />
+
+        <TextView
+            android:id="@+id/textTaskDetailStartDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingEnd="@dimen/item_padding"
+            app:dateShowerDate="@{viewModel.currentTask.created}"
+            app:layout_constraintStart_toEndOf="@id/textTaskDetailStartDateText"
+            app:layout_constraintTop_toBottomOf="@id/textTaskDetailProject" />
+
+        <TextView
+            android:id="@+id/textTaskDetailDueDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingEnd="@dimen/item_padding"
+            android:text="Due to "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textTaskDetailStartDateText" />
+
+        <TextView
+            android:id="@+id/textTaskDetailDueDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingEnd="@dimen/item_padding"
+            app:dateShowerDate="@{viewModel.currentTask.updated}"
+            app:layout_constraintStart_toEndOf="@id/textTaskDetailDueDateText"
+            app:layout_constraintTop_toBottomOf="@id/textTaskDetailStartDate" />
+
+        <TextView
+            android:id="@+id/textTaskDetailPriority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingEnd="@dimen/item_padding"
+            android:text="@{viewModel.currentTask.priority.toString()}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textTaskDetailDueDate" />
+
+
+        <GridLayout
+            android:id="@+id/gridTaskDetailTeamLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textTaskDetailPriority" />
+
+        <TextView
+            android:id="@+id/taskDetailCommentLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            android:text="Comments"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/gridTaskDetailTeamLayout" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/taskDetailCommentRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/taskDetailCommentLabel" />
+
+        <TextView
+            android:id="@+id/taskDetailFileLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            android:text="Files"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/taskDetailCommentRecyclerView" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/taskDetailFileRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/taskDetailFileLabel" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/teamRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/taskDetailFileRecyclerView" />
+
+        </com.example.projectandroidsuite.ui.dialogs.CustomConstraintLayout>
+        <include
+            android:id="@+id/expendableActions"
+            layout="@layout/expandable_actions" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

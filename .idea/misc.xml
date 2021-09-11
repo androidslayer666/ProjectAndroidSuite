@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/border_set.xml" value="0.2796296296296296" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/button_round.xml" value="0.2078125" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_play_arrow_24.xml" value="0.22395833333333334" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_cancel.xml" value="0.2972222222222222" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_edit_button.xml" value="0.23177083333333334" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_fab.xml" value="0.2421875" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2421875" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_project_detail.xml" value="0.2796296296296296" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_project_is_private.xml" value="0.2796296296296296" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_project_status_active.xml" value="0.2796296296296296" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_project_status_done.xml" value="0.2796296296296296" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_project_status_paused.xml" value="0.2796296296296296" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_task_add.xml" value="0.2421875" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_task_is_active.xml" value="0.37083333333333335" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_user_chosen.xml" value="0.2421875" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/popup_background.xml" value="0.26851851851851855" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/round_button.xml" value="0.2972222222222222" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout-v26/task_item.xml" value="0.22604166666666667" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/activity_main.xml" value="0.22604166666666667" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/comment_item.xml" value="0.21510416666666668" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/comment_item_recycler.xml" value="0.5" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/dialog_confirmation.xml" value="0.3546875" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/dialog_create_project.xml" value="0.3546875" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/dialog_create_task.xml" value="0.22" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/dialog_team_picker.xml" value="0.22604166666666667" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/expandable_actions.xml" value="0.22604166666666667" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fab_add.xml" value="0.2078125" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/file_item.xml" value="0.1828125" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fragment_blank.xml" value="0.10144927536231885" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fragment_discussion.xml" value="0.2015625" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fragment_login.xml" value="0.1" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fragment_project.xml" value="0.22604166666666667" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fragment_project_detail.xml" value="0.1" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fragment_task_detail.xml" value="0.33" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fragment_task_list.xml" value="0.3546875" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fragment_task_project_pager.xml" value="0.21510416666666668" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/fragment_tasks.xml" value="0.3546875" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/message_comment_item.xml" value="0.2015625" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/milestone_item.xml" value="0.2078125" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/milestones_and_task_item.xml" value="0.22604166666666667" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/popup_background.xml" value="0.3546875" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/project_item.xml" value="0.5" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/project_picker_item.xml" value="0.2" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/task_item.xml" value="0.33" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/task_milestone_fragment.xml" value="0.215625" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/team_item.xml" value="0.33" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/team_member_holder.xml" value="0.67" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/menu/menu_main.xml" value="0.19739583333333333" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardExpand"
+        android:layout_margin="@dimen/item_padding"
+        android:layout_width="@dimen/card_size"
+        android:layout_height="@dimen/card_size"
+        android:backgroundTint="@color/grey_light"
+        android:elevation="30dp"
+        app:cardElevation="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        card_view:cardCornerRadius="@dimen/card_size">
+
+        <ImageView
+            android:id="@+id/buttonExpandOptions"
+            android:layout_width="@dimen/card_image_size"
+            android:layout_height="@dimen/card_image_size"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_baseline_expand_more_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardEdit"
+        android:layout_width="@dimen/card_size"
+        android:layout_height="@dimen/card_size"
+        android:layout_margin="@dimen/item_padding"
+        android:backgroundTint="@color/grey_light"
+        android:elevation="30dp"
+        app:cardElevation="10dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardExpand"
+        card_view:cardCornerRadius="@dimen/card_size">
+
+        <ImageView
+            android:id="@+id/buttonEdit"
+            android:layout_width="@dimen/card_image_size"
+            android:layout_height="@dimen/card_image_size"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_edit_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardDelete"
+        android:layout_width="@dimen/card_size"
+        android:layout_height="@dimen/card_size"
+        android:backgroundTint="@color/grey_light"
+        android:layout_margin="@dimen/item_padding"
+        android:elevation="30dp"
+        app:cardElevation="10dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardEdit"
+        card_view:cardCornerRadius="@dimen/card_size">
+
+        <ImageView
+            android:id="@+id/buttonDelete"
+            android:layout_width="@dimen/card_image_size"
+            android:layout_height="@dimen/card_image_size"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="com.example.projectandroidsuite.viewmodel.TaskCreateEditViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/taskTitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            android:text="Title"
+            app:layout_constraintBottom_toBottomOf="@+id/taskTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/taskTitle" />
+
+        <EditText
+            android:id="@+id/taskTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            app:layout_constraintStart_toEndOf="@id/taskTitleText"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/taskDescriptionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            android:text="Description"
+            app:layout_constraintBottom_toBottomOf="@+id/taskDescription"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/taskTitle" />
+
+        <EditText
+            android:id="@+id/taskDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onTextChanged="@{(text, start, before, count) -> viewModel.setDescription(text.toString())}"
+            android:padding="@dimen/item_padding"
+            app:layout_constraintStart_toEndOf="@id/taskDescriptionText"
+            app:layout_constraintTop_toBottomOf="@id/taskTitle" />
+
+        <TextView
+            android:id="@+id/taskStartDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            android:text="Title"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonPickStartDate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/buttonPickStartDate" />
+
+        <TextView
+            android:id="@+id/buttonPickStartDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            app:layout_constraintStart_toEndOf="@id/taskStartDateText"
+            app:layout_constraintTop_toBottomOf="@id/taskDescription" />
+
+        <TextView
+            android:id="@+id/taskEndDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            android:text="Title"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonPickEndDate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/buttonPickEndDate" />
+
+        <TextView
+            android:id="@+id/buttonPickEndDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            app:layout_constraintStart_toEndOf="@id/taskEndDateText"
+            app:layout_constraintTop_toBottomOf="@id/buttonPickStartDate" />
+
+
+        <TextView
+            android:id="@+id/taskTeamText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            android:text="Team"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonChooseTeam"
+            app:layout_constraintTop_toTopOf="@+id/buttonChooseTeam" />
+
+        <TextView
+            android:id="@+id/buttonChooseTeam"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            android:text="Choose responsibles"
+            app:layout_constraintStart_toEndOf="@id/taskTeamText"
+            app:layout_constraintTop_toBottomOf="@id/buttonPickEndDate" />
+
+        <TextView
+            android:id="@+id/taskProjectText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            android:text="Project"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonChooseProject"
+            app:layout_constraintTop_toTopOf="@+id/buttonChooseProject" />
+
+
+        <TextView
+            android:id="@+id/chosenProjectText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            app:layout_constraintStart_toEndOf="@id/taskProjectText"
+            app:layout_constraintTop_toBottomOf="@id/buttonChooseTeam" />
+
+        <TextView
+            android:id="@+id/buttonChooseProject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            android:text="Project"
+            app:layout_constraintStart_toEndOf="@id/chosenProjectText"
+            app:layout_constraintTop_toBottomOf="@id/buttonChooseTeam" />
+
+
+        <HorizontalScrollView
+            android:id="@+id/scrollTeamLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttonChooseProject">
+
+            <GridLayout
+                android:id="@+id/teamLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+
+                android:orientation="horizontal" />
+
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/projectWarning"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Please choose the project"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/scrollTeamLayout"
+            />
+
+
+        <Button
+            android:id="@+id/buttonOk"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/darker"
+            android:text="Ok"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/buttonDismiss"
+            app:layout_constraintTop_toBottomOf="@id/projectWarning" />
+
+        <Button
+            android:id="@+id/buttonDismiss"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/light"
+            android:text="Dismiss"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/buttonOk"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/projectWarning" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
