@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/darker"
-            android:layout_marginStart="@{ifPadding? 100 : 0}"
+            android:paddingStart="@{ifPadding? 100 : 0}"
             >
 
         <TextView
