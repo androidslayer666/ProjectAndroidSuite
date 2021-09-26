@@ -5,7 +5,13 @@
       <map>
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/border_set.xml" value="0.2796296296296296" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/button_round.xml" value="0.2078125" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_comment_24.xml" value="0.13425925925925927" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_expand_less_24.xml" value="0.1" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_expand_more_24.xml" value="0.1" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_filter_alt_24.xml" value="0.1" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_play_arrow_24.xml" value="0.22395833333333334" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.1" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_send_24.xml" value="0.13425925925925927" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_cancel.xml" value="0.2972222222222222" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_edit_button.xml" value="0.23177083333333334" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_fab.xml" value="0.2421875" />
@@ -18,12 +24,12 @@
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_task_add.xml" value="0.2421875" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_task_is_active.xml" value="0.37083333333333335" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_user_chosen.xml" value="0.2421875" />
-        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/popup_background.xml" value="0.26851851851851855" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/popup_background.xml" value="0.2" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/round_button.xml" value="0.2972222222222222" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout-v26/task_item.xml" value="0.22604166666666667" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/activity_main.xml" value="0.22604166666666667" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/comment_item.xml" value="0.21510416666666668" />
-        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/comment_item_recycler.xml" value="0.5" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/comment_item_recycler.xml" value="0.18" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/dialog_confirmation.xml" value="0.3546875" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/dialog_create_project.xml" value="0.3546875" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/dialog_create_task.xml" value="0.22" />

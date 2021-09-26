@@ -8,7 +8,10 @@ import kotlinx.coroutines.flow.Flow
 interface ProjectDao {
 
     @Query("SELECT * FROM projects")
-    fun getAll(): Flow<List<ProjectEntity>>
+    fun getAllFlow(): Flow<List<ProjectEntity>>
+
+    @Query("SELECT * FROM projects")
+    suspend fun getAll(): List<ProjectEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProjects(projectList: List<ProjectEntity>)
@@ -17,10 +20,10 @@ interface ProjectDao {
     suspend fun insertProject(project: ProjectEntity)
 
     @Query("SELECT * FROM projects WHERE id = :projectId")
-    suspend fun getProjectFromDbById(projectId: Int) : ProjectEntity
+    fun getProjectFromDbById(projectId: Int) : Flow<ProjectEntity?>
 
-    @Delete
-    fun deleteProject(project: ProjectEntity)
+    @Query("DELETE FROM projects WHERE id = :projectId")
+    fun deleteProject(projectId: Int)
 
     @Query("DELETE FROM projects")
     fun deleteAllProjects()

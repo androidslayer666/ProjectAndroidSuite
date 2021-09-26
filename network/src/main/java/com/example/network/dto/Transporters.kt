@@ -19,7 +19,7 @@ data class MilestonesTransporter(
 
 data class MessagesTransporter(
     @SerializedName("response")
-    val listComments: List<MessageDto>? = null
+    val listMessages: List<MessageDto>? = null
 )
 
 data class TasksTransporter(

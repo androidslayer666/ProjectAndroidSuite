@@ -25,18 +25,26 @@ class TeamRepository @Inject constructor(
         return teamEndPoint.getProjectTeam(projectId).ids
     }
 
-    suspend fun populateAllPortalUsers(){
-        teamEndPoint.getAllPortalUsers().ids?.let {
-            val newList = mutableListOf<UserDto>()
-            for (user in it) {
-                if(user.isVisitor != true){
-                    newList.add(user)
+    suspend fun populateAllPortalUsers() : Result<String, String> {
+        try {
+            val users = teamEndPoint.getAllPortalUsers().ids
+            if(users != null ){
+                val newList = mutableListOf<UserDto>()
+                for (user in users) {
+                    if (user.isVisitor != true) {
+                        newList.add(user)
+                    }
                 }
+                userDao.insertUsers(newList.toListUserEntity())
+                return Success("Comments are populated")
+            }else {
+                return Failure("Network/server problem")
             }
-
-            userDao.insertUsers(newList.toListUserEntity()) }
+        }catch (e: Exception){
+            Log.e("TeamRepository", "caught an exception" + e.toString())
+            return Failure("Network/server problem")
+        }
     }
 
-    suspend fun getAllPortalUsers() = userDao.getAll()
-
+    fun getAllPortalUsers() = userDao.getAll()
 }

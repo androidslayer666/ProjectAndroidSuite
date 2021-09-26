@@ -3,7 +3,9 @@ package com.example.domain.mappers
 import android.util.Log
 import com.example.database.entities.MilestoneEntity
 import com.example.database.entities.TaskEntity
+import com.example.domain.repository.dateToString
 import com.example.network.dto.MilestoneDto
+import com.example.network.dto.MilestonePost
 import com.example.network.dto.TaskDto
 
 fun List<MilestoneDto>.toListEntities(projectId: Int): List<MilestoneEntity> {
@@ -14,7 +16,6 @@ fun List<MilestoneDto>.toListEntities(projectId: Int): List<MilestoneEntity> {
             milestoneDto.toEntity(projectId)
         )
     }
-    Log.d("TaskDto", listProjectEntity.toString())
     return listProjectEntity
 }
 
@@ -34,4 +35,17 @@ fun MilestoneDto.toEntity(projectId: Int): MilestoneEntity {
         updated = this.updated?.stringToDate(),
         projectId = projectId
     )
+}
+
+
+fun MilestoneEntity.toMilestonePost(): MilestonePost {
+    return MilestonePost(
+        title = this.title,
+        description = this.description,
+        deadline = this.deadline?.dateToString(),
+        responsible = this.responsible?.id,
+        notifyResponsible = true,
+        isNotify = true,
+        isKey = true
+        )
 }

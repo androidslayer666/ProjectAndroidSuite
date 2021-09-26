@@ -2,10 +2,9 @@ package com.example.network
 
 object Constants {
 
-    const val BASE_URL_PROJECT = "https://oleggonchar.onlyoffice.com/"
 
     const val LOGIN_URL = "api/2.0/authentication.json"
-    const val BASE_URL_AUTH = "https://oleggonchar.onlyoffice.com/"
+
 
     // Projects
     const val GET_PROJECTS_URL = "api/2.0/project/@self"

@@ -48,19 +48,19 @@ data class TaskDto(
 
 data class TaskPost(
     @SerializedName("description")
-    val description: String,
+    val description: String? = "",
     @SerializedName("deadline")
-    val deadline: String,
+    val deadline: String? = "",
     @SerializedName("priority")
-    val priority: String,
+    val priority: String? = "normal",
     @SerializedName("title")
-    val title: String,
+    val title: String? = "",
     @SerializedName("milestoneid")
     val milestoneid: Int = 0,
     @SerializedName("responsibles")
-    val responsibles: List<String>,
+    val responsibles: List<String>? = listOf(),
     @SerializedName("notify")
-    val notify: Boolean,
+    val notify: Boolean? = false,
     @SerializedName("startDate")
-    val startDate: String
+    val startDate: String? = ""
 )

@@ -9,7 +9,7 @@ fun UserDto.toUserEntity(): UserEntity {
         this.id,
         this.firstName,
         this.lastName,
-        this.displayName,
+        this.displayName ?: this.firstName + this.lastName,
         this.email,
         this.avatarSmall,
         this.profileUrl

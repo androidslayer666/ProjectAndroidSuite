@@ -12,7 +12,6 @@ interface FileEndPoint {
     @GET("api/2.0/project/task/{taskId}/files")
     suspend fun getTaskFiles(@Path("taskId")taskId: Int): FilesTransporterResponse
 
-
     @GET("api/2.0/project/{id}/files")
     suspend fun getProjectFiles(@Path("id")projectId: Int): FilesTransporter
 

@@ -15,9 +15,9 @@ data class TaskEntity(
     val canReadFiles: Boolean? = null,
     @PrimaryKey
     override val id: Int,
-    override var title: String? = null,
-    var description: String? = null,
-    var deadline: Date? = null,
+    override var title: String = "",
+    var description: String = "",
+    var deadline: Date = Date(),
     val priority: Int? = null,
     val milestoneId: Int? = null,
     @Embedded(prefix = "projectOwner")
@@ -27,13 +27,13 @@ data class TaskEntity(
     val responsible: UserEntity? = null,
     @Embedded(prefix = "updatedBy")
     val updatedBy: UserEntity? = null,
-    var created: Date? = null,
+    var created: Date = Date(),
     @Embedded(prefix = "createdBy")
     val createdBy: UserEntity? = null,
-    val updated: Date? = null,
-    var responsibles: MutableList<UserEntity>? = null,
+    val updated: Date = Date(),
+    var responsibles: MutableList<UserEntity> = mutableListOf(),
     val projectId: Int? = null,
-    val subtasks: List<SubtaskEntity>?
+    val subtasks: List<SubtaskEntity>? = listOf()
 
 ) : UniversalEntity(id, title)
 

@@ -25,13 +25,13 @@ fun List<ProjectDto>.toListEntities(): MutableList<ProjectEntity> {
     return listProjectEntity
 }
 
-fun ProjectDto.toProjectEntity() : ProjectEntity{
+fun ProjectDto.toProjectEntity(): ProjectEntity {
     return ProjectEntity(
         canEdit = this.canEdit,
         canDelete = this.canDelete,
         id = this.id,
-        title = this.title,
-        description = this.description,
+        title = this.title ?: "",
+        description = this.description ?: "",
         status = this.status,
         responsible = this.responsible?.toUserEntity(),
         isPrivate = this.isPrivate,
@@ -43,33 +43,34 @@ fun ProjectDto.toProjectEntity() : ProjectEntity{
         documentsCount = this.documentsCount,
         isFollow = this.isFollow,
         updatedBy = this.updatedBy?.toUserEntity(),
-        created = this.created?.stringToDate(),
+        created = this.created?.stringToDate() ?: Date(),
         createdBy = this.createdBy?.toUserEntity(),
-        updated = this.updated?.stringToDate(),
+        updated = this.updated?.stringToDate() ?: Date(),
         team = this.team?.toListUserEntity()
     )
 }
 
-fun ProjectEntity.fromEntityToPost() : ProjectPost {
+fun ProjectEntity.fromEntityToPost(): ProjectPost {
     return ProjectPost(
-        title= this.title ?:"",
+        title = this.title ?: "",
 
-    description = this.description ?:"",
+        description = this.description ?: "",
 
-    responsibleId = this.responsible?.id.toString(),
+        responsibleId = this.responsible?.id.toString(),
 
-    tags = "",
+        tags = "",
         //todo
-    private = true,
+        private = true,
 
-    taskDtos = listOf(),
+        taskDtos = listOf(),
 
-    milestoneDtos = listOf(),
+        milestoneDtos = listOf(),
 
-    participants= this.team?.fromListUsersToStrings() ?: listOf()
+        participants = this.team?.fromListUsersToStrings() ?: listOf()
 
     )
 }
+
 
 
 

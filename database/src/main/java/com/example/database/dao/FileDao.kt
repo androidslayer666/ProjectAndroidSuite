@@ -17,6 +17,9 @@ interface FileDao {
     @Query("SELECT * FROM files WHERE taskId = :taskId")
     fun getFilesByTaskId(taskId: Int): Flow<List<FileEntity>>
 
+    @Query("SELECT * FROM files WHERE projectId = :projectId")
+    fun getFilesByProjectId(projectId: Int): Flow<List<FileEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTasks(taskList: List<FileEntity>?)
 }

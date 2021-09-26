@@ -26,6 +26,5 @@ data class CommentPost(
     @SerializedName("content")
     val content: String,
     @SerializedName("createdBy")
-    val parentId: String
-
+    val parentId: String?
 )

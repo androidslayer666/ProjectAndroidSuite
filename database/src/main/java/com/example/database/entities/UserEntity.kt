@@ -9,7 +9,7 @@ data class UserEntity (
     var id: String,
     var firstName: String?,
     var lastName: String?,
-    val displayName : String? = firstName+lastName,
+    val displayName : String = firstName+lastName,
     var email: String?,
     val avatarSmall : String? = null,
     val profileUrl: String? = null,

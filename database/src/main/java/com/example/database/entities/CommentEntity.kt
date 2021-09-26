@@ -11,13 +11,16 @@ data class CommentEntity(
     val id: String,
     @Embedded(prefix = "createdBy")
     val createdBy: UserEntity? = null,
-    val text: String? = null,
+    val text: String = "",
     val parentId: String? = null,
     val inactive: Boolean? = null,
-    val canEdit: Boolean?,
-    val created: Date? = null,
-    val updated: Date? = null,
+    val canEdit: Boolean? = null,
+    val created: Date = Date(),
+    val updated: Date =Date(),
     val taskId: Int? = null,
-    val messageId: Int? =null
+    val messageId: Int? =null,
+    var commentLevel: Int  = 0
     )
+
+
 

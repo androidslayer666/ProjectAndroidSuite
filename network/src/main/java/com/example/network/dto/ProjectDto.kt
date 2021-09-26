@@ -52,19 +52,19 @@ data class ProjectDto (
 
 data class ProjectPost (
     @SerializedName("title")
-    val title: String,
+    val title: String? = "",
     @SerializedName("description")
-    val description: String,
+    val description: String? = "",
     @SerializedName("responsibleId")
-    val responsibleId: String,
+    val responsibleId: String? = "",
     @SerializedName("tags")
-    val tags: String,
+    val tags: String? = "",
     @SerializedName("private")
-    val private: Boolean,
+    val private: Boolean? = false,
     @SerializedName("tasks")
-    val taskDtos: List<TaskDto>,
+    val taskDtos: List<TaskDto>? =listOf(),
     @SerializedName("milestones")
-    val milestoneDtos:List<MilestoneDto>,
+    val milestoneDtos:List<MilestoneDto>? = listOf(),
     @SerializedName("participants")
     val participants: List<String>? = null
 )

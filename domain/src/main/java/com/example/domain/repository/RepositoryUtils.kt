@@ -1,30 +1,43 @@
 package com.example.domain.repository
 
+import android.util.Log
+import com.example.database.entities.CommentEntity
+import com.example.database.entities.ProjectEntity
+import com.example.database.entities.TaskEntity
 import com.example.database.entities.UserEntity
 import com.example.network.dto.CommentDto
+import com.example.network.dto.TaskDto
+import java.text.SimpleDateFormat
+import java.util.*
 
-fun arrangingComments(list: List<CommentDto>): List<CommentDto> {
-    val listCommentWithParent = mutableListOf<CommentDto>()
-    val listCommentWithoutParent = mutableListOf<CommentDto>()
+const val FORMAT_API_DATE = "yyyy-MM-dd'T'HH:mm:ss"
+
+fun arrangingComments(list: List<CommentEntity>): List<CommentEntity> {
+    val childList = mutableListOf<CommentEntity>()
+    val parentList = mutableListOf<CommentEntity>()
     for (comment in list) {
         if (comment.parentId != "00000000-0000-0000-0000-000000000000") {
-            listCommentWithParent.add(comment)
+            //Log.d("arrangingComments", "Parent ID  !=   " + comment.parentId.toString())
+            childList.add(comment)
         } else {
-            listCommentWithoutParent.add(comment)
+            //Log.d("arrangingComments", "Parent ID  ==   " + comment.parentId.toString())
+            parentList.add(comment)
         }
     }
-    return insertingCommentToParentOne(listCommentWithoutParent, listCommentWithParent)
+    return insertingCommentToParent(parentList, childList)
 }
 
-fun insertingCommentToParentOne(
-    parentList: MutableList<CommentDto>,
-    childList: MutableList<CommentDto>
-): List<CommentDto> {
+fun insertingCommentToParent(
+    parentList: MutableList<CommentEntity>,
+    childList: MutableList<CommentEntity>,
+    commentLevel: Int = 1
+): List<CommentEntity> {
 
 //        val newChildList = childList.toMutableList()
 //        val newParentList = parentList.toMutableList()
-//        Log.d("insertingCommentToParen", childList.toString())
-//        Log.d("insertingCommentToParen", parentList.toString())
+
+    //Log.d("insertingCommentToParen", "Child list" + childList.map{it.parentId}.toString())
+    //Log.d("insertingCommentToParen", "Parent list" + parentList.map{it.parentId}.toString())
     var counter = childList.size
 
     for (i in 0 until parentList.size) {
@@ -40,8 +53,11 @@ fun insertingCommentToParentOne(
 //                Log.d("insertingCommentToParen", "y  "+ parentList[i].toString())
             if (childList[y].parentId == parentList[i].id) {
                 if (parentList.indexOf(parentList[i]) != parentList.size - 1) {
+                    //Log.d("insertingCommentToParen", "setting level to  $commentLevel"+ parentList[i].toString())
+                    childList[y].commentLevel = commentLevel
                     parentList.add(parentList.indexOf(parentList[i]) + 1, childList[y])
                 } else {
+                    childList[y].commentLevel = commentLevel
                     parentList.add(childList[y])
                 }
                 childList.remove(childList[y])
@@ -53,10 +69,10 @@ fun insertingCommentToParentOne(
     }
     if (childList.size > 0) {
 //            Log.d("insertingCommentToParen", childList.toString())
-        insertingCommentToParentOne(parentList, childList)
+        insertingCommentToParent(parentList, childList, commentLevel + 1)
     } else {
 //            Log.d("insertingCommentToParen", "returning parent")
-        return@insertingCommentToParentOne parentList
+        return@insertingCommentToParent parentList
     }
 //        Log.d("insertingCommentToParen", "returning empty" + "$childList.size")
     return parentList
@@ -69,7 +85,6 @@ data class Success<out Success>(val value: Success) : Result<Success, Nothing>()
 data class Failure<out Failure>(val reason: Failure) : Result<Nothing, Failure>()
 
 
-
 fun List<UserEntity>.fromListUsersToStrings(): List<String> {
     val listString = mutableListOf<String>()
     for (user in this) {
@@ -78,4 +93,39 @@ fun List<UserEntity>.fromListUsersToStrings(): List<String> {
     return listString
 }
 
+fun List<ProjectEntity>.toListProjectIds(): MutableList<Int> {
+    val listString = mutableListOf<Int>()
+    for (project in this) {
+        listString.add(project.id)
+    }
+    return listString
+}
 
+fun List<TaskDto>.toListTaskIds(): MutableList<Int> {
+    val listString = mutableListOf<Int>()
+    for (task in this) {
+        listString.add(task.id)
+    }
+    return listString
+}
+
+
+fun Date.dateToString(): String {
+    return SimpleDateFormat(FORMAT_API_DATE).format(this)
+}
+
+fun List<UserEntity>.toStringIds(): String {
+    var string = ""
+    this.map {
+        string += it.id + ","
+    }
+    return string.dropLast(1)
+}
+
+fun List<CommentDto>.toListCommentIds(): MutableList<String> {
+    val listString = mutableListOf<String>()
+    for (comment in this) {
+        listString.add(comment.id)
+    }
+    return listString
+}

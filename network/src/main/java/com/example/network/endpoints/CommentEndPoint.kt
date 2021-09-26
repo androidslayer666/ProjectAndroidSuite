@@ -23,6 +23,6 @@ interface CommentEndPoint {
     suspend fun updateComment(@Path("commentId")commentId: Int, @Body comment: CommentPost): CommentDto
 
     @DELETE("api/2.0/project/comment/{commentId}")
-    suspend fun deleteComment(@Path("commentId")commentId: Int, @Body comment: CommentPost): CommentDto
+    suspend fun deleteComment(@Path("commentId")commentId: String): CommentDto
 
 }

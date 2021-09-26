@@ -1,24 +1,20 @@
 package com.example.domain.mappers
 
-import android.util.Log
 import com.example.database.entities.FileEntity
-import com.example.database.entities.MilestoneEntity
 import com.example.network.dto.FileDto
-import com.example.network.dto.MilestoneDto
 
-fun List<FileDto>.toListEntities(taskId: Int): List<FileEntity> {
+fun List<FileDto>.toListEntities(taskId: Int? = null, projectId: Int? = null): List<FileEntity> {
 
     val listFileEntity = mutableListOf<FileEntity>()
     for (fileDto in this) {
         listFileEntity.add(
-            fileDto.toEntity(taskId)
+            fileDto.toEntity(taskId, projectId)
         )
     }
-    Log.d("TaskDto", listFileEntity.toString())
     return listFileEntity
 }
 
-fun FileDto.toEntity(taskId: Int) : FileEntity{
+fun FileDto.toEntity(taskId: Int?, projectId: Int?) : FileEntity{
     return FileEntity(
         id = this.id,
         title = this.title,
@@ -27,6 +23,7 @@ fun FileDto.toEntity(taskId: Int) : FileEntity{
         createdBy = this.createdBy?.toUserEntity(),
         updated = this.updated?.stringToDate(),
         fileExst = this.fileExst,
-        taskId = taskId
+        taskId = taskId,
+        projectId = projectId
     )
 }

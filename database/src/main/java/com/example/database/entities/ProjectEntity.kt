@@ -13,8 +13,8 @@ data class ProjectEntity(
     val projectFolder: Int? = null,
     @PrimaryKey
     var id: Int,
-    var title: String? = null,
-    var description: String? = null,
+    var title: String = "",
+    var description: String = "",
     val status: Int? = null,
     @Embedded(prefix = "userResponsible")
     var responsible: UserEntity? = null,
@@ -28,10 +28,10 @@ data class ProjectEntity(
     val isFollow: Boolean? = null,
     @Embedded(prefix = "userUpdatedBy")
     val updatedBy: UserEntity? = null,
-    val created: Date? = null,
+    val created: Date = Date(),
     @Embedded(prefix = "userCratedBy")
     val createdBy: UserEntity? = null,
-    val updated: Date? = null,
+    val updated: Date = Date(),
     var chosen: Boolean? = null,
     var team: MutableList<UserEntity>? = null
 )

@@ -10,8 +10,14 @@ import retrofit2.http.POST
 
 interface Auth {
 
+        //todo make one request
+
         @POST(LOGIN_URL)
         @Headers("Accept: application/json")
-        fun login(@Body request: LoginRequest): Call<LoginResponse>
+        fun tryLogin(@Body request: LoginRequest): Call<LoginResponse>
+
+        @POST(LOGIN_URL)
+        @Headers("Accept: application/json")
+        suspend fun login(@Body request: LoginRequest): LoginResponse
 
 }

@@ -2,6 +2,8 @@ package com.example.domain.mappers
 
 import com.example.database.entities.CommentEntity
 import com.example.network.dto.CommentDto
+import com.example.network.dto.CommentPost
+import java.util.*
 
 fun List<CommentDto>.toListEntities(
     taskId: Int? = null,
@@ -23,14 +25,21 @@ fun CommentDto.toEntity(
     return CommentEntity(
         id = this.id,
         canEdit = this.canEdit,
-        created = this.created?.stringToDate(),
+        created = this.created?.stringToDate() ?: Date(),
         createdBy = this.createdBy?.toUserEntity(),
         inactive = this.inactive,
         parentId = this.parentId,
-        text = this.text,
-        updated = this.updated?.stringToDate(),
+        text = this.text ?: "",
+        updated = this.updated?.stringToDate() ?: Date(),
         taskId = taskId,
         messageId = messageId
 
     )
+}
+
+fun CommentEntity.toCommentPost(): CommentPost {
+return CommentPost(
+    content = this.text,
+    parentId = this.parentId
+)
 }

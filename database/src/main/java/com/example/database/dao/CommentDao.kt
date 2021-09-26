@@ -14,13 +14,19 @@ interface CommentDao {
     fun getAllComments(): Flow<List<CommentEntity>>
 
     @Query("SELECT * FROM comments WHERE taskId = :taskId")
-    fun getCommentsByTaskId(taskId: Int): Flow<List<CommentEntity>>
+    suspend fun getCommentsByTaskId(taskId: Int): List<CommentEntity>
+
+    @Query("SELECT * FROM comments WHERE taskId = :taskId")
+    fun getCommentsByTaskIdFlow(taskId: Int): Flow<List<CommentEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertComments(commentList: List<CommentEntity>)
 
-
     @Query("SELECT * FROM comments WHERE messageId = :messageId")
     suspend fun getCommentsByMessageId(messageId: Int): List<CommentEntity>
+
+    @Query("DELETE FROM comments WHERE id = :commentId")
+    suspend fun deleteComment(commentId: String)
+
 
 }

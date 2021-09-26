@@ -17,57 +17,50 @@ class NetworkApiProvider {
 
     @Provides
     @Singleton
-    fun projectEndPointProvider(token: String): ProjectEndPoint {
-        return buildEndPoint(ProjectEndPoint::class.java, token)
+    fun projectEndPointProvider(manager: SessionManager): ProjectEndPoint {
+        return buildEndPoint(ProjectEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
     }
 
     @Provides
     @Singleton
-    fun taskEndPointProvider(token: String): TaskEndPoint {
-        return buildEndPoint(TaskEndPoint::class.java, token)
+    fun taskEndPointProvider(manager: SessionManager): TaskEndPoint {
+        return buildEndPoint(TaskEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
     }
 
     @Provides
     @Singleton
-    fun milestoneEndPointProvider(token: String): MilestoneEndPoint {
-        return buildEndPoint(MilestoneEndPoint::class.java, token)
+    fun milestoneEndPointProvider(manager: SessionManager): MilestoneEndPoint {
+        return buildEndPoint(MilestoneEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
     }
 
     @Provides
     @Singleton
-    fun fileEndPointProvider(token: String): FileEndPoint {
-        return buildEndPoint(FileEndPoint::class.java, token)
+    fun fileEndPointProvider(manager: SessionManager): FileEndPoint {
+        return buildEndPoint(FileEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
     }
 
     @Provides
     @Singleton
-    fun messageEndPointProvider(token: String): MessageEndPoint {
-        return buildEndPoint(MessageEndPoint::class.java, token)
+    fun messageEndPointProvider(manager: SessionManager): MessageEndPoint {
+        return buildEndPoint(MessageEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
     }
 
     @Provides
     @Singleton
-    fun subtaskEndPointProvider(token: String): SubtaskEndPoint {
-        return buildEndPoint(SubtaskEndPoint::class.java, token)
+    fun subtaskEndPointProvider(manager: SessionManager): SubtaskEndPoint {
+        return buildEndPoint(SubtaskEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
     }
 
     @Provides
     @Singleton
-    fun teamEndPointProvider(token: String): TeamEndPoint {
-        return buildEndPoint(TeamEndPoint::class.java, token)
+    fun teamEndPointProvider(manager: SessionManager): TeamEndPoint {
+        return buildEndPoint(TeamEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
     }
 
     @Provides
     @Singleton
-    fun commentEndPointProvider(token: String): CommentEndPoint {
-        return buildEndPoint(CommentEndPoint::class.java, token)
-    }
-
-
-    @Provides
-    @Singleton
-    fun provideToken(@ApplicationContext context: Context): String {
-        return SessionManager(context).fetchAuthToken()?: "No token yet"
+    fun commentEndPointProvider(manager: SessionManager): CommentEndPoint {
+        return buildEndPoint(CommentEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
     }
 
     @Provides

@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.network.endpoints.*
 import com.example.database.dao.*
 import com.example.database.db.ProjectDatabase
-import com.example.domain.TestRepository
+
 
 import dagger.Module
 import dagger.Provides
@@ -16,42 +16,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 class DatabaseProvider {
-
-    @Provides
-    @Singleton
-    fun provideProjectRepository(
-        projectDao: ProjectDao,
-        fileDao: FileDao,
-        messageDao: MessageDao,
-        milestoneDao: MilestoneDao,
-        subtaskDao: SubtaskDao,
-        taskDao: TaskDao,
-        userDao: UserDao,
-        projectEndPoint: ProjectEndPoint,
-        taskEndPoint: TaskEndPoint,
-        milestoneEndPoint: MilestoneEndPoint,
-        userEndPoint: TeamEndPoint,
-        commentEndPoint: CommentEndPoint,
-        messageEndPoint: MessageEndPoint,
-        fileEndPoint: FileEndPoint,
-        ) : TestRepository {
-        return TestRepository(
-            projectDao,
-            fileDao,
-            messageDao,
-            milestoneDao,
-            subtaskDao,
-            taskDao,
-            userDao,
-            projectEndPoint,
-            taskEndPoint,
-            milestoneEndPoint,
-            userEndPoint,
-            commentEndPoint,
-            messageEndPoint,
-            fileEndPoint
-        )
-    }
 
     @Provides
     @Singleton

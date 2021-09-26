@@ -35,7 +35,6 @@ abstract class ProjectDatabase() : RoomDatabase() {
     abstract fun commentDao(): CommentDao
     abstract fun teamDao(): TeamDao
 
-
     companion object {
         @Volatile
         private var instance: ProjectDatabase? = null

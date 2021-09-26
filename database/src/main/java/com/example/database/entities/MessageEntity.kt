@@ -11,19 +11,19 @@ data class MessageEntity(
     val canEdit: Boolean? = null,
     @PrimaryKey
     val id: Int,
-    val title: String? = null,
+    val title: String ="",
     val description: String? = null,
     @Embedded(prefix = "projectOwner")
     val projectOwner: UserEntity? = null,
     val commentsCount: Int? = null,
-    val text: String? = null,
+    val text: String = "",
     val status: Int? = null,
     @Embedded(prefix = "updatedBy")
     val updatedBy: UserEntity? = null,
-    val created: Date? = null,
+    val created: Date = Date(),
     @Embedded(prefix = "createdBy")
     val createdBy: UserEntity? = null,
-    val updated: Date? = null,
+    val updated: Date = Date(),
     val projectId: Int? = null,
     var listMessages: List<CommentEntity>? = null
 )
