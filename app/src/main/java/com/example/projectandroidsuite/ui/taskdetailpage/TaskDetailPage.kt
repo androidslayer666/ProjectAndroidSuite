@@ -107,7 +107,9 @@ fun TaskDetailPage(
                     expandButtons,
                     { expandButtons = !expandButtons },
                     { showUpdateTaskDialog = true },
-                    { viewModel.deleteTask() }
+                    { showDeleteDialog = true },
+                    viewModel.currentTask.value?.canEdit,
+                    viewModel.currentTask.value?.canDelete
                 )
             }
         }
@@ -116,7 +118,7 @@ fun TaskDetailPage(
                 hiltViewModel(),
                 { showUpdateTaskDialog = false },
                 viewModel.currentTask.value,
-                { string -> onTaskDeletedOrEdited(string) }
+                { string -> makeToast(string, context) }
             )
         }
         if (taskDeletionStatus != null) {
@@ -125,7 +127,9 @@ fun TaskDetailPage(
                     Log.d("delete task", taskDeletionStatus.toString())
                     onTaskDeletedOrEdited((taskDeletionStatus as Success<String>).value)
                     viewModel.resetState()
-                    navController.navigate("Projects")
+                    navController.popBackStack()
+
+                    //navigate("Projects")
                 }
                 is Failure -> {
                     Log.d("delete task", taskDeletionStatus.toString())

@@ -12,9 +12,18 @@ import kotlinx.coroutines.flow.Flow
 interface MessageDao {
 
     @Query("SELECT * FROM message WHERE projectId = :projectId")
-    fun getMessageByProjectId(projectId: Int): Flow<List<MessageEntity>>
+    suspend fun getMessageByProjectId(projectId: Int): List<MessageEntity>
+
+    @Query("SELECT * FROM message WHERE projectId = :projectId")
+    fun getMessageByProjectIdFlow(projectId: Int): Flow<List<MessageEntity>>
+
+    @Query("SELECT * FROM message WHERE id = :messageId")
+    suspend fun getMessageByMessageId(messageId: Int): MessageEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessages(messageList: List<MessageEntity>)
+
+    @Query("DELETE FROM message WHERE id = :messageId")
+    suspend fun deleteMessage(messageId: Int)
 
 }

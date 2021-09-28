@@ -39,7 +39,7 @@ fun DetailHeaderWrapper(
             }
         Row {
             Text(text = "Team", Modifier.padding(end = 12.dp, top = 12.dp, start = 6.dp))
-            team?.let { TeamMemberRow(it) }
+            team?.let { TeamMemberRow(it, Modifier.padding(bottom = 12.dp, top = 12.dp))}
         }
     }
 }

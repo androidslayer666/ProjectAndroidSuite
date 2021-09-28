@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.projectpage
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.UserEntity
 import com.example.domain.repository.Failure

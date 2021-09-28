@@ -1,26 +1,23 @@
 package com.example.projectandroidsuite.ui.parts
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NavHostController
 import com.example.database.entities.ProjectEntity
 import com.example.database.entities.UserEntity
-import com.example.domain.repository.Failure
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
-import com.example.projectandroidsuite.logic.addOrRemoveIfExisted
+import com.example.projectandroidsuite.logic.ProjectStatus
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.projectdetailpage.ProjectCreateEditViewModel
 
@@ -37,6 +34,7 @@ fun CreateProjectDialog(
     var responsibleIsNotChosen by remember { mutableStateOf(false) }
     val projectUpdatingStatus by viewModel.projectUpdatingStatus.observeAsState()
     val projectCreationStatus by viewModel.projectCreationStatus.observeAsState()
+
 
     if (projectCreationStatus is Success<String>) {
         onSuccessProjectCreation((projectCreationStatus as Success<String>).value)
@@ -106,10 +104,11 @@ fun CreateProjectDialogInput(
     val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf<UserEntity>())
     val responsible by viewModel.responsible.observeAsState()
     val userSearch by viewModel.userSearchQuery.observeAsState("")
+    val projectStatus by viewModel.projectStatus.observeAsState()
 
 
 
-    Column(Modifier.defaultMinSize(minHeight = 200.dp)) {
+    Column(Modifier.defaultMinSize(minHeight = 300.dp)) {
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(text = "Title", modifier = Modifier.weight(2F))
             CustomTextField(modifier = Modifier
@@ -130,9 +129,36 @@ fun CreateProjectDialogInput(
                 }
             })
         }
+        Row(Modifier.padding(vertical = 12.dp)) {
+            Text(text = "Status", modifier = Modifier.weight(2F))
+            Column(Modifier.selectableGroup().weight(4F)) {
+                Row() {
+                    RadioButton(
+                        (projectStatus == ProjectStatus.ACTIVE),
+                        { viewModel.setProjectStatus(ProjectStatus.ACTIVE)}
+                    )
+                    Text(text = "Active")
+                }
+                Row() {
+                    RadioButton(
+                        (projectStatus == ProjectStatus.PAUSED),
+                        { viewModel.setProjectStatus(ProjectStatus.PAUSED)}
+                    )
+                    Text(text = "Paused")
+                }
+                Row() {
+                    RadioButton(
+                        (projectStatus == ProjectStatus.STOPPED),
+                        { viewModel.setProjectStatus(ProjectStatus.STOPPED)}
+                    )
+                    Text(text = "Stopped")
+                }
+
+            }
+        }
+
+
         Row (Modifier.padding(vertical = 12.dp)){
-
-
             Text(
                 text = "Team",
                 Modifier
@@ -152,12 +178,12 @@ fun CreateProjectDialogInput(
                         onSubmitList = { },
                         onClick = { user ->
                             run {
-                                listChosenUsers.addOrRemoveIfExisted(user)
+                                //listChosenUsers.addOrRemoveIfExisted(user)
                                 viewModel.addOrRemoveUser(user)
                             }
                         },
                         closeDialog = { showTeamPicker = false },
-                        ifChooseResponsibleOrTeam = PickerType.MULTIPLE,
+                        pickerType = PickerType.MULTIPLE,
                         userSearch,
                         { query -> viewModel.setUserSearch(query) }
                     )
@@ -187,7 +213,7 @@ fun CreateProjectDialogInput(
                         }
                     },
                     closeDialog = { showResponsiblePicker = false },
-                    ifChooseResponsibleOrTeam = PickerType.SINGLE,
+                    pickerType = PickerType.SINGLE,
                     userSearch,
                     { query -> viewModel.setUserSearch(query) }
                 )

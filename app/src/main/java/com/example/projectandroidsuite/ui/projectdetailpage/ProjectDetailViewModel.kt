@@ -87,7 +87,32 @@ class ProjectDetailViewModel @Inject constructor(
         }
     }
 
+    fun deleteMilestone(milestoneEntity: MilestoneEntity?) {
+        CoroutineScope(IO).launch {
+            if(milestoneEntity != null)
+            milestoneRepository.deleteMilestone(milestoneEntity.id, projectId.value)
+        }
+    }
+
     fun resetState(){
         _projectDeletionStatus.value = null
+    }
+
+    fun deleteComment(commentEntity: CommentEntity){
+        CoroutineScope(IO).launch {
+            commentRepository.deleteComment(commentEntity.id)
+            if(projectId.value != null) {
+                messageRepository.populateMessageWithProjectId(projectId.value!!)
+            }
+        }
+    }
+
+    fun deleteMessage(message: MessageEntity) {
+        CoroutineScope(IO).launch {
+            messageRepository.deleteMessage(message.id)
+            if(projectId.value != null) {
+                messageRepository.populateMessageWithProjectId(projectId.value!!)
+            }
+        }
     }
 }

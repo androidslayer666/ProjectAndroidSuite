@@ -21,10 +21,10 @@ fun ProjectTheme(
 
 private val LightColors = lightColors(
     primary = Color(0xFF435F7D),
-    secondary = Color(0xFFA43F6C),
-    primaryVariant = Color(0xFF55789E),
+    secondary = Color(0xFFD54127),
+    primaryVariant = Color(0xFFABCDFF),
     error = Color(0xFFA43F6C),
-    background = Color(0xFFEDECEB)
+    background = Color(0xFFFFFCF9)
 )
 
 private val DarkColors = darkColors(

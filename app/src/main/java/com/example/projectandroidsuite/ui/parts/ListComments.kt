@@ -2,19 +2,15 @@ package com.example.projectandroidsuite.ui.parts
 
 import android.os.Build
 import android.text.Html
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -26,15 +22,26 @@ import com.example.projectandroidsuite.R
 fun ListComments(
     listComments: List<CommentEntity>? = listOf(),
     onReplyClick: (CommentEntity) -> Unit,
+    messageId: Int? = null,
     onDeleteClick: (CommentEntity) -> Unit
 ) {
+    var activeComment by remember { mutableStateOf("")}
+
+
     if (listComments != null) {
-        LazyColumn {
-            items(listComments) { comment ->
-                CommentItem(comment, onReplyClick, null, onDeleteClick)
+        Column() {
+            listComments.forEach { comment ->
+                CommentItem(
+                    comment = comment,
+                    onReplyClick = onReplyClick,
+                    messageId = messageId,
+                    onDeleteClick = onDeleteClick,
+                    isFocused = activeComment == comment.id,
+                    setActive = { comment -> activeComment = comment })
             }
         }
     }
+
 }
 
 @Composable
@@ -43,73 +50,108 @@ fun CommentItem(
     onReplyClick: (CommentEntity) -> Unit,
     messageId: Int? = null,
     onDeleteClick: (CommentEntity) -> Unit,
+    isFocused: Boolean,
+    setActive: (String) -> Unit
 ) {
     val padding = (12 * comment.commentLevel).dp
     var replyText by remember { mutableStateOf("") }
     var showReply by remember { mutableStateOf(false) }
-    var showReplyButton by remember { mutableStateOf(false) }
-    var showDeleteButton by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
-    Row {
-
-
-        Column(
-            modifier = Modifier
-                .padding(start = padding)
-                .clickable {
-                    showReplyButton = !showReplyButton
-                    showDeleteButton = !showDeleteButton
-                }
+    Row(
+        Modifier
+            .padding(start = padding, top = 6.dp)
+    ) {
+        Card(
+            border = BorderStroke(1.dp, MaterialTheme.colors.primaryVariant),
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.padding(4.dp),
+            backgroundColor = MaterialTheme.colors.background
         ) {
-            comment.createdBy?.let { TeamMemberCard(user = it) }
-            Row() {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Text(text = Html.fromHtml(comment.text, Html.FROM_HTML_MODE_COMPACT).toString())
-                } else {
-                    Text(text = Html.fromHtml(comment.text).toString())
-                }
-            }
-
-
-            if (showReply) {
-                Row {
-                    TextField(value = replyText, onValueChange = { text -> replyText = text })
-                    Image(
-                        painterResource(R.drawable.ic_baseline_send_24),
-                        "",
+            Column() {
+                Row(modifier = Modifier.padding(4.dp)) {
+                    Column(
                         modifier = Modifier
+                            .padding(start = padding)
                             .clickable {
-                                onReplyClick(
-                                    CommentEntity(
-                                        id = "",
-                                        text = replyText,
-                                        createdBy = comment.createdBy,
-                                        parentId = comment.id,
-                                        messageId = messageId
-                                    )
-                                )
+                                setActive(comment.id)
                                 showReply = false
                             }
-                    )
+                            .weight(5F)
+                    ) {
+                        if (comment.inactive != true) {
+                            comment.createdBy?.let { TeamMemberCard(user = it) }
+
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                Text(
+                                    text = Html.fromHtml(comment.text, Html.FROM_HTML_MODE_COMPACT)
+                                        .toString()
+                                )
+                            } else {
+                                Text(text = Html.fromHtml(comment.text).toString())
+                            }
+
+                        } else {
+                            Text(text = "Comment has been deleted")
+                        }
+                    }
+
+                    if (isFocused && comment.inactive != true) {
+                        Image(
+                            painterResource(R.drawable.ic_baseline_comment_24),
+                            "",
+                            modifier = Modifier
+                                .clickable {
+                                    showReply = true
+                                }
+                                .weight(1F)
+                        )
+                    }
+                    if (isFocused && comment.inactive != true) {
+                        Image(
+                            painterResource(R.drawable.ic_baseline_delete_24),
+                            "",
+                            modifier = Modifier
+                                .clickable { showDeleteDialog = true }
+                                .weight(1F),
+
+                            )
+                    }
+
+                }
+                if (showReply && isFocused && comment.inactive != true) {
+                    Row {
+                        TextField(
+                            value = replyText,
+                            onValueChange = { text -> replyText = text },
+                        modifier = Modifier.weight(5F))
+                        Image(
+                            painterResource(R.drawable.ic_baseline_send_24),
+                            "",
+                            modifier = Modifier
+                                .clickable {
+                                    onReplyClick(
+                                        CommentEntity(
+                                            id = "",
+                                            text = replyText,
+                                            parentId = comment.id,
+                                            messageId = messageId
+                                        )
+                                    )
+                                    showReply = false
+                                }
+                                .weight(1F)
+                        )
+                    }
+                }
+                if (showDeleteDialog) {
+                    ConfirmationDialog(
+                        text = "Do you want to delete the comment?",
+                        onSubmit = { onDeleteClick(comment) },
+                        { showDeleteDialog = false })
                 }
             }
-        }
-        if (showReplyButton) {
-            Image(
-                painterResource(R.drawable.ic_baseline_comment_24),
-                "",
-                modifier = Modifier
-                    .clickable { showReply = true
-                        showReplyButton = false
-                        showDeleteButton = false
-                    })
-        }
-        if (showDeleteButton) {
-            Image(
-                Icons.Default.Delete,
-                "",
-                modifier = Modifier
-                    .clickable { onDeleteClick(comment) })
         }
     }
 }

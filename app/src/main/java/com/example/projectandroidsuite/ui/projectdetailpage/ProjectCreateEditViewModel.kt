@@ -43,6 +43,9 @@ class ProjectCreateEditViewModel @Inject constructor(
     private var _userSearchQuery = MutableLiveData<String>()
     val userSearchQuery: LiveData<String> = _userSearchQuery
 
+    private var _projectStatus = MutableLiveData<ProjectStatus>()
+    val projectStatus: LiveData<ProjectStatus> = _projectStatus
+
     private var _projectCreationStatus = MutableLiveData<Result<String, String>?>()
     val projectCreationStatus: LiveData<Result<String, String>?> = _projectCreationStatus
 
@@ -50,6 +53,14 @@ class ProjectCreateEditViewModel @Inject constructor(
     val projectUpdatingStatus: LiveData<Result<String, String>?> = _projectUpdatingStatus
 
     val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
+        .combineWith(chosenUserList) { users, chosenUsers ->
+            users?.forEach { user ->
+                if (chosenUsers?.getListIds()?.contains(user.id) == true) {
+                    user.chosen = true
+                }
+            }
+            return@combineWith users
+        }
         .combineWith(userSearch) { listProject, filter ->
             if (filter != null) listProject?.filterUsersByFilter(filter)
             else listProject
@@ -68,6 +79,13 @@ class ProjectCreateEditViewModel @Inject constructor(
         _description.value = project.description
         project.team?.let { _chosenUserList.value = project.team!! }
         project.responsible?.let { _responsible.value = project.responsible!! }
+        project.status?.let {
+            when (project.status) {
+                0 -> _projectStatus.value = ProjectStatus.ACTIVE
+                1 -> _projectStatus.value = ProjectStatus.STOPPED
+                2 -> _projectStatus.value = ProjectStatus.PAUSED
+            }
+        }
     }
 
     fun setTitle(string: String) {
@@ -83,7 +101,11 @@ class ProjectCreateEditViewModel @Inject constructor(
         _responsible.value = user
     }
 
-    fun clearInput(){
+    fun setProjectStatus(status: ProjectStatus) {
+        _projectStatus.value = status
+    }
+
+    fun clearInput() {
         projectId = null
         _title.value = null
         _description.value = null
@@ -146,8 +168,16 @@ class ProjectCreateEditViewModel @Inject constructor(
                     description = description.value,
                     participants = chosenUserList.value?.fromListUsersToStrings(),
                     responsibleId = responsible.value?.id
-                )
+                ),
+                when (projectStatus.value) {
+                    ProjectStatus.ACTIVE -> "open"
+                    ProjectStatus.PAUSED -> "Paused"
+                    ProjectStatus.ACTIVE -> "Closed"
+                    else -> "open"
+                }
             )
+
+
             Log.d("updateProject", response.toString())
             withContext(Main) {
                 _projectUpdatingStatus.value = response

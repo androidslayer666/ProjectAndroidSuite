@@ -35,6 +35,9 @@ interface ProjectEndPoint {
     @PUT("api/2.0/project/{projectId}")
     suspend fun updateProject(@Path("projectId")projectId: Int,@Body projectPost: ProjectPost): ProjectTransporter
 
+    @PUT("api/2.0/project/{id}/status")
+    suspend fun updateProjectStatus(@Path("id")projectId: Int,@Body projectStatus: ProjectStatusPost): ProjectDto
+
     @DELETE("api/2.0/project/{projectId}")
     suspend fun deleteProject(@Path("projectId")projectId: Int): ProjectTransporter
 

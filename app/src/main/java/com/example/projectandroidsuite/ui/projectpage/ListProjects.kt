@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,14 +33,14 @@ fun ProjectList(
     val list by viewModel.projects.observeAsState(listOf())
     val problemWithFetchingProjects by viewModel.problemWithFetchingProjects.observeAsState()
 
-    if(problemWithFetchingProjects != null){
+    if (problemWithFetchingProjects != null) {
         Text(text = problemWithFetchingProjects!!)
     }
-    
-    LazyColumn(Modifier.background(MaterialTheme.colors.background)){
+
+    LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
         list?.let {
             items(list!!) { project ->
-                ProjectItem(project) { id -> navController.navigate("projects/$id") }
+                ProjectItem(project) { id -> navController.navigate("project/$id") }
                 CustomDivider()
             }
         }
@@ -55,27 +56,44 @@ fun ProjectItem(project: ProjectEntity, onClick: (projectId: Int) -> Unit) {
         if (participantsNumber > 1) responsibleString += "+ ${(participantsNumber - 1)}"
     }
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(12.dp)
-        .background(MaterialTheme.colors.background))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp)
+            .background(MaterialTheme.colors.background),
+        verticalAlignment = Alignment.CenterVertically
+    )
     {
         Image(
-            painterResource(R.drawable.ic_project_status_active),
+            painterResource(
+                when (project.status) {
+                    0 -> R.drawable.ic_project_status_active
+                    1 -> R.drawable.ic_project_status_done
+                    2 -> R.drawable.ic_project_status_paused
+                    else -> R.drawable.ic_project_status_active
+                }
+            ),
             contentDescription = "Status",
-            modifier = Modifier.weight(0.3f)
+            modifier = Modifier.weight(0.5f).padding(end = 12.dp)
         )
 
-        Column(Modifier.weight(3f).clickable { onClick(project.id) }) {
+        Column(
+            Modifier
+                .weight(3f)
+                .clickable { onClick(project.id) }) {
             project.title.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.body1, maxLines = 1, overflow = TextOverflow.Clip,
+                    style = MaterialTheme.typography.body1,
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip,
                 )
             }
             if (responsibleString != null) {
-                Text(text = responsibleString,
-                    style = MaterialTheme.typography.overline)
+                Text(
+                    text = responsibleString,
+                    style = MaterialTheme.typography.overline
+                )
             }
         }
         Column(Modifier.weight(0.5f)) {

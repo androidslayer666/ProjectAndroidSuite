@@ -7,6 +7,7 @@ import com.example.domain.mappers.toListEntities
 import com.example.domain.mappers.toListUserEntity
 import com.example.domain.mappers.toProjectEntity
 import com.example.network.dto.ProjectPost
+import com.example.network.dto.ProjectStatusPost
 import com.example.network.endpoints.ProjectEndPoint
 import com.example.network.endpoints.TeamEndPoint
 import kotlinx.coroutines.CoroutineScope
@@ -51,8 +52,8 @@ class ProjectRepository @Inject constructor(
             //Log.d("ProjectRepository", "Projects are populated")
             projectDao.getAll().forEach { project ->
                 if (!projectsFromNetwork.toListProjectIds().contains(project.id))
-                    //Log.d("ProjectRepository", project.title)
-                projectDao.deleteProject(project.id)
+                //Log.d("ProjectRepository", project.title)
+                    projectDao.deleteProject(project.id)
             }
             return Success("Projects are populated")
         } catch (e: Exception) {
@@ -71,18 +72,24 @@ class ProjectRepository @Inject constructor(
 
     val projectsFromDb = projectDao.getAllFlow()
 
-    suspend fun updateProject(projectId: Int, project: ProjectPost): Result<String, String> {
+    suspend fun updateProject(
+        projectId: Int,
+        project: ProjectPost,
+        projectStatus: String
+    ): Result<String, String> {
         try {
-            Log.d("ProjectRepository", "updating project" + project.toString())
+            //Log.d("ProjectRepository", "updating project" + project.toString())
             val response = projectEndPoint.updateProject(projectId, project)
-            Log.d("ProjectRepository", "got a response when updating" + project.toString())
+
+            updateProjectStatus(projectId , projectStatus)
+            //Log.d("ProjectRepository", "got a response when updating" + project.toString())
             if (response.projectDto != null) {
                 //todo update in dao
                 val renewedProject =
                     projectEndPoint.getProjectById(projectId).projectDto?.toProjectEntity()
                 val team = teamEndPoint.getProjectTeam(projectId)
                 renewedProject?.team = team.ids?.toListUserEntity()
-                Log.d("ProjectRepository", "updating project from db" + renewedProject.toString())
+                //Log.d("ProjectRepository", "updating project from db" + renewedProject.toString())
                 if (renewedProject != null)
                     projectDao.updateProject(renewedProject)
 
@@ -142,4 +149,33 @@ class ProjectRepository @Inject constructor(
             return Failure("Project was not deleted, please check network or ask the developer to fix this")
         }
     }
+
+    suspend fun updateProjectStatus(projectId: Int, projectStatus: String): Result<String, String> {
+        try {
+            Log.d("ProjectRepository", "updating project" + projectId.toString())
+            val response =
+                projectEndPoint.updateProjectStatus(projectId, ProjectStatusPost(projectStatus))
+            Log.d("ProjectRepository", "got a response when updating" + projectStatus)
+            if (response != null) {
+                val renewedProject =
+                    projectEndPoint.getProjectById(projectId).projectDto?.toProjectEntity()
+                val team = teamEndPoint.getProjectTeam(projectId)
+                renewedProject?.team = team.ids?.toListUserEntity()
+                Log.d("ProjectRepository", "updating project from db" + renewedProject.toString())
+                if (renewedProject != null)
+                    projectDao.insertProject(renewedProject)
+
+                return Success("Project successfully updated")
+            } else {
+                return Failure("Error during updating the project")
+            }
+        } catch (e: IOException) {
+            Log.d(
+                "ProjectRepository",
+                "tried to create a project but caught an exception: ${e.message}"
+            )
+            return Failure("Error during updating the project")
+        }
+    }
+
 }

@@ -100,12 +100,15 @@ fun ProjectDetailPage(
                     }
                 }
                 when (state) {
-                    0 -> ListTasksMilestones(listTasksAndMilestones, navController)
-                    1 -> ListMessages(listMessages) { comment ->
-                        viewModel.addCommentToMessage(
-                            comment
-                        )
-                    }
+                    0 -> ListTasksMilestones(
+                        listTasksAndMilestones,
+                        navController,
+                        { milestone -> viewModel.deleteMilestone(milestone) })
+                    1 -> ListMessages(
+                        listMessages,
+                        { comment -> viewModel.addCommentToMessage(comment) },
+                        { message -> viewModel.deleteMessage(message) },
+                        { comment -> viewModel.deleteComment(comment) })
                     2 -> ListFiles(listFiles = listFiles)
                 }
             }
@@ -115,10 +118,13 @@ fun ProjectDetailPage(
             }
             Column(Modifier.weight(1F)) {
                 ExpandableButtons(
-                    expandButtons,
-                    { expandButtons = !expandButtons },
-                    { showUpdateProjectDialog = true },
-                    { showDeleteDialog = true })
+                    expandButtons = expandButtons,
+                    expandOrHide = { expandButtons = !expandButtons },
+                    onEditClick = { showUpdateProjectDialog = true },
+                    onDeleteClick = { showDeleteDialog = true },
+                    canEdit = viewModel.currentProject.value?.canEdit,
+                    canDelete = viewModel.currentProject.value?.canDelete
+                )
             }
         }
         if (showUpdateProjectDialog) {

@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.parts
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,7 @@ fun TeamPickerDialog(
     onSubmitList: () -> Unit,
     onClick: (user: UserEntity) -> Unit,
     closeDialog: () -> Unit,
-    ifChooseResponsibleOrTeam: PickerType,
+    pickerType: PickerType,
     searchString: String,
     onSearchChanged: (String) -> Unit
 ) {
@@ -37,7 +36,7 @@ fun TeamPickerDialog(
             closeDialog()
         },
         title = {
-            when (ifChooseResponsibleOrTeam) {
+            when (pickerType) {
                 PickerType.SINGLE -> Text(text = "Choose responsible")
                 PickerType.MULTIPLE -> Text(text = "Choose team")
             }
@@ -45,7 +44,7 @@ fun TeamPickerDialog(
         },
         text = {
             TeamPickerBody(
-                list = list, { user -> onClick(user) }, ifChooseResponsibleOrTeam,
+                list = list, { user -> onClick(user) }, pickerType,
                 searchString, onSearchChanged, closeDialog
             )
         },
@@ -75,7 +74,7 @@ fun TeamPickerDialog(
 fun TeamPickerBody(
     list: List<UserEntity>,
     onClick: (name: UserEntity) -> Unit,
-    ifChooseResponsibleOrTeam: PickerType,
+    pickerType: PickerType,
     searchString: String,
     onSearchChanged: (String) -> Unit,
     closeDialog: () -> Unit
@@ -84,24 +83,24 @@ fun TeamPickerBody(
     Column {
         TextField(value = searchString, onValueChange = onSearchChanged)
         LazyColumn {
-            items(list) { name ->
-                var chosen by remember { mutableStateOf(false) }
+            items(list) { user ->
+                var chosen by remember { mutableStateOf(user.chosen == true) }
                 Row(Modifier.padding(12.dp)) {
-                    when (ifChooseResponsibleOrTeam) {
+                    when (pickerType) {
                         PickerType.SINGLE -> {
                         }
                         PickerType.MULTIPLE -> if (chosen) {
                             Image(imageVector = Icons.Default.Star, contentDescription = "star")
                         }
                     }
-                    Text(text = name.displayName, Modifier.clickable {
-                        when (ifChooseResponsibleOrTeam) {
+                    Text(text = user.displayName, Modifier.clickable {
+                        when (pickerType) {
                             PickerType.SINGLE -> {
-                                onClick(name)
+                                onClick(user)
                                 closeDialog()
                             }
                             PickerType.MULTIPLE -> {
-                                onClick(name)
+                                onClick(user)
                                 chosen = !chosen
                             }
                         }

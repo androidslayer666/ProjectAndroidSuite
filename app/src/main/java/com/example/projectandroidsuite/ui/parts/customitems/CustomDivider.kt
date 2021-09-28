@@ -8,6 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CustomDivider(){
-    Divider(color = MaterialTheme.colors.primary, thickness = 2.dp, startIndent = 40.dp, modifier = Modifier.width(200.dp))
+fun CustomDivider(start: Int = 55) {
+    Divider(
+        color = MaterialTheme.colors.primary,
+        thickness = 2.dp,
+        startIndent = start.dp,
+        modifier = Modifier.width(200.dp)
+    )
 }

@@ -72,24 +72,26 @@ fun <T, K, R> LiveData<T>.combineWith(
 }
 
 
-fun MutableList<UserEntity>.addOrRemoveIfExisted(user: UserEntity) {
-    Log.d("addOrRemoveIfExisted", "initial list  $this")
-
-    var removed = false
-    for (userInList in this) {
-        if (userInList.id == user.id) {
-            Log.d("addOrRemoveIfExisted", "removing")
-            this.remove(user)
-            removed = true
-        }
-    }
-    if (!removed) {
-        Log.d("addOrRemoveIfExisted", "adding")
-        this.add(user)
-    }
-
-    Log.d("addOrRemoveIfExisted", "final list  $this")
-}
+//fun MutableList<UserEntity>.addOrRemoveIfExisted(user: UserEntity) {
+//    Log.d("addOrRemoveIfExisted", "initial list  $this")
+//    var newList = mutableListOf<UserEntity>()
+//    newList.addAll(this)
+//    var removed = false
+//    this.forEach{userInList ->
+//        if (userInList.id == user.id) {
+//            Log.d("addOrRemoveIfExisted", "removing")
+//            newList.removeAt(this.indexOf(user))
+//            removed = true
+//        }
+//    }
+//    this = newList
+//    if (!removed) {
+//        Log.d("addOrRemoveIfExisted", "adding")
+//        this.add(user)
+//    }
+//
+//    Log.d("addOrRemoveIfExisted", "final list  $this")
+//}
 
 fun arrangeMilestonesAndTasks(
     listMilestones: List<MilestoneEntity>,

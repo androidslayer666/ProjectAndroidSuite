@@ -20,8 +20,7 @@ interface MilestoneEndPoint {
     @POST("api/2.0/project/{projectId}/milestone")
     suspend fun putMilestoneToProject(@Path("projectId") projectId: Int, @Body milestone: MilestonePost): MilestoneDto
 
-    @DELETE("api/2.0/project/comment/{milestoneId}")
-    suspend fun deleteMilestone(@Path("milestoneId")milestoneId: Int) : MilestoneDto
-
+    @DELETE("api/2.0/project/milestone/{milestoneId}")
+    suspend fun deleteMilestone(@Path("milestoneId")milestoneId: Int): MilestoneDto
 
 }

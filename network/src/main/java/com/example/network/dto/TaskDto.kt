@@ -28,7 +28,7 @@ data class TaskDto(
     @SerializedName("projectOwner")
     val projectOwner: ProjectDto? = null,
     @SerializedName("status")
-    val status: Int? = null,
+    var status: Int? = null,
     @SerializedName("responsible")
     val responsible: UserDto? = null,
     @SerializedName("updatedBy")
@@ -44,7 +44,7 @@ data class TaskDto(
     @SerializedName("subtasks")
     val subtasks: List<SubtaskDto>? = null,
 
-)
+    )
 
 data class TaskPost(
     @SerializedName("description")
@@ -63,4 +63,11 @@ data class TaskPost(
     val notify: Boolean? = false,
     @SerializedName("startDate")
     val startDate: String? = ""
+)
+
+data class TaskStatusPost(
+    @SerializedName("status")
+    val status: String,
+    @SerializedName("statusId")
+    val statusId: Int
 )

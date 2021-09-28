@@ -68,3 +68,8 @@ data class ProjectPost (
     @SerializedName("participants")
     val participants: List<String>? = null
 )
+
+data class ProjectStatusPost(
+    @SerializedName("status")
+    val status: String
+)

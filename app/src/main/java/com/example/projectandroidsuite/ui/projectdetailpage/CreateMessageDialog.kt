@@ -127,7 +127,7 @@ fun CreateMessageDialogInput(viewModel: MessageCreateEditViewModel) {
                             }
                         },
                         closeDialog = { showTeamPicker = false },
-                        ifChooseResponsibleOrTeam = PickerType.MULTIPLE,
+                        pickerType = PickerType.MULTIPLE,
                         userSearch,
                         { query -> viewModel.setUserSearch(query) }
                     )

@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.projectpage
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.database.entities.TaskEntity
 import com.example.projectandroidsuite.R
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDivider
 
 
 @Composable
@@ -28,11 +31,11 @@ fun TaskList(
 ) {
 
     val list by viewModel.tasks.observeAsState()
-    LazyColumn(Modifier.background(MaterialTheme.colors.background)){
+    LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
         list?.let {
             items(list!!) { task ->
                 TaskItem(task) { id -> navController.navigate("tasks/$id") }
-                Divider(color =MaterialTheme.colors.primary, thickness = 2.dp, startIndent = 40.dp, modifier = Modifier.width(200.dp))
+                CustomDivider()
             }
         }
     }
@@ -40,16 +43,28 @@ fun TaskList(
 
 @Composable
 fun TaskItem(task: TaskEntity, onClick: (taskId: Int) -> Unit) {
-    Row(modifier = Modifier
-
-        .fillMaxWidth()
-        .padding(12.dp)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Image(
-            painterResource(R.drawable.ic_project_status_active),
+            painterResource(
+                when (task.status) {
+                    1 -> R.drawable.ic_project_status_active
+                    2 -> R.drawable.ic_project_status_done
+                    else -> R.drawable.ic_project_status_active
+                }
+            ),
             contentDescription = "Status",
-            modifier = Modifier.weight(0.3f)
+            modifier = Modifier
+                .weight(0.3f)
+                .padding(end = 12.dp)
         )
-        Column(modifier = Modifier.weight(2f).clickable { onClick(task.id) }) {
+        Column(modifier = Modifier
+            .weight(2f)
+            .clickable { onClick(task.id) }) {
             Text(text = task.title,
                 style = MaterialTheme.typography.body1,
                 maxLines = 1,
@@ -59,7 +74,8 @@ fun TaskItem(task: TaskEntity, onClick: (taskId: Int) -> Unit) {
                 })
             if (task.responsibles.isNotEmpty()) {
                 Text(
-                    text = task.responsibles[0].displayName + " + " + (task.responsibles.size - 1),
+                    text = task.responsibles[0].displayName + " + "
+                            + if (task.responsibles.size > 0) (task.responsibles.size - 1) else "",
                     style = MaterialTheme.typography.overline
                 )
             }

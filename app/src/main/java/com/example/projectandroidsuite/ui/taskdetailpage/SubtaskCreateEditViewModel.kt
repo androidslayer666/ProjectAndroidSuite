@@ -119,16 +119,16 @@ class SubtaskCreateEditViewModel @Inject constructor(
 
 fun updateSubtask() {
     viewModelScope.launch(IO) {
-        val response = taskRepository.updateTask(
-            //todo shouldNot be null
-            taskId ?: 0,
-            TaskPost(
-                title = title.value,
-            )
-        )
-        withContext(Dispatchers.Main) {
-            _subtaskUpdatingStatus.value = response
-        }
+//        val response = taskRepository.updateTask(
+//            //todo shouldNot be null
+//            taskId ?: 0,
+//            TaskPost(
+//                title = title.value,
+//            )
+//        )
+//        withContext(Dispatchers.Main) {
+//            _subtaskUpdatingStatus.value = response
+//        }
     }
 }
 }

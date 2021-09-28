@@ -13,10 +13,16 @@ import kotlinx.coroutines.flow.Flow
 interface MilestoneDao {
 
     @Query("SELECT * FROM milestones WHERE projectId = :projectId")
-    fun getMilestoneByProjectId(projectId: Int): Flow<List<MilestoneEntity>>
+    suspend fun getMilestoneByProjectId(projectId: Int): List<MilestoneEntity>
+
+    @Query("SELECT * FROM milestones WHERE projectId = :projectId")
+    fun getMilestoneByProjectIdFlow(projectId: Int): Flow<List<MilestoneEntity>>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMilestones(taskList: List<MilestoneEntity>)
+
+    @Query("DELETE FROM milestones WHERE id = :milestoneId")
+    fun deleteMilestone(milestoneId: Int)
 
 }

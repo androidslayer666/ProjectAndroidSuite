@@ -1,9 +1,12 @@
 package com.example.projectandroidsuite.ui.parts
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -14,6 +17,8 @@ import com.example.database.entities.TaskEntity
 import com.example.database.entities.UserEntity
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.logic.ProjectStatus
+import com.example.projectandroidsuite.logic.TaskStatus
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.taskdetailpage.TaskCreateEditViewModel
 import java.text.SimpleDateFormat
@@ -26,18 +31,21 @@ fun CreateTaskDialog(
     task: TaskEntity? = null,
     onTaskDeletedOrEdited: (String) -> Unit = { }
 ) {
+    //viewModel.clearInput()
     task?.let { viewModel.setTask(it) }
 
     val taskUpdatingStatus by viewModel.taskUpdatingStatus.observeAsState()
     val taskCreationStatus by viewModel.taskCreationStatus.observeAsState()
 
     if (taskCreationStatus is Success<String>) {
+        //Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
         onTaskDeletedOrEdited((taskCreationStatus as Success<String>).value)
         viewModel.clearInput()
         closeDialog()
     }
 
-    if (taskUpdatingStatus is Success<String>) {
+    if (taskUpdatingStatus != null) {
+        //Log.d("CreateTaskDialog ", "Task updating " + taskUpdatingStatus.toString())
         onTaskDeletedOrEdited((taskUpdatingStatus as Success<String>).value)
         viewModel.clearInput()
         closeDialog()
@@ -46,7 +54,6 @@ fun CreateTaskDialog(
     AlertDialog(
         onDismissRequest = {
             closeDialog()
-            //viewModel.clearInput()
         },
         title = {
             if (task == null) Text(text = "Create Task") else Text(text = "Update Task")
@@ -57,9 +64,12 @@ fun CreateTaskDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    closeDialog()
-                    //viewModel.clearInput()
-                    if (task != null) viewModel.updateTask() else viewModel.createTask()
+                    //closeDialog()
+                    if (task == null)  {
+                        viewModel.createTask()
+                    } else {
+                        viewModel.updateTask()
+                    }
                 }, modifier = Modifier.width(100.dp)
             ) {
                 Text("Confirm")
@@ -69,7 +79,6 @@ fun CreateTaskDialog(
             Button(
                 onClick = {
                     closeDialog()
-                    viewModel.clearInput()
                 }, modifier = Modifier.width(100.dp)
             ) {
                 Text("Dismiss")
@@ -93,6 +102,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
     val endDate by viewModel.endDate.observeAsState(Date())
     val projectSearch by viewModel.projectSearchQuery.observeAsState("")
     val userSearch by viewModel.userSearchQuery.observeAsState("")
+    val taskStatus by viewModel.taskStatus.observeAsState()
 
     Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
         Row(Modifier.padding(vertical = 12.dp)) {
@@ -109,6 +119,26 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                 .fillMaxWidth()
                 .weight(4F),
                 value = description, onValueChange = { text -> viewModel.setDescription(text) })
+        }
+
+        Row(Modifier.padding(vertical = 12.dp)) {
+            Text(text = "Status", modifier = Modifier.weight(2F))
+            Column(Modifier.selectableGroup().weight(4F)) {
+                Row() {
+                    RadioButton(
+                        (taskStatus == TaskStatus.ACTIVE),
+                        { viewModel.setTaskStatus(TaskStatus.ACTIVE)}
+                    )
+                    Text(text = "Active")
+                }
+                Row() {
+                    RadioButton(
+                        (taskStatus == TaskStatus.COMPLETE),
+                        { viewModel.setTaskStatus(TaskStatus.COMPLETE)}
+                    )
+                    Text(text = "Complete")
+                }
+            }
         }
 
         listUsersFlow?.let {
@@ -136,7 +166,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                         }
                     },
                     closeDialog = { showTeamPicker = false },
-                    ifChooseResponsibleOrTeam = PickerType.MULTIPLE,
+                    pickerType = PickerType.MULTIPLE,
                     userSearch,
                     { query -> viewModel.setUserSearch(query) }
                 )

@@ -6,6 +6,8 @@ import com.example.database.entities.ProjectEntity
 import com.example.database.entities.TaskEntity
 import com.example.database.entities.UserEntity
 import com.example.network.dto.CommentDto
+import com.example.network.dto.MessageDto
+import com.example.network.dto.MilestoneDto
 import com.example.network.dto.TaskDto
 import java.text.SimpleDateFormat
 import java.util.*
@@ -128,4 +130,25 @@ fun List<CommentDto>.toListCommentIds(): MutableList<String> {
         listString.add(comment.id)
     }
     return listString
+}
+
+fun List<MilestoneDto>.toListMilestoneIds(): MutableList<Int> {
+    val listString = mutableListOf<Int>()
+    for (milestone in this) {
+        listString.add(milestone.id)
+    }
+    return listString
+}
+
+fun List<MessageDto>.toListMessageIds() : List<Int> {
+    val listString = mutableListOf<Int>()
+    for (message in this) {
+        listString.add(message.id)
+    }
+    return listString
+}
+
+fun List<TaskDto>.setStatus(status: Int): List<TaskDto> {
+    this.forEach { it.status = status }
+    return this
 }

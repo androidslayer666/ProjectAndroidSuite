@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -22,12 +23,13 @@ import com.example.projectandroidsuite.ui.parts.ScaffoldTopBarWrapper
 fun ProjectsPage(
     navController: NavHostController,
     toggleSearch: () -> Unit,
-    toggleFab: Pair<Boolean, () -> Unit>
+    toggleFab: Pair<Boolean, () -> Unit>,
+    state: Int? = null
 ) {
     //Log.d("deleteProject", "Recompose ProjectPage")
 
     var showFilters by remember { mutableStateOf(false) }
-    var state by remember { mutableStateOf(0) }
+    var state by rememberSaveable { mutableStateOf(state?:0) }
     val titles = listOf("Projects", "Tasks")
 
     ScaffoldTopBarWrapper(

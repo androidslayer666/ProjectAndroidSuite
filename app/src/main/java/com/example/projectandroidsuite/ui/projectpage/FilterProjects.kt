@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.projectpage
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -13,9 +12,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.ProjectStatus
 import com.example.projectandroidsuite.ui.parts.TeamMemberCard
@@ -74,7 +70,7 @@ fun FilterProjects(
                     onSubmitList = { },
                     onClick = { user -> viewModel.setUserForFilteringProject(user) },
                     closeDialog = { showUserPicker = false },
-                    ifChooseResponsibleOrTeam = PickerType.SINGLE,
+                    pickerType = PickerType.SINGLE,
                     userSearch,
                     { query -> viewModel.setUserSearch(query) }
                 )

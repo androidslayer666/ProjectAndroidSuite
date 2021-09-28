@@ -23,7 +23,7 @@ class CommentRepository @Inject constructor(
         try {
             //Log.d("CommentRepository", taskId.toString())
             val comments = commentEndPoint.getTaskComment(taskId).listCommentDtos
-            Log.d("CommentRepository", comments.toString())
+            //Log.d("CommentRepository", comments.toString())
 
             return if (comments == null) {
                 Failure("Can't download comments")
@@ -32,9 +32,9 @@ class CommentRepository @Inject constructor(
                     commentDao.insertComments(it)
                 }
                 commentDao.getCommentsByTaskId(taskId).forEach {
-                    Log.d("CommentRepository", "id " + it.id)
+                    //Log.d("CommentRepository", "id " + it.id)
                     if(comments?.toListCommentIds()?.contains(it.id) != true){
-                        Log.d("CommentRepository", "DeleteMessage with id " + it.id)
+                        //Log.d("CommentRepository", "DeleteMessage with id " + it.id)
                         commentDao.deleteComment(it.id)
                     }
                 }
@@ -100,13 +100,16 @@ class CommentRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteComment(commentId: String, taskId: Int): Result<String, String> {
+    suspend fun deleteComment(commentId: String, taskId: Int? = null): Result<String, String> {
         try {
             Log.d("TaskRepository", "Start deleting the comment with id : $commentId")
             val response = commentEndPoint.deleteComment(commentId)
             if (response != null) {
                 Log.d("CommentRepository", "Task deleted")
-                populateCommentsWithTaskId(taskId)
+                if (taskId != null) {
+                    populateCommentsWithTaskId(taskId)
+                }
+
                 return Success("The comment successfully deleted")
             } else {
                 Log.d("CommentRepository", "Failed to delete the comment")

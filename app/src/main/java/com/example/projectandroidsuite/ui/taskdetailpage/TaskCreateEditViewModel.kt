@@ -48,6 +48,9 @@ class TaskCreateEditViewModel @Inject constructor(
     private var _userSearchQuery = MutableLiveData<String>()
     val userSearchQuery: LiveData<String> = _userSearchQuery
 
+    private var _taskStatus = MutableLiveData<TaskStatus>()
+    val taskStatus: LiveData<TaskStatus> = _taskStatus
+
     private var _projectSearchQuery = MutableLiveData<String>()
     val projectSearchQuery: LiveData<String> = _projectSearchQuery
 
@@ -60,10 +63,20 @@ class TaskCreateEditViewModel @Inject constructor(
     private var _endDate = MutableLiveData<Date>(Date())
     val endDate: LiveData<Date> = _endDate
 
-    val userListFlow = teamRepository.getAllPortalUsers().asLiveData().combineWith(userSearch){
-            listProject, filter ->
-        if(filter != null) listProject?.filterUsersByFilter(filter)
-        else listProject
+    val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
+        .combineWith(chosenUserList){ users, chosenUsers ->
+                users?.forEach { user ->
+                    if(chosenUsers?.getListIds()?.contains(user.id) == true){
+                        user.chosen = true
+                    }
+                }
+        return@combineWith users
+    }
+        .combineWith(userSearch){
+            users, filter ->
+
+        if(filter != null) users?.filterUsersByFilter(filter)
+        else users
     }
 
     val projectList = projectRepository.getAllStoredProjects().asLiveData().combineWith(projectSearch){
@@ -71,9 +84,6 @@ class TaskCreateEditViewModel @Inject constructor(
         if(filter != null) listProject?.filterProjectsByFilter(filter)
         else listProject
     }
-
-
-
 
 
     init {
@@ -104,6 +114,10 @@ class TaskCreateEditViewModel @Inject constructor(
     fun setProject(project: ProjectEntity) {
         _project.value = project
         Log.d("setProject", _project.value.toString())
+    }
+
+    fun setTaskStatus(status: TaskStatus) {
+        _taskStatus.value = status
     }
 
     fun setDate(date: Date){
@@ -185,9 +199,15 @@ class TaskCreateEditViewModel @Inject constructor(
                     title = title.value,
                     responsibles = chosenUserList.value?.fromListUsersToStrings(),
                     startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date())
-                )
+                ),
+                when(taskStatus.value) {
+                    TaskStatus.ACTIVE -> "Open"
+                    TaskStatus.COMPLETE -> "Closed"
+                    else -> "Open"
+                }
             )
             withContext(Dispatchers.Main) {
+                //Log.d("TaskCreateEditViewModel", response.toString())
                 _taskUpdatingStatus.value = response
             }
         }

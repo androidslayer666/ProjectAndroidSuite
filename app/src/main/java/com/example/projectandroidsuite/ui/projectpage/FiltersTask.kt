@@ -68,7 +68,7 @@ fun FilterTasks(
                     onSubmitList = { },
                     onClick = { user -> viewModel.setUserForFilteringTask(user) },
                     closeDialog = { showUserPicker = false },
-                    ifChooseResponsibleOrTeam = PickerType.SINGLE,
+                    pickerType = PickerType.SINGLE,
                     userSearch,
                     { query -> viewModel.setUserSearch(query) }
                 )

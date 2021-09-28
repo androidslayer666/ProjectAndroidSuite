@@ -41,8 +41,12 @@ fun ProjectNavHost(
             ProjectsPage(navController, toggleSearch, toggleFab)
         }
 
+        composable(route = ProjectsScreens.Projects.name + "taskTab") {
+            ProjectsPage(navController, toggleSearch, toggleFab, 1)
+        }
+
         composable(
-            route = "projects/{id}",
+            route = "project/{id}",
             arguments = listOf(
                 navArgument("id") {
                     type = NavType.IntType

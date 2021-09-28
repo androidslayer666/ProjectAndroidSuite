@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.parts
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -24,8 +25,10 @@ fun ExpandableButtons(
     expandOrHide: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    canEdit: Boolean? = false,
+    canDelete: Boolean? = false
 ) {
-    var showDeleteDialog by remember {mutableStateOf(false)}
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Column() {
         FloatingActionButton(
@@ -38,54 +41,55 @@ fun ExpandableButtons(
             if (expandButtons) Image(painterResource(R.drawable.ic_baseline_expand_less_24), "")
             else Image(painterResource(R.drawable.ic_baseline_expand_more_24), "")
         }
-
-        AnimatedVisibility(
-            expandButtons,
-            enter = slideInVertically(
-                // Enters by sliding down from offset -fullHeight to 0.
-                initialOffsetY = { fullHeight -> -fullHeight  },
-                animationSpec = tween(durationMillis = 250)
-            ),
-            exit = slideOutVertically(
-                // Exits by sliding up from offset 0 to -fullHeight.
-                targetOffsetY = { fullHeight -> -fullHeight },
-                animationSpec = tween(durationMillis = 250)
-            )
-        ) {
-            FloatingActionButton(
-                modifier = Modifier.padding(top = 12.dp, end = 12.dp),
-                onClick = {
-                    onEditClick()
-                },
-                backgroundColor = MaterialTheme.colors.primary
+        if (canEdit == true)
+            AnimatedVisibility(
+                expandButtons,
+                enter = slideInVertically(
+                    // Enters by sliding down from offset -fullHeight to 0.
+                    initialOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(durationMillis = 250)
+                ),
+                exit = slideOutVertically(
+                    // Exits by sliding up from offset 0 to -fullHeight.
+                    targetOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(durationMillis = 250)
+                )
             ) {
-                Image(painterResource(R.drawable.ic_edit_button), "")
+                FloatingActionButton(
+                    modifier = Modifier.padding(top = 12.dp, end = 12.dp),
+                    onClick = {
+                        onEditClick()
+                    },
+                    backgroundColor = MaterialTheme.colors.primary
+                ) {
+                    Image(painterResource(R.drawable.ic_edit_button), "")
+                }
             }
-        }
-        AnimatedVisibility(
-            expandButtons,
-            enter = slideInVertically(
-                // Enters by sliding down from offset -fullHeight to 0.
-                initialOffsetY = { fullHeight -> -fullHeight * 2},
-                animationSpec = tween(durationMillis = 250)
-            ),
-            exit = slideOutVertically(
-                // Exits by sliding up from offset 0 to -fullHeight.
-                targetOffsetY = { fullHeight -> -fullHeight  * 2},
-                animationSpec = tween(durationMillis = 250)
-            )
-        ) {
-
-            FloatingActionButton(
-                modifier = Modifier.padding(top = 12.dp, end = 12.dp),
-                onClick = {
-                    onDeleteClick()
-                },
-                backgroundColor = MaterialTheme.colors.primary
+        if (canDelete == true)
+            AnimatedVisibility(
+                expandButtons,
+                enter = slideInVertically(
+                    // Enters by sliding down from offset -fullHeight to 0.
+                    initialOffsetY = { fullHeight -> -fullHeight * 2 },
+                    animationSpec = tween(durationMillis = 250)
+                ),
+                exit = slideOutVertically(
+                    // Exits by sliding up from offset 0 to -fullHeight.
+                    targetOffsetY = { fullHeight -> -fullHeight * 2 },
+                    animationSpec = tween(durationMillis = 250)
+                )
             ) {
-                Image(painterResource(R.drawable.ic_cancel), "")
+
+                FloatingActionButton(
+                    modifier = Modifier.padding(top = 12.dp, end = 12.dp),
+                    onClick = {
+                        onDeleteClick()
+                    },
+                    backgroundColor = MaterialTheme.colors.primary
+                ) {
+                    Image(painterResource(R.drawable.ic_cancel), "")
+                }
             }
-        }
 
     }
 }

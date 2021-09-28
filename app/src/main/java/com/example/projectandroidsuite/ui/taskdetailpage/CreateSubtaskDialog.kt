@@ -11,13 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.SubtaskEntity
-import com.example.database.entities.UserEntity
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.taskdetailpage.SubtaskCreateEditViewModel
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Composable
 fun CreateSubtaskDialog(
@@ -121,7 +118,7 @@ fun CreateSubtaskDialogInput(viewModel: SubtaskCreateEditViewModel) {
                         }
                     },
                     closeDialog = { showTeamPicker = false },
-                    ifChooseResponsibleOrTeam = PickerType.SINGLE,
+                    pickerType = PickerType.SINGLE,
                     userSearch,
                     { query -> viewModel.setUserSearch(query) }
                 )
