@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.*
 import com.example.domain.repository.*
-import com.example.network.dto.ProjectPost
 import com.example.projectandroidsuite.logic.arrangeMilestonesAndTasks
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -38,16 +37,13 @@ class ProjectDetailViewModel @Inject constructor(
         fileRepository.getFilesWithProjectId(projectId).asLiveData()
     }
 
-//    private var _projectCreationStatus = MutableLiveData<String>()
-//    val projectCreationStatus: LiveData<String> = _projectCreationStatus
-
     private var _projectDeletionStatus = MutableLiveData<Result<String, String>?>()
     val projectDeletionStatus: LiveData<Result<String, String>?> = _projectDeletionStatus
 
     val taskAndMilestones: LiveData<Map<MilestoneEntity?, List<TaskEntity>>> =
         _projectId.switchMap { projectId ->
             taskRepository.getTasksByProject(projectId)
-                .combine(milestoneRepository.getMilestoneByProject(projectId))
+                .combine(milestoneRepository.getMilestonesByProjectFlow(projectId))
                 { taskList, milestoneList ->
                     return@combine arrangeMilestonesAndTasks(milestoneList, taskList)
                 }.asLiveData()

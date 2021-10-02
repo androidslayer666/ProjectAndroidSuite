@@ -1,8 +1,6 @@
 package com.example.projectandroidsuite.logic
 
-import com.example.database.entities.ProjectEntity
-import com.example.database.entities.TaskEntity
-import com.example.database.entities.UserEntity
+import com.example.database.entities.*
 
 data class ProjectFilter(
     var searchQuery: String? = null,
@@ -87,3 +85,34 @@ fun List<TaskEntity>.filterTaskByFilter(filter: TaskFilter): List<TaskEntity> {
     return newList.toList()
 }
 
+data class MilestoneFilter(
+    var searchQuery: String?
+)
+
+fun List<MilestoneEntity>.filterMilestoneByFilter(filter: MilestoneFilter) : List<MilestoneEntity>{
+    val newList = mutableListOf<MilestoneEntity>()
+    this.forEach { milestone ->
+        //Log.d("filterProjectsBySearch", filter.toString())
+        if (filter.searchQuery != null)
+            if (milestone.title?.contains(filter.searchQuery!!.trim(), true) == true) {
+                newList.add(milestone)
+            }
+    }
+    return newList
+}
+
+data class FileFilter(
+    var searchQuery: String?
+)
+
+fun List<FileEntity>.filterFileByFilter(filter: FileFilter) : List<FileEntity>{
+    val newList = mutableListOf<FileEntity>()
+    this.forEach { file ->
+        //Log.d("filterProjectsBySearch", filter.toString())
+        if (filter.searchQuery != null)
+            if (file.title?.contains(filter.searchQuery!!.trim(), true) == true) {
+                newList.add(file)
+            }
+    }
+    return newList
+}

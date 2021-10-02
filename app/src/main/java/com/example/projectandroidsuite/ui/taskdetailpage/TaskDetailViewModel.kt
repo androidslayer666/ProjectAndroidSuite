@@ -3,6 +3,7 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.CommentEntity
+import com.example.database.entities.MilestoneEntity
 import com.example.database.entities.TaskEntity
 import com.example.domain.repository.*
 import com.example.network.dto.SubtaskPost
@@ -18,7 +19,8 @@ import javax.inject.Inject
 class TaskDetailViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val fileRepository: FileRepository,
-    private val commentRepository: CommentRepository
+    private val commentRepository: CommentRepository,
+    private val milestoneRepository: MilestoneRepository
 ) : ViewModel() {
 
     private var _taskId = MutableLiveData<Int>()
@@ -26,6 +28,12 @@ class TaskDetailViewModel @Inject constructor(
 
     val currentTask = _taskId.switchMap { taskId ->
         taskRepository.getTaskById(taskId).asLiveData()
+    }
+
+    val taskMilestone = currentTask.switchMap { task ->
+        if(task?.milestoneId != null){
+            liveData<MilestoneEntity> {  emit(milestoneRepository.getMilestoneById(task.milestoneId!!))}
+        } else liveData{}
     }
 
     val filesForTask = _taskId.switchMap { taskId ->

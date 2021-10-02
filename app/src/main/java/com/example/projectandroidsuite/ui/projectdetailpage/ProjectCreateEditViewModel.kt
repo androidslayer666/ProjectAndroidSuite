@@ -55,9 +55,7 @@ class ProjectCreateEditViewModel @Inject constructor(
     val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
         .combineWith(chosenUserList) { users, chosenUsers ->
             users?.forEach { user ->
-                if (chosenUsers?.getListIds()?.contains(user.id) == true) {
-                    user.chosen = true
-                }
+                user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
             }
             return@combineWith users
         }
@@ -107,38 +105,31 @@ class ProjectCreateEditViewModel @Inject constructor(
 
     fun clearInput() {
         projectId = null
-        _title.value = null
-        _description.value = null
+        _title.value = ""
+        _description.value = ""
         _chosenUserList.value = mutableListOf()
         _responsible.value = null
         _projectCreationStatus.value = null
         _projectUpdatingStatus.value = null
     }
 
-    fun clearChosenUsers() {
-        if (chosenUserList.value != null) {
-            for (task in chosenUserList.value!!) {
-                task.chosen = null
-            }
-        }
-    }
-
     fun addOrRemoveUser(user: UserEntity) {
-        Log.d("addOrRemoveUser", user.toString())
+        //Log.d("addOrRemoveUser", user.toString())
         val listIds = _chosenUserList.value!!.getListIds()
         if (listIds.contains(user.id)) {
             _chosenUserList.value!!.remove(_chosenUserList.value!!.getUserById(user.id))
             Log.d("addOrRemoveUser", "remove user " + user.toString())
+            _chosenUserList.forceRefresh()
         } else {
             _chosenUserList.value!!.add(user)
             Log.d("addOrRemoveUser", "add user " + user.toString())
+            _chosenUserList.forceRefresh()
         }
     }
 
     fun setUserSearch(query: String) {
         _userSearchQuery.value = query
-        userSearch.value =
-            UserFilter(query)
+        userSearch.value = UserFilter(query)
     }
 
     fun createProject() {

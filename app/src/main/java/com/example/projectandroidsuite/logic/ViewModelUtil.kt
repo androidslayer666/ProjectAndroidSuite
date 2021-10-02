@@ -72,27 +72,6 @@ fun <T, K, R> LiveData<T>.combineWith(
 }
 
 
-//fun MutableList<UserEntity>.addOrRemoveIfExisted(user: UserEntity) {
-//    Log.d("addOrRemoveIfExisted", "initial list  $this")
-//    var newList = mutableListOf<UserEntity>()
-//    newList.addAll(this)
-//    var removed = false
-//    this.forEach{userInList ->
-//        if (userInList.id == user.id) {
-//            Log.d("addOrRemoveIfExisted", "removing")
-//            newList.removeAt(this.indexOf(user))
-//            removed = true
-//        }
-//    }
-//    this = newList
-//    if (!removed) {
-//        Log.d("addOrRemoveIfExisted", "adding")
-//        this.add(user)
-//    }
-//
-//    Log.d("addOrRemoveIfExisted", "final list  $this")
-//}
-
 fun arrangeMilestonesAndTasks(
     listMilestones: List<MilestoneEntity>,
     listTasks: List<TaskEntity>
@@ -106,6 +85,7 @@ fun arrangeMilestonesAndTasks(
                 listTasksWithMilestone.add(task)
             }
             if(task.milestoneId == null){
+                if(!listTasksWithoutMilestone.map{it.id}.contains(task.id))
                 listTasksWithoutMilestone.add(task)
             }
         }
@@ -113,4 +93,12 @@ fun arrangeMilestonesAndTasks(
     }
     map[null] = listTasksWithoutMilestone
     return map
+}
+
+fun priorityToString(value : Int) : String {
+    return when(value) {
+        0 -> "normal"
+        1 -> "high"
+        else -> "normal"
+    }
 }

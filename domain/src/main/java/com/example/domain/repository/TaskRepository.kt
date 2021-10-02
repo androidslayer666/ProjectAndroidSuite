@@ -2,7 +2,7 @@ package com.example.domain.repository
 
 import android.util.Log
 import com.example.database.dao.TaskDao
-import com.example.database.entities.*
+import com.example.database.entities.TaskEntity
 import com.example.domain.mappers.toListEntities
 import com.example.network.dto.SubtaskPost
 import com.example.network.dto.TaskDto
@@ -41,6 +41,11 @@ class TaskRepository @Inject constructor(
             Log.e("TaskRepository", "tried to populate tasks but got an exception ${e.message}")
             return Failure("Something wrong with network or server")
         }
+    }
+
+    //todo can either go to net from
+    private suspend fun attachMilestoneToTask(task: TaskEntity){
+
     }
 
     fun getTasksByProject(projectId: Int): Flow<List<TaskEntity>> {

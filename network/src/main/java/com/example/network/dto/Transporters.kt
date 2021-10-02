@@ -58,3 +58,8 @@ data class SubtaskTransporter(
     @SerializedName("response")
     val listSubtaskDto: List<SubtaskDto>? = null
 )
+
+data class UserTransporter(
+    @SerializedName("response")
+    val user: UserDto? = null
+)

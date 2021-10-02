@@ -9,6 +9,7 @@ import com.example.network.dto.CommentDto
 import com.example.network.dto.MessageDto
 import com.example.network.dto.MilestoneDto
 import com.example.network.dto.TaskDto
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -151,4 +152,22 @@ fun List<MessageDto>.toListMessageIds() : List<Int> {
 fun List<TaskDto>.setStatus(status: Int): List<TaskDto> {
     this.forEach { it.status = status }
     return this
+}
+
+
+suspend fun <T> networkCaller(
+    call: suspend () -> T,
+    onSuccess: suspend (T) -> Unit
+): Result<String, String> {
+    try {
+        val result = call()
+        if (result != null) {
+            onSuccess(result)
+            return Success("")
+        } else {
+            return Failure("")
+        }
+    } catch (e: IOException) {
+        return Failure("")
+    }
 }

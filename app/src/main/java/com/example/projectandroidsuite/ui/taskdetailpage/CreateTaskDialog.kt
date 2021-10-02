@@ -1,18 +1,22 @@
 package com.example.projectandroidsuite.ui.parts
 
 import android.util.Log
+import android.view.ContextThemeWrapper
+import android.widget.CalendarView
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.database.entities.TaskEntity
 import com.example.database.entities.UserEntity
 import com.example.domain.repository.Success
@@ -22,6 +26,8 @@ import com.example.projectandroidsuite.logic.TaskStatus
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.taskdetailpage.TaskCreateEditViewModel
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Composable
@@ -40,15 +46,15 @@ fun CreateTaskDialog(
     if (taskCreationStatus is Success<String>) {
         //Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
         onTaskDeletedOrEdited((taskCreationStatus as Success<String>).value)
-        viewModel.clearInput()
         closeDialog()
+        viewModel.clearInput()
     }
 
     if (taskUpdatingStatus != null) {
         //Log.d("CreateTaskDialog ", "Task updating " + taskUpdatingStatus.toString())
         onTaskDeletedOrEdited((taskUpdatingStatus as Success<String>).value)
-        viewModel.clearInput()
         closeDialog()
+        viewModel.clearInput()
     }
 
     AlertDialog(
@@ -65,7 +71,7 @@ fun CreateTaskDialog(
             Button(
                 onClick = {
                     //closeDialog()
-                    if (task == null)  {
+                    if (task == null) {
                         viewModel.createTask()
                     } else {
                         viewModel.updateTask()
@@ -92,56 +98,74 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
     var showTeamPicker by remember { mutableStateOf(false) }
     var showProjectPicker by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showMilestonePicker by remember { mutableStateOf(false) }
 
     val title by viewModel.title.observeAsState("")
     val description by viewModel.description.observeAsState("")
     val listProjects by viewModel.projectList.observeAsState()
     val project by viewModel.project.observeAsState()
     val listUsersFlow by viewModel.userListFlow.observeAsState()
-    val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf<UserEntity>())
+    val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf())
     val endDate by viewModel.endDate.observeAsState(Date())
     val projectSearch by viewModel.projectSearchQuery.observeAsState("")
     val userSearch by viewModel.userSearchQuery.observeAsState("")
     val taskStatus by viewModel.taskStatus.observeAsState()
+    val milestone by viewModel.milestone.observeAsState()
+    val listMilestones by viewModel.milestonesList.observeAsState()
+    val priority by viewModel.priority.observeAsState()
 
-    Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
-        Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Title", modifier = Modifier.weight(2F))
-            CustomTextField(modifier = Modifier
-                .fillMaxWidth()
-                .weight(4F),
+    Column(Modifier.defaultMinSize(minHeight = 350.dp)) {
+        Row() {
+            CustomTextField(
+                label = "Title",
                 value = title,
                 onValueChange = { text -> viewModel.setTitle(text) })
         }
-        Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Description", modifier = Modifier.weight(2F))
-            CustomTextField(modifier = Modifier
-                .fillMaxWidth()
-                .weight(4F),
-                value = description, onValueChange = { text -> viewModel.setDescription(text) })
+        Row(Modifier.height(100.dp)) {
+            CustomTextField(
+                label = "Description",
+                numberOfLines = 3,
+                height = 100,
+                value = description,
+                onValueChange = { text -> viewModel.setDescription(text) }
+            )
         }
 
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(text = "Status", modifier = Modifier.weight(2F))
-            Column(Modifier.selectableGroup().weight(4F)) {
+            Column(
+                Modifier
+                    .selectableGroup()
+                    .weight(4F)
+            ) {
                 Row() {
                     RadioButton(
                         (taskStatus == TaskStatus.ACTIVE),
-                        { viewModel.setTaskStatus(TaskStatus.ACTIVE)}
+                        { viewModel.setTaskStatus(TaskStatus.ACTIVE) }
                     )
                     Text(text = "Active")
                 }
                 Row() {
                     RadioButton(
                         (taskStatus == TaskStatus.COMPLETE),
-                        { viewModel.setTaskStatus(TaskStatus.COMPLETE)}
+                        { viewModel.setTaskStatus(TaskStatus.COMPLETE) }
                     )
                     Text(text = "Complete")
                 }
             }
         }
 
-        listUsersFlow?.let {
+        Row(Modifier.padding(vertical = 12.dp)) {
+            Text(text = "Priority", modifier = Modifier.weight(2F))
+            Checkbox(
+                modifier = Modifier.weight(4F),
+                checked = priority == 1,
+                onCheckedChange = { viewModel.setPriority(if (it) 1 else 0) }
+            )
+        }
+
+        if (listUsersFlow != null) {
+
             Row(Modifier.padding(vertical = 12.dp)) {
                 Text(text = "Team",
                     Modifier
@@ -150,18 +174,17 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                         .weight(2F))
 
                 TeamMemberRow(
-                    list = listChosenUsers!!,
+                    list = listChosenUsers,
                     Modifier
                         .weight(4F)
                 )
             }
             if (showTeamPicker) {
                 TeamPickerDialog(
-                    list = it,
+                    list = listUsersFlow!!,
                     onSubmitList = { },
                     onClick = { user ->
                         run {
-                            //listChosenUsers.addOrRemoveIfExisted(user)
                             viewModel.addOrRemoveUser(user)
                         }
                     },
@@ -171,8 +194,18 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                     { query -> viewModel.setUserSearch(query) }
                 )
             }
+
+
+        } else {
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Text(
+                    text = "",
+                )
+            }
         }
-        listProjects?.let {
+
+        if (listProjects != null) {
+
             Row(Modifier.padding(vertical = 12.dp)) {
                 Text(
                     text = "Project",
@@ -181,11 +214,15 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                         .padding(end = 12.dp)
                         .weight(2F)
                 )
-                project?.title?.let { it1 -> Text(text = it1, Modifier
-                    .weight(4F)) }
+                project?.title?.let { it1 ->
+                    Text(
+                        text = it1, Modifier
+                            .weight(4F)
+                    )
+                }
                 if (showProjectPicker) {
                     ProjectPickerDialog(
-                        list = it,
+                        list = listProjects!!,
                         onSubmitList = { },
                         onClick = { project ->
                             run {
@@ -200,7 +237,51 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                     )
                 }
             }
+        } else {
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Text(
+                    text = "",
+                )
+            }
         }
+
+        if (listMilestones != null) {
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Text(
+                    text = "Milestone",
+                    Modifier
+                        .clickable { showMilestonePicker = true }
+                        .padding(end = 12.dp)
+                        .weight(2F)
+                )
+                milestone?.title?.let { it1 ->
+                    Text(
+                        text = it1, Modifier
+                            .weight(4F)
+                    )
+                }
+                if (showMilestonePicker) {
+                    PickerMilestoneDialog(
+                        list = listMilestones!!,
+                        onClick = { milestone ->
+                            run {
+                                viewModel.setMilestone(milestone)
+                                showMilestonePicker = false
+                            }
+                        },
+                        closeDialog = { showMilestonePicker = false }
+                    )
+                }
+            }
+        } else {
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Text(
+                    text = ""
+                )
+            }
+        }
+
+
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(
                 text = "End date",
@@ -217,11 +298,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                     .weight(4F)
             )
             if (showDatePicker) {
-                DatePickerDialog(
-                    date = viewModel.endDate.value ?: Date(),
-                    true,
-                    { showDatePicker = false },
-                    { date -> viewModel.setDate(date) })
+                DatePicker({ date -> viewModel.setDate(date) }, { showDatePicker = false })
             }
         }
 

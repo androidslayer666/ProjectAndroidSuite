@@ -2,4 +2,6 @@
 <resources>
     <color name="main">#047C00</color>
     <color name="light">#000000</color>
+    <color name="red">#eb7304</color>
+    <color name="primary">#435F7D</color>
 </resources>

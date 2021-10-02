@@ -1,6 +1,7 @@
 package com.example.projectandroidsuite
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.SessionManager
@@ -18,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ProjectAppCompose(sessionManager)
+            ProjectAppCompose(sessionManager.isAuthenticated())
         }
     }
 }

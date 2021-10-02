@@ -25,6 +25,7 @@ fun MilestoneDto.toEntity(projectId: Int): MilestoneEntity {
         canDelete = this.canDelete,
         deadline = this.deadline?.stringToDate(),
         id = this.id,
+        isKey = this.isKey,
         title = this.title,
         description = this.description,
         status = this.status,

@@ -61,4 +61,8 @@ class FileRepository @Inject constructor(
         return fileDao.getFilesByProjectId(projectId)
     }
 
+    fun getAllFiles(): Flow<List<FileEntity>> {
+        return fileDao.getAllFiles()
+    }
+
 }

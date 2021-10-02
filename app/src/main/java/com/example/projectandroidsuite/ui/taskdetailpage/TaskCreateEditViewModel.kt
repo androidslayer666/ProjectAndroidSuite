@@ -2,6 +2,7 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
+import com.example.database.entities.MilestoneEntity
 import com.example.database.entities.ProjectEntity
 import com.example.database.entities.TaskEntity
 import com.example.database.entities.UserEntity
@@ -15,6 +16,7 @@ import com.example.projectandroidsuite.ui.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -25,7 +27,8 @@ import javax.inject.Inject
 class TaskCreateEditViewModel @Inject constructor(
     private val teamRepository: TeamRepository,
     private val taskRepository: TaskRepository,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val milestoneRepository: MilestoneRepository
 ) : ViewModel() {
 
     private var taskId: Int? = null
@@ -36,11 +39,17 @@ class TaskCreateEditViewModel @Inject constructor(
     private var _description = MutableLiveData("")
     val description: LiveData<String> = _description
 
+    private var _priority = MutableLiveData(0)
+    val priority: LiveData<Int> = _priority
+
     private var _chosenUserList = MutableLiveData<MutableList<UserEntity>>(mutableListOf())
     val chosenUserList: LiveData<MutableList<UserEntity>> = _chosenUserList
 
     private var _project = MutableLiveData<ProjectEntity?>()
     val project: LiveData<ProjectEntity?> = _project
+
+    private var _milestone = MutableLiveData<MilestoneEntity?>()
+    val milestone: LiveData<MilestoneEntity?> = _milestone
 
     private var projectSearch = MutableLiveData<ProjectFilter>()
     private var userSearch = MutableLiveData<UserFilter>()
@@ -60,29 +69,32 @@ class TaskCreateEditViewModel @Inject constructor(
     private var _taskUpdatingStatus = MutableLiveData<Result<String, String>?>()
     val taskUpdatingStatus: LiveData<Result<String, String>?> = _taskUpdatingStatus
 
-    private var _endDate = MutableLiveData<Date>(Date())
+    private var _endDate = MutableLiveData(Date())
     val endDate: LiveData<Date> = _endDate
 
     val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
-        .combineWith(chosenUserList){ users, chosenUsers ->
-                users?.forEach { user ->
-                    if(chosenUsers?.getListIds()?.contains(user.id) == true){
-                        user.chosen = true
-                    }
-                }
-        return@combineWith users
-    }
-        .combineWith(userSearch){
-            users, filter ->
+        .combineWith(chosenUserList) { users, chosenUsers ->
+            users?.forEach { user ->
+                user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
+            }
+            return@combineWith users
+        }
+        .combineWith(userSearch) { users, filter ->
+            if (filter != null) users?.filterUsersByFilter(filter)
+            else users
+        }
 
-        if(filter != null) users?.filterUsersByFilter(filter)
-        else users
-    }
+    val projectList = projectRepository.getAllStoredProjects().asLiveData()
+        .combineWith(projectSearch) { listProject, filter ->
+            if (filter != null) listProject?.filterProjectsByFilter(filter)
+            else listProject
+        }
 
-    val projectList = projectRepository.getAllStoredProjects().asLiveData().combineWith(projectSearch){
-        listProject, filter ->
-        if(filter != null) listProject?.filterProjectsByFilter(filter)
-        else listProject
+    val milestonesList = project.switchMap {
+        if (it?.id != null)
+             milestoneRepository.getMilestonesByProjectFlow(it.id).asLiveData()
+        else
+            liveData { }
     }
 
 
@@ -100,7 +112,17 @@ class TaskCreateEditViewModel @Inject constructor(
         _title.value = task.title
         _description.value = task.description
         _chosenUserList.value = task.responsibles
-        task.projectOwner?.let {_project.value = it }
+        _endDate.value = task.deadline
+        _priority.value = task.priority
+        task.projectOwner?.let { _project.value = it }
+        task.milestoneId?.let {
+            viewModelScope.launch {
+                val milestone = milestoneRepository.getMilestoneById(task.milestoneId!!)
+                withContext(Main) {
+                    _milestone.value = milestone
+                }
+            }
+        }
     }
 
     fun setTitle(string: String) {
@@ -111,51 +133,62 @@ class TaskCreateEditViewModel @Inject constructor(
         _description.value = string
     }
 
+    fun setPriority(value: Int) {
+        Log.d("setPriority", value.toString())
+        _priority.value = value
+    }
+
     fun setProject(project: ProjectEntity) {
         _project.value = project
         Log.d("setProject", _project.value.toString())
+    }
+
+    fun setMilestone(milestone:MilestoneEntity) {
+        _milestone.value = milestone
+        Log.d("setProject", _milestone.value.toString())
     }
 
     fun setTaskStatus(status: TaskStatus) {
         _taskStatus.value = status
     }
 
-    fun setDate(date: Date){
+    fun setDate(date: Date) {
         Log.d("setDate", date.toString())
         _endDate.value = date
     }
 
-
-    //todo only users
     fun clearInput() {
         _title.value = ""
         _description.value = ""
+        _priority.value = 0
         _chosenUserList.value = mutableListOf()
         _project.value = null
+        _milestone.value = null
         _taskCreationStatus.value = null
         _taskUpdatingStatus.value = null
     }
-
 
     fun addOrRemoveUser(user: UserEntity) {
         //Log.d("addOrRemoveUser", user.toString())
         val listIds = _chosenUserList.value!!.getListIds()
         if (listIds.contains(user.id)) {
             _chosenUserList.value!!.remove(_chosenUserList.value!!.getUserById(user.id))
-            //Log.d("addOrRemoveUser", task.value.toString())
+            Log.d("addOrRemoveUser", "remove user " + user.toString())
+            _chosenUserList.forceRefresh()
         } else {
             _chosenUserList.value!!.add(user)
-            //Log.d("addOrRemoveUser", task.value.toString())
+            Log.d("addOrRemoveUser", "add user " + user.toString())
+            _chosenUserList.forceRefresh()
         }
     }
 
-    fun setProjectSearch(query: String){
+    fun setProjectSearch(query: String) {
         _projectSearchQuery.value = query
         projectSearch.value =
             ProjectFilter(query, projectSearch.value?.responsible)
     }
 
-    fun setUserSearch(query: String){
+    fun setUserSearch(query: String) {
         _userSearchQuery.value = query
         userSearch.value =
             UserFilter(query)
@@ -165,7 +198,7 @@ class TaskCreateEditViewModel @Inject constructor(
     fun createTask() {
         viewModelScope.launch(IO) {
 
-            if(project.value?.id != null) {
+            if (project.value?.id != null) {
                 val response = taskRepository.createTask(
                     //todo shouldNot be null
                     project.value?.id!!,
@@ -174,7 +207,9 @@ class TaskCreateEditViewModel @Inject constructor(
                         deadline = SimpleDateFormat(FORMAT_API_DATE).format(endDate.value),
                         title = title.value,
                         responsibles = chosenUserList.value?.fromListUsersToStrings(),
-                        startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date())
+                        startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date()),
+                        milestoneid = milestone.value?.id ?:0,
+                        priority = priorityToString(priority.value?:0)
                     )
                 )
                 withContext(Dispatchers.Main) {
@@ -189,24 +224,25 @@ class TaskCreateEditViewModel @Inject constructor(
 
     fun updateTask() {
         viewModelScope.launch(IO) {
-
             val response = taskRepository.updateTask(
                 //todo shouldNot be null
-                taskId?: 0,
+                taskId ?: 0,
                 TaskPost(
                     description = description.value,
                     deadline = SimpleDateFormat(FORMAT_API_DATE).format(endDate.value),
                     title = title.value,
                     responsibles = chosenUserList.value?.fromListUsersToStrings(),
-                    startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date())
+                    startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date()),
+                    milestoneid = milestone.value?.id ?:0,
+                    priority = priorityToString(priority.value?:0)
                 ),
-                when(taskStatus.value) {
+                when (taskStatus.value) {
                     TaskStatus.ACTIVE -> "Open"
                     TaskStatus.COMPLETE -> "Closed"
                     else -> "Open"
                 }
             )
-            withContext(Dispatchers.Main) {
+            withContext(Main) {
                 //Log.d("TaskCreateEditViewModel", response.toString())
                 _taskUpdatingStatus.value = response
             }

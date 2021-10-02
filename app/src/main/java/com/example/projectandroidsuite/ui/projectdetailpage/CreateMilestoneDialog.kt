@@ -1,9 +1,11 @@
 package com.example.projectandroidsuite.ui.parts
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -19,13 +21,14 @@ import java.util.*
 
 @Composable
 fun CreateMilestoneDialog(
+    milestone :MilestoneEntity? = null,
     projectId: Int,
     viewModel: MilestoneCreateEditViewModel,
     closeDialog: () -> Unit,
-    message: MilestoneEntity? = null,
     onMilestoneDeletedOrEdited: (String) -> Unit = { }
 ) {
     viewModel.setProjectId(projectId)
+    if(milestone != null) viewModel.setMilestone(milestone)
 
     val milestoneUpdatingStatus by viewModel.subtaskUpdatingStatus.observeAsState()
     val milestoneCreationStatus by viewModel.subtaskCreationStatus.observeAsState()
@@ -45,10 +48,10 @@ fun CreateMilestoneDialog(
     AlertDialog(
         onDismissRequest = {
             closeDialog()
-            //viewModel.clearInput()
+            viewModel.clearInput()
         },
         title = {
-            if (message == null) Text(text = "Create milestone") else Text(text = "Update milestone")
+            if (milestone == null) Text(text = "Create milestone") else Text(text = "Update milestone")
         },
         text = {
             CreateMilestoneDialogInput(viewModel)
@@ -57,8 +60,7 @@ fun CreateMilestoneDialog(
             Button(
                 onClick = {
                     closeDialog()
-                    //viewModel.clearInput()
-                    if (message != null) viewModel.updateMilestone() else viewModel.createMilestone()
+                    if (milestone != null) viewModel.updateMilestone() else viewModel.createMilestone()
                 }, modifier = Modifier.width(100.dp)
             ) {
                 Text("Confirm")
@@ -79,7 +81,6 @@ fun CreateMilestoneDialog(
 
 @Composable
 fun CreateMilestoneDialogInput(viewModel: MilestoneCreateEditViewModel) {
-    var showTeamPicker by remember { mutableStateOf(false) }
     var showResponsiblePicker by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -89,28 +90,33 @@ fun CreateMilestoneDialogInput(viewModel: MilestoneCreateEditViewModel) {
     val userSearch by viewModel.userSearchQuery.observeAsState("")
     val responsible by viewModel.responsible.observeAsState()
     val endDate by viewModel.endDate.observeAsState(Date())
+    val priority by viewModel.priority.observeAsState()
 
-
-    Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
+    Column(Modifier.defaultMinSize(minHeight = 200.dp)) {
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(text = "Title", modifier = Modifier.weight(2F))
-            CustomTextField(modifier = Modifier
-                .fillMaxWidth()
-                .weight(4F),
+            CustomTextField(
                 value = title,
                 onValueChange = { text -> viewModel.setTitle(text) })
         }
 
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(text = "Description", modifier = Modifier.weight(2F))
-            CustomTextField(modifier = Modifier
-                .fillMaxWidth()
-                .weight(4F),
+            CustomTextField(
                 value = description, onValueChange = { text ->
                     run {
                         viewModel.setDescription(text)
                     }
                 })
+        }
+
+        Row(Modifier.padding(vertical = 12.dp)){
+            Text(text = "Key milestone", modifier = Modifier.weight(2F))
+            Checkbox(
+                modifier = Modifier.weight(4F),
+                checked = priority?: false,
+                onCheckedChange = { viewModel.setPriority(it) }
+            )
         }
 
         Row(Modifier.padding(vertical = 12.dp)) {
@@ -158,11 +164,7 @@ fun CreateMilestoneDialogInput(viewModel: MilestoneCreateEditViewModel) {
                     .weight(4F)
             )
             if (showDatePicker) {
-                DatePickerDialog(
-                    date = viewModel.endDate.value ?: Date(),
-                    true,
-                    { showDatePicker = false },
-                    { date -> viewModel.setDate(date) })
+                DatePicker({date -> viewModel.setDate(date)},{showDatePicker = false})
             }
         }
     }

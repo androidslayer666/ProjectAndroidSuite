@@ -25,6 +25,7 @@ fun TaskDto.toEntity(): TaskEntity {
         id = this.id,
         title = this.title ?: "",
         description = this.description ?: "",
+        priority = this.priority,
         status = this.status,
         responsible = this.responsible?.toUserEntity(),
         updatedBy = this.updatedBy?.toUserEntity(),

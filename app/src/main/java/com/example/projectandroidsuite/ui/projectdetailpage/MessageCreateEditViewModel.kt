@@ -47,14 +47,19 @@ class MessageCreateEditViewModel @Inject constructor(
     private var _userSearchQuery = MutableLiveData<String>()
     val userSearchQuery: LiveData<String> = _userSearchQuery
 
+    private var _creationStatus = MutableLiveData<Result<String, String>?>()
+    val creationStatus: LiveData<Result<String, String>?> = _creationStatus
 
-    private var _subtaskCreationStatus = MutableLiveData<Result<String, String>?>()
-    val subtaskCreationStatus: LiveData<Result<String, String>?> = _subtaskCreationStatus
-
-    private var _subtaskUpdatingStatus = MutableLiveData<Result<String, String>?>()
-    val subtaskUpdatingStatus: LiveData<Result<String, String>?> = _subtaskUpdatingStatus
+    private var _updatingStatus = MutableLiveData<Result<String, String>?>()
+    val updatingStatus: LiveData<Result<String, String>?> = _updatingStatus
 
     val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
+        .combineWith(chosenUserList) { users, chosenUsers ->
+            users?.forEach { user ->
+                user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
+            }
+            return@combineWith users
+        }
         .combineWith(userSearch) { listProject, filter ->
             if (filter != null) listProject?.filterUsersByFilter(filter)
             else listProject
@@ -64,17 +69,9 @@ class MessageCreateEditViewModel @Inject constructor(
         viewModelScope.launch(IO) {
             teamRepository.populateAllPortalUsers()
             projectRepository.getProjects()
-            //if(projectResponse is Failure<String>) _problemWithFetchingProjects.value = projectResponse.reason!!
         }
     }
 
-//    fun setSubtask(subtask: SubtaskEntity) {
-//        //Log.d("setTask", task.toString())
-//        //taskId = subtask.id
-//        _title.value = subtask.title
-//        subtask.responsible?.let { _responsible.value = it }
-//
-//    }
 
     fun setTitle(string: String) {
         _title.value = string
@@ -93,9 +90,11 @@ class MessageCreateEditViewModel @Inject constructor(
         val listIds = _chosenUserList.value!!.getListIds()
         if (listIds.contains(user.id)) {
             _chosenUserList.value!!.remove(_chosenUserList.value!!.getUserById(user.id))
+            _chosenUserList.forceRefresh()
             //Log.d("addOrRemoveUser", task.value.toString())
         } else {
             _chosenUserList.value!!.add(user)
+            _chosenUserList.forceRefresh()
             //Log.d("addOrRemoveUser", task.value.toString())
         }
     }
@@ -103,10 +102,12 @@ class MessageCreateEditViewModel @Inject constructor(
 
     //todo only users
     fun clearInput() {
-        _title.value = ""
-        //_responsible.value = null
-        _subtaskCreationStatus.value = null
-        _subtaskUpdatingStatus.value = null
+        projectId = null
+        _title.value = null
+        _description.value = null
+        _chosenUserList.value = mutableListOf()
+        _creationStatus.value = null
+        _updatingStatus.value = null
     }
 
     fun setUserSearch(query: String) {
@@ -130,7 +131,7 @@ class MessageCreateEditViewModel @Inject constructor(
             )
             withContext(Dispatchers.Main) {
                 Log.d("", response.toString())
-                _subtaskCreationStatus.value = response
+                _creationStatus.value = response
             }
         }
     }

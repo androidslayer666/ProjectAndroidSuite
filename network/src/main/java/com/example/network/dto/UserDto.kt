@@ -15,6 +15,8 @@ data class UserDto (
     var email: String? = null,
     @SerializedName("avatarSmall")
     val avatarSmall : String? = null,
+    @SerializedName("avatarMedium")
+    val avatarMedium : String? = null,
     @SerializedName("profileUrl")
     val profileUrl: String? = null,
     @SerializedName("isVisitor")

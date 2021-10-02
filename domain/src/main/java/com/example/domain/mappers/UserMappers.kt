@@ -6,13 +6,14 @@ import com.example.network.dto.UserDto
 
 fun UserDto.toUserEntity(): UserEntity {
     return UserEntity(
-        this.id,
-        this.firstName,
-        this.lastName,
-        this.displayName ?: this.firstName + this.lastName,
-        this.email,
-        this.avatarSmall,
-        this.profileUrl
+        id =this.id,
+        firstName = this.firstName,
+        lastName = this.lastName,
+        displayName = this.displayName ?: this.firstName + this.lastName,
+        email = this.email,
+        avatarSmall = this.avatarSmall,
+        profileUrl = this.profileUrl,
+        avatarMedium = this.avatarMedium
     )
 }
 

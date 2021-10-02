@@ -3,13 +3,24 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/calendar_check_outline.xml" value="0.262037037037037" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/file_document_outline.xml" value="0.262037037037037" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/file_powerpoint_outline.xml" value="0.262037037037037" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/file_table_outline.xml" value="0.262037037037037" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/project_icon.xml" value="0.262037037037037" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/border_set.xml" value="0.2796296296296296" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/button_round.xml" value="0.2078125" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_arrow_downward_24.xml" value="0.26481481481481484" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_arrow_upward_24.xml" value="0.26481481481481484" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_comment_24.xml" value="0.13425925925925927" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.13055555555555556" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_expand_less_24.xml" value="0.1" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_expand_more_24.xml" value="0.1" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_filter_alt_24.xml" value="0.1" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_flag_24.xml" value="0.262037037037037" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_key_24.xml" value="0.240625" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_keyboard_double_arrow_down_24.xml" value="0.262037037037037" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_keyboard_double_arrow_up_24.xml" value="0.228125" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_play_arrow_24.xml" value="0.22395833333333334" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.1" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_baseline_send_24.xml" value="0.13425925925925927" />
@@ -27,6 +38,8 @@
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/ic_user_chosen.xml" value="0.2421875" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/popup_background.xml" value="0.2" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/round_button.xml" value="0.2972222222222222" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/sort_reverse_variant.xml" value="0.240625" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable/sort_variant.xml" value="0.240625" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout-v26/task_item.xml" value="0.22604166666666667" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/activity_main.xml" value="0.22604166666666667" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/layout/comment_item.xml" value="0.21510416666666668" />

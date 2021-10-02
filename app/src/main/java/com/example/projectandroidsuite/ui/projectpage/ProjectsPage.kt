@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.projectpage
 
-import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -10,48 +9,57 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.SwipeDirections
 import com.example.projectandroidsuite.logic.swipeToChangeScreen
-import com.example.projectandroidsuite.logic.swipeToRefresh
-import com.example.projectandroidsuite.ui.parts.ScaffoldTopBarWrapper
+import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
 
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProjectsPage(
     navController: NavHostController,
-    toggleSearch: () -> Unit,
-    toggleFab: Pair<Boolean, () -> Unit>,
     state: Int? = null
 ) {
-    //Log.d("deleteProject", "Recompose ProjectPage")
 
     var showFilters by remember { mutableStateOf(false) }
-    var state by rememberSaveable { mutableStateOf(state?:0) }
+    var state by rememberSaveable { mutableStateOf(state ?: 0) }
     val titles = listOf("Projects", "Tasks")
 
-    ScaffoldTopBarWrapper(
-        showFilters = true,
-        onFilterClick = { showFilters = !showFilters },
-        toggleSearch
-    ) {
-        Box(
-            if (toggleFab.first)
-                Modifier.clickable { toggleFab.second() } else Modifier.padding()) {
-
-            Column(Modifier.background(MaterialTheme.colors.background)) {
+    CustomScaffold({ showFilters = !showFilters }, navController, viewModel = hiltViewModel()) {
+        Box() {
+            Column(
+                Modifier
+                    .background(MaterialTheme.colors.background)
+                    .fillMaxHeight()
+                    .clickable(enabled = showFilters) { showFilters = false }) {
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            text = { Text(title) },
+                            text = {
+                                Row {
+                                    if (index == 0)
+                                        Icon(painterResource(R.drawable.project_icon), "")
+                                    else
+                                        Icon(painterResource(R.drawable.calendar_check_outline), "")
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(title)
+                                }
+                            },
                             selected = state == index,
                             onClick = { state = index }
                         )
                     }
                 }
-                Surface(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.background)) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colors.background)
+                ) {
                     AnimatedVisibility(
                         state == 0,
                         enter = slideInHorizontally(
@@ -63,7 +71,10 @@ fun ProjectsPage(
                             animationSpec = tween(durationMillis = 500)
                         )
                     ) {
-                        Surface(Modifier.background(MaterialTheme.colors.background).swipeToChangeScreen(SwipeDirections.RIGHT) { state = 1 }) {
+                        Surface(
+                            Modifier
+                                .background(MaterialTheme.colors.background)
+                                .swipeToChangeScreen(SwipeDirections.RIGHT) { state = 1 }) {
                             ProjectList(hiltViewModel(), navController)
                         }
                     }
@@ -79,7 +90,10 @@ fun ProjectsPage(
                             animationSpec = tween(durationMillis = 200)
                         )
                     ) {
-                        Surface(Modifier.background(MaterialTheme.colors.background).swipeToChangeScreen(SwipeDirections.LEFT) { state = 0 }) {
+                        Surface(
+                            Modifier
+                                .background(MaterialTheme.colors.background)
+                                .swipeToChangeScreen(SwipeDirections.LEFT) { state = 0 }) {
                             TaskList(hiltViewModel(), navController)
                         }
                     }
@@ -91,12 +105,12 @@ fun ProjectsPage(
                 enter = slideInVertically(
                     // Enters by sliding down from offset -fullHeight to 0.
                     initialOffsetY = { fullHeight -> -fullHeight },
-                    animationSpec = tween(durationMillis = 200)
+                    animationSpec = tween(durationMillis = 400)
                 ),
                 exit = slideOutVertically(
                     // Exits by sliding up from offset 0 to -fullHeight.
                     targetOffsetY = { fullHeight -> -fullHeight },
-                    animationSpec = tween(durationMillis = 200)
+                    animationSpec = tween(durationMillis = 400)
                 )
             ) {
                 if (state == 0)

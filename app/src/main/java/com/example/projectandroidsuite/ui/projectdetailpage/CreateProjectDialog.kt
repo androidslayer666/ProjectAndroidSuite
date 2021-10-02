@@ -4,10 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -50,7 +47,6 @@ fun CreateProjectDialog(
 
     AlertDialog(
         onDismissRequest = {
-            viewModel.clearChosenUsers()
             closeDialog()
         },
         title = {
@@ -99,7 +95,7 @@ fun CreateProjectDialogInput(
     var showResponsiblePicker by remember { mutableStateOf(false) }
 
     val title by viewModel.title.observeAsState("")
-    val description by viewModel.description.observeAsState("")
+    val description by viewModel.description.observeAsState("\n")
     val listUsersFlow by viewModel.userListFlow.observeAsState()
     val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf<UserEntity>())
     val responsible by viewModel.responsible.observeAsState()
@@ -107,80 +103,78 @@ fun CreateProjectDialogInput(
     val projectStatus by viewModel.projectStatus.observeAsState()
 
 
-
-    Column(Modifier.defaultMinSize(minHeight = 300.dp)) {
-        Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Title", modifier = Modifier.weight(2F))
-            CustomTextField(modifier = Modifier
-                .fillMaxWidth()
-                .weight(4F),
-                value = title, onValueChange = { text ->
-                    viewModel.setTitle(text)
-                })
-        }
-        Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Description", modifier = Modifier.weight(2F))
-            CustomTextField(modifier = Modifier
-                .fillMaxWidth()
-                .weight(4F),
-                value = description, onValueChange = { text ->
-                run {
-                    viewModel.setDescription(text)
-                }
+    Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
+        CustomTextField(
+            label = "Title",
+            value = title,
+            onValueChange = { text ->
+                viewModel.setTitle(text)
             })
-        }
+        CustomTextField(
+            label = "Description",
+            numberOfLines = 3,
+            height = 100,
+            value = description,
+            onValueChange = { text ->
+                viewModel.setDescription(text)
+            })
         Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Status", modifier = Modifier.weight(2F))
-            Column(Modifier.selectableGroup().weight(4F)) {
+            Text(
+                text = "Status",
+                modifier = Modifier.weight(2F)
+            )
+            Column(
+                Modifier
+                    .selectableGroup()
+                    .weight(4F)
+            ) {
                 Row() {
                     RadioButton(
                         (projectStatus == ProjectStatus.ACTIVE),
-                        { viewModel.setProjectStatus(ProjectStatus.ACTIVE)}
+                        { viewModel.setProjectStatus(ProjectStatus.ACTIVE) }
                     )
                     Text(text = "Active")
                 }
                 Row() {
                     RadioButton(
                         (projectStatus == ProjectStatus.PAUSED),
-                        { viewModel.setProjectStatus(ProjectStatus.PAUSED)}
+                        { viewModel.setProjectStatus(ProjectStatus.PAUSED) }
                     )
                     Text(text = "Paused")
                 }
                 Row() {
                     RadioButton(
                         (projectStatus == ProjectStatus.STOPPED),
-                        { viewModel.setProjectStatus(ProjectStatus.STOPPED)}
+                        { viewModel.setProjectStatus(ProjectStatus.STOPPED) }
                     )
                     Text(text = "Stopped")
                 }
-
             }
         }
 
+        if (listUsersFlow != null) {
+            Row(Modifier.padding(vertical = 12.dp)) {
 
-        Row (Modifier.padding(vertical = 12.dp)){
-            Text(
-                text = "Team",
-                Modifier
-                    .clickable { showTeamPicker = true }
-                    .weight(2F)
-            )
-            listUsersFlow?.let {
-                Row(Modifier
-                    .weight(4F)) {
+                Text(
+                    text = "Team",
+                    Modifier
+                        .clickable { showTeamPicker = true }
+                        .weight(2F)
+                )
+                Row(
+                    Modifier
+                        .weight(4F)
+                ) {
                     TeamMemberRow(
                         list = listChosenUsers,
                     )
                 }
                 if (showTeamPicker) {
                     TeamPickerDialog(
-                        list = it,
+                        list = listUsersFlow!!,
                         onSubmitList = { },
                         onClick = { user ->
-                            run {
-                                //listChosenUsers.addOrRemoveIfExisted(user)
-                                viewModel.addOrRemoveUser(user)
-                            }
+                            viewModel.addOrRemoveUser(user)
                         },
                         closeDialog = { showTeamPicker = false },
                         pickerType = PickerType.MULTIPLE,
@@ -188,23 +182,26 @@ fun CreateProjectDialogInput(
                         { query -> viewModel.setUserSearch(query) }
                     )
                 }
+
             }
-        }
-        Row(Modifier.padding(vertical = 12.dp)) {
-            Text(
-                text = "Choose responsible",
-                Modifier
-                    .clickable { showResponsiblePicker = true }
-                    .weight(2F)
-            )
-            responsible?.let { user -> Row( Modifier
-                .weight(4F) ){TeamMemberCard(user = user) }}
-        }
-        listUsersFlow?.let {
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Text(
+                    text = "Choose responsible",
+                    Modifier
+                        .clickable { showResponsiblePicker = true }
+                        .weight(2F)
+                )
+                responsible?.let { user ->
+                    Row(
+                        Modifier
+                            .weight(4F)
+                    ) { TeamMemberCard(user = user) }
+                }
+            }
 
             if (showResponsiblePicker) {
                 TeamPickerDialog(
-                    list = it,
+                    list = listUsersFlow!!,
                     onSubmitList = { },
                     onClick = { user ->
                         run {
@@ -216,6 +213,18 @@ fun CreateProjectDialogInput(
                     pickerType = PickerType.SINGLE,
                     userSearch,
                     { query -> viewModel.setUserSearch(query) }
+                )
+            }
+
+        } else {
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Text(
+                    text = "",
+                )
+            }
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Text(
+                    text = "",
                 )
             }
         }

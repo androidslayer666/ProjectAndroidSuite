@@ -3,23 +3,16 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.MilestoneEntity
-import com.example.database.entities.ProjectEntity
-import com.example.database.entities.SubtaskEntity
 import com.example.database.entities.UserEntity
 import com.example.domain.repository.*
-import com.example.network.dto.SubtaskPost
-import com.example.network.dto.TaskPost
-import com.example.projectandroidsuite.logic.Constants.FORMAT_API_DATE
+import com.example.network.dto.MilestonePost
 import com.example.projectandroidsuite.logic.*
-
-import com.example.projectandroidsuite.ui.*
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -33,11 +26,17 @@ class MilestoneCreateEditViewModel @Inject constructor(
 
     private var projectId: Int? = null
 
+    private var _milestone = MutableLiveData<MilestoneEntity>()
+    val milestone: LiveData<MilestoneEntity> = _milestone
+
     private var _title = MutableLiveData("")
     val title: LiveData<String> = _title
 
     private var _description = MutableLiveData("")
     val description: LiveData<String> = _description
+
+    private var _priority = MutableLiveData(false)
+    val priority: LiveData<Boolean?> = _priority
 
     private var _responsible = MutableLiveData<UserEntity?>()
     val responsible: LiveData<UserEntity?> = _responsible
@@ -50,11 +49,11 @@ class MilestoneCreateEditViewModel @Inject constructor(
     private var _endDate = MutableLiveData<Date>(Date())
     val endDate: LiveData<Date> = _endDate
 
-    private var _subtaskCreationStatus = MutableLiveData<Result<String, String>?>()
-    val subtaskCreationStatus: LiveData<Result<String, String>?> = _subtaskCreationStatus
+    private var _milestoneCreationStatus = MutableLiveData<Result<String, String>?>()
+    val subtaskCreationStatus: LiveData<Result<String, String>?> = _milestoneCreationStatus
 
-    private var _subtaskUpdatingStatus = MutableLiveData<Result<String, String>?>()
-    val subtaskUpdatingStatus: LiveData<Result<String, String>?> = _subtaskUpdatingStatus
+    private var _milestoneUpdatingStatus = MutableLiveData<Result<String, String>?>()
+    val subtaskUpdatingStatus: LiveData<Result<String, String>?> = _milestoneUpdatingStatus
 
     val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
         .combineWith(userSearch) { listProject, filter ->
@@ -70,13 +69,14 @@ class MilestoneCreateEditViewModel @Inject constructor(
         }
     }
 
-//    fun setSubtask(subtask: SubtaskEntity) {
-//        //Log.d("setTask", task.toString())
-//        //taskId = subtask.id
-//        _title.value = subtask.title
-//        subtask.responsible?.let { _responsible.value = it }
-//
-//    }
+    fun setMilestone(milestone: MilestoneEntity) {
+        _milestone.value = milestone
+        _title.value = milestone.title
+        _priority.value = milestone.isKey
+        _description.value = milestone.description
+        _endDate.value = milestone.deadline ?: Date()
+        _responsible.value = milestone.responsible
+    }
 
     fun setTitle(string: String) {
         _title.value = string
@@ -86,12 +86,11 @@ class MilestoneCreateEditViewModel @Inject constructor(
         _description.value = string
     }
 
-    fun setProjectId(projectId: Int){
+    fun setProjectId(projectId: Int) {
         this.projectId = projectId
     }
 
-
-    fun setDate(date: Date){
+    fun setDate(date: Date) {
         Log.d("setDate", date.toString())
         _endDate.value = date
     }
@@ -101,12 +100,19 @@ class MilestoneCreateEditViewModel @Inject constructor(
         _responsible.value = user
     }
 
-    //todo only users
+    fun setPriority(value: Boolean) {
+        Log.d("setPriority", value.toString())
+        _priority.value = value
+    }
+
     fun clearInput() {
         _title.value = ""
-        //_responsible.value = null
-        _subtaskCreationStatus.value = null
-        _subtaskUpdatingStatus.value = null
+        _description.value = ""
+        _priority.value = false
+        _endDate.value = Date()
+        _responsible.value = null
+        _milestoneCreationStatus.value = null
+        _milestoneUpdatingStatus.value = null
     }
 
     fun setUserSearch(query: String) {
@@ -121,34 +127,40 @@ class MilestoneCreateEditViewModel @Inject constructor(
             val response = milestoneRepository.putMilestoneToProject(
                 //todo shouldNot be null
                 projectId ?: 0,
+                MilestonePost(
+                    title = title.value ?: "",
+                    responsible = responsible.value?.id,
+                    description = description.value,
+                    isKey = priority.value,
+                    deadline = endDate.value?.dateToString(),
+                )
+            )
+            withContext(Dispatchers.Main) {
+                Log.d("", response.toString())
+                _milestoneCreationStatus.value = response
+            }
+        }
+    }
+
+    fun updateMilestone() {
+        viewModelScope.launch(IO) {
+            val response = milestoneRepository.updateMilestoneToProject(
+                //todo shouldNot be null
+                projectId ?: 0,
                 MilestoneEntity(
                     title = title.value ?: "",
                     responsible = responsible.value,
                     description = description.value,
-                    id = 0,
+                    id = milestone.value?.id ?: 0,
                     deadline = endDate.value
                 )
             )
             withContext(Dispatchers.Main) {
                 Log.d("", response.toString())
-                _subtaskCreationStatus.value = response
+                _milestoneCreationStatus.value = response
             }
+        }
     }
-}
 
-fun updateMilestone() {
-    viewModelScope.launch(IO) {
-//        val response = taskRepository.updateTask(
-//            //todo shouldNot be null
-//            taskId ?: 0,
-//            TaskPost(
-//                title = title.value,
-//            )
-//        )
-//        withContext(Dispatchers.Main) {
-//            _subtaskUpdatingStatus.value = response
-//        }
-    }
-}
 }
 

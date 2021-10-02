@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -41,7 +42,7 @@ fun ProjectList(
         list?.let {
             items(list!!) { project ->
                 ProjectItem(project) { id -> navController.navigate("project/$id") }
-                CustomDivider()
+
             }
         }
     }
@@ -74,12 +75,14 @@ fun ProjectItem(project: ProjectEntity, onClick: (projectId: Int) -> Unit) {
                 }
             ),
             contentDescription = "Status",
-            modifier = Modifier.weight(0.5f).padding(end = 12.dp)
+            modifier = Modifier
+                .weight(0.3f)
+                .padding(end = 12.dp)
         )
 
         Column(
             Modifier
-                .weight(3f)
+                .weight(2f)
                 .clickable { onClick(project.id) }) {
             project.title.let {
                 Text(
@@ -96,7 +99,7 @@ fun ProjectItem(project: ProjectEntity, onClick: (projectId: Int) -> Unit) {
                 )
             }
         }
-        Column(Modifier.weight(0.5f)) {
+        Column(Modifier.weight(0.5f), horizontalAlignment = Alignment.CenterHorizontally) {
             project.taskCount?.let {
                 Text(
                     text = "$it Tasks",
@@ -105,4 +108,12 @@ fun ProjectItem(project: ProjectEntity, onClick: (projectId: Int) -> Unit) {
             }
         }
     }
+    Row(Modifier.padding(horizontal= 12.dp)){
+        Column(Modifier.weight(0.3F)) {}
+        Column(Modifier.weight(2F)) {
+            Divider()
+        }
+        Column(Modifier.weight(0.5F)) {}
+    }
+
 }

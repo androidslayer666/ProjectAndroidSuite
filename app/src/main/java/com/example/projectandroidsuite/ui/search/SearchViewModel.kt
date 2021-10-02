@@ -1,15 +1,16 @@
 package com.example.projectandroidsuite.ui.search
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.database.entities.MilestoneEntity
 import com.example.domain.repository.FileRepository
 import com.example.domain.repository.MilestoneRepository
 import com.example.domain.repository.ProjectRepository
 import com.example.domain.repository.TaskRepository
 import com.example.projectandroidsuite.logic.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,7 +33,6 @@ class SearchViewModel @Inject constructor(
             }
         }
 
-
     val tasks = taskRepository.getAllUserTasks().asLiveData()
         .combineWith(searchString) { listTasks, searchString ->
             if (!searchString.isNullOrEmpty()) {
@@ -41,6 +41,31 @@ class SearchViewModel @Inject constructor(
                 listTasks
             }
         }
+
+        //todo implement population on the repository side
+
+    val milestones = projectRepository.getAllStoredProjects().asLiveData().switchMap { projects ->
+        val listMilestones = mutableListOf<MilestoneEntity>()
+        viewModelScope.launch {
+            projects.forEach { project ->
+                milestoneRepository.getMilestonesByProjectFlow(project.id).collectLatest { milestones ->
+                    listMilestones.addAll(milestones)
+                }
+            }
+        }
+        liveData {emit(listMilestones)}.combineWith(searchString) { listMilestones, searchString ->
+            listMilestones?.filterMilestoneByFilter(MilestoneFilter(searchString))
+        }
+    }
+
+    val files = fileRepository.getAllFiles().asLiveData().combineWith(searchString){ listFiles, searchString ->
+        listFiles?.filterFileByFilter(FileFilter(searchString))
+    }
+
+
+    fun clearSearchString(){
+        _searchString.value = ""
+    }
 
     fun setSearchString(searchString: String) {
         _searchString.value = searchString

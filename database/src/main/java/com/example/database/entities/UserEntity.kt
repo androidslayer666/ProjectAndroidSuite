@@ -12,6 +12,7 @@ data class UserEntity (
     val displayName : String = firstName+lastName,
     var email: String?,
     val avatarSmall : String? = null,
+    val avatarMedium : String? = null,
     val profileUrl: String? = null,
     var chosen: Boolean? = null
 )

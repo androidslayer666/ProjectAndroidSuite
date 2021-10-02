@@ -43,6 +43,13 @@ class ProjectViewModel @Inject constructor(
     private var _problemWithFetchingProjects = MutableLiveData<String>()
     val problemWithFetchingProjects: LiveData<String> = _problemWithFetchingProjects
 
+    private var _projectSorting = MutableLiveData<ProjectSorting>()
+    val projectSorting: LiveData<ProjectSorting> = _projectSorting
+
+    private var _taskSorting = MutableLiveData<TaskSorting>()
+    val taskSorting: LiveData<TaskSorting> = _taskSorting
+
+
     val projects =
         repository.projectsFromDb.asLiveData().combineWith(projectFilter) { listProjects, filter ->
                 if (filter != null) {
@@ -50,6 +57,8 @@ class ProjectViewModel @Inject constructor(
                 } else {
                     listProjects
                 }
+        }.combineWith(projectSorting) { listProjects, sorting ->
+            listProjects?.sortProjects(sorting)
         }
 
     val tasks = taskRepository.getAllUserTasks().asLiveData().combineWith(taskFilter){
@@ -59,6 +68,8 @@ class ProjectViewModel @Inject constructor(
         }else {
             listTasks
         }
+    }.combineWith(taskSorting) { listTasks, sorting ->
+        listTasks?.sortTasks(sorting)
     }
 
     val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
@@ -75,6 +86,14 @@ class ProjectViewModel @Inject constructor(
             taskRepository.populateTasks()
             teamRepository.populateAllPortalUsers()
         }
+    }
+
+    fun setProjectSorting(sorting: ProjectSorting) {
+        _projectSorting.value = sorting
+    }
+
+    fun setTaskSorting(sorting: TaskSorting) {
+        _taskSorting.value = sorting
     }
 
     fun setUserSearch(query: String) {

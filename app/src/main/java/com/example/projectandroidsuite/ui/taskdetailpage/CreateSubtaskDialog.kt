@@ -89,9 +89,7 @@ fun CreateSubtaskDialogInput(viewModel: SubtaskCreateEditViewModel) {
     Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(text = "Title", modifier = Modifier.weight(2F))
-            CustomTextField(modifier = Modifier
-                .fillMaxWidth()
-                .weight(4F),
+            CustomTextField(
                 value = title,
                 onValueChange = { text -> viewModel.setTitle(text) })
         }

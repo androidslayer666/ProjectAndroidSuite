@@ -6,6 +6,7 @@ import com.example.database.entities.ProjectEntity
 import com.example.domain.mappers.toListEntities
 import com.example.domain.mappers.toListUserEntity
 import com.example.domain.mappers.toProjectEntity
+import com.example.network.dto.ProjectDto
 import com.example.network.dto.ProjectPost
 import com.example.network.dto.ProjectStatusPost
 import com.example.network.endpoints.ProjectEndPoint
@@ -24,41 +25,29 @@ class ProjectRepository @Inject constructor(
     private val projectEndPoint: ProjectEndPoint,
     private val teamEndPoint: TeamEndPoint,
 ) {
-    suspend fun getProjects(): Result<String, String> {
-        try {
-            // getting a list with a limited information about projects
-            val projectsFromNetwork =
-                projectEndPoint.getAllProjects().listProjectDtos?.toListEntities()
-            if (projectsFromNetwork == null) {
-                return Failure("Something wrong with network or server")
-            }
-            //Log.d("ProjectRepository", "Projects from network" + projectsFromNetwork.toString())
 
-            projectsFromNetwork.forEach { project ->
-                //gathering full info about each project
-                //Log.d("ProjectRepository", project.toString())
-                CoroutineScope(IO).launch {
-                    try {
-                        val projectFrom = projectEndPoint.getProjectById(project.id).projectDto
-                        val team = teamEndPoint.getProjectTeam(project.id)
-                        // adding team
-                        projectFrom?.team = team.ids?.toMutableList()
-                        projectFrom?.toProjectEntity()?.let { projectDao.insertProject(it) }
-                    } catch (e: Exception) {
-                        //Log.e("ProjectRepository", e.toString())
+    suspend fun getProjects(): Result<String, String> {
+        return networkCaller(
+            call = { projectEndPoint.getAllProjects().listProjectDtos },
+            onSuccess = { projects ->
+                projects?.forEach { project ->
+                    //gathering full info about each project
+                    CoroutineScope(IO).launch {
+                        getTeamAndInsertProjectToDb(project.id)
                     }
                 }
+                clearDeletedProjects(projects)
             }
-            //Log.d("ProjectRepository", "Projects are populated")
-            projectDao.getAll().forEach { project ->
-                if (!projectsFromNetwork.toListProjectIds().contains(project.id))
+        )
+    }
+
+    private suspend fun clearDeletedProjects(list: List<ProjectDto>?) {
+        projectDao.getAll().forEach { project ->
+            //Log.d("ProjectRepository", list?.map{ it.title}.toString())
+            if (list?.toListEntities()?.toListProjectIds()?.contains(project.id) != true) {
                 //Log.d("ProjectRepository", project.title)
-                    projectDao.deleteProject(project.id)
+                projectDao.deleteProject(project.id)
             }
-            return Success("Projects are populated")
-        } catch (e: Exception) {
-            //Log.e("ProjectRepository", e.toString())
-            return Failure("Something wrong with network or server")
         }
     }
 
@@ -77,105 +66,58 @@ class ProjectRepository @Inject constructor(
         project: ProjectPost,
         projectStatus: String
     ): Result<String, String> {
-        try {
-            //Log.d("ProjectRepository", "updating project" + project.toString())
-            val response = projectEndPoint.updateProject(projectId, project)
-
-            updateProjectStatus(projectId , projectStatus)
-            //Log.d("ProjectRepository", "got a response when updating" + project.toString())
-            if (response.projectDto != null) {
-                //todo update in dao
-                val renewedProject =
-                    projectEndPoint.getProjectById(projectId).projectDto?.toProjectEntity()
-                val team = teamEndPoint.getProjectTeam(projectId)
-                renewedProject?.team = team.ids?.toListUserEntity()
-                //Log.d("ProjectRepository", "updating project from db" + renewedProject.toString())
-                if (renewedProject != null)
-                    projectDao.updateProject(renewedProject)
-
-                return Success("Project successfully updated")
-            } else {
-                return Failure("Error during updating the project")
-            }
-        } catch (e: IOException) {
-            Log.d(
-                "ProjectRepository",
-                "tried to create a project but caught an exception: ${e.message}"
-            )
-            return Failure("Error during updating the project")
-        }
+        return networkCaller(
+            call = {
+                projectEndPoint.updateProject(projectId, project)
+                updateProjectStatus(projectId, projectStatus)
+            },
+            onSuccess = { getTeamAndInsertProjectToDb(projectId) }
+        )
     }
 
     suspend fun createProject(project: ProjectPost): Result<String, String> {
-        Log.d("ProjectRepository", "Started creating pproject")
-        try {
-            val response = projectEndPoint.createProject(project)
-            Log.d("ProjectRepository", response.toString())
-            if (response != null) {
-                Log.d("ProjectRepository", "Project created")
-                //because response from server doesn't give id
-                getProjects()
-                return Success("Project successfully create")
-            } else {
-                return Failure("Project was not created due to a server problem")
-            }
-        } catch (e: Exception) {
-            Log.d(
-                "ProjectRepository",
-                "tried to create a project but caught an exception: ${e.message}"
-            )
-            return Failure("Project was not created, please check network or ask the developer to fix this")
-        }
+        return networkCaller(
+            call = { projectEndPoint.createProject(project) },
+            onSuccess = { getProjects() }
+        )
     }
 
     suspend fun deleteProject(projectId: Int): Result<String, String> {
-        Log.d("ProjectRepository", "Start deleting the project")
-        try {
-            val response = projectEndPoint.deleteProject(projectId)
-            if (response.projectDto != null) {
-                Log.d("ProjectRepository", "project deleted")
-                //projectDao.deleteProject(projectId)
-                //getProjects()
-                return Success("Project successfully deleted")
-            } else {
-                Log.d("ProjectRepository", "Failed to delete the project")
-                return Failure("Project was not created due to a server problem")
-            }
-        } catch (e: IOException) {
-            Log.d(
-                "ProjectRepository",
-                "tried to create a project but caught an exception: ${e.message}"
-            )
-            return Failure("Project was not deleted, please check network or ask the developer to fix this")
-        }
+        return networkCaller(
+            call = { projectEndPoint.deleteProject(projectId) },
+            onSuccess = { }
+        )
     }
 
-    suspend fun updateProjectStatus(projectId: Int, projectStatus: String): Result<String, String> {
-        try {
-            Log.d("ProjectRepository", "updating project" + projectId.toString())
-            val response =
-                projectEndPoint.updateProjectStatus(projectId, ProjectStatusPost(projectStatus))
-            Log.d("ProjectRepository", "got a response when updating" + projectStatus)
-            if (response != null) {
-                val renewedProject =
-                    projectEndPoint.getProjectById(projectId).projectDto?.toProjectEntity()
+    private suspend fun updateProjectStatus(
+        projectId: Int,
+        projectStatus: String
+    ): Result<String, String> {
+        return networkCaller(
+            call = {
+                projectEndPoint.updateProjectStatus(
+                    projectId,
+                    ProjectStatusPost(projectStatus)
+                )
+            },
+            onSuccess = { getTeamAndInsertProjectToDb(projectId) }
+        )
+    }
+
+    private suspend fun getTeamAndInsertProjectToDb(projectId: Int) {
+
+        networkCaller(
+            call = { projectEndPoint.getProjectById(projectId).projectDto?.toProjectEntity() },
+            onSuccess = { project ->
                 val team = teamEndPoint.getProjectTeam(projectId)
-                renewedProject?.team = team.ids?.toListUserEntity()
-                Log.d("ProjectRepository", "updating project from db" + renewedProject.toString())
-                if (renewedProject != null)
-                    projectDao.insertProject(renewedProject)
-
-                return Success("Project successfully updated")
-            } else {
-                return Failure("Error during updating the project")
+                project?.team = team.ids?.toListUserEntity()
+                if (project != null)
+                    projectDao.insertProject(project)
             }
-        } catch (e: IOException) {
-            Log.d(
-                "ProjectRepository",
-                "tried to create a project but caught an exception: ${e.message}"
-            )
-            return Failure("Error during updating the project")
-        }
+        )
     }
-
 }
+
+
+
+

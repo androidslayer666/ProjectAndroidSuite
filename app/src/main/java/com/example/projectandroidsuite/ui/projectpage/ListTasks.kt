@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -29,13 +30,11 @@ fun TaskList(
     viewModel: ProjectViewModel,
     navController: NavHostController
 ) {
-
     val list by viewModel.tasks.observeAsState()
     LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
         list?.let {
             items(list!!) { task ->
                 TaskItem(task) { id -> navController.navigate("tasks/$id") }
-                CustomDivider()
             }
         }
     }
@@ -65,13 +64,25 @@ fun TaskItem(task: TaskEntity, onClick: (taskId: Int) -> Unit) {
         Column(modifier = Modifier
             .weight(2f)
             .clickable { onClick(task.id) }) {
-            Text(text = task.title,
-                style = MaterialTheme.typography.body1,
-                maxLines = 1,
-                overflow = TextOverflow.Clip,
-                modifier = Modifier.clickable {
-                    onClick(task.id)
-                })
+            Row (verticalAlignment = Alignment.CenterVertically){
+                if (task.priority != null && task.priority == 1) {
+                    Image(
+                        painterResource(
+                            R.drawable.ic_baseline_flag_24
+                        ),
+                        contentDescription = "Status",
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                    )
+                }
+                Text(text = task.title,
+                    style = MaterialTheme.typography.body1,
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip,
+                    modifier = Modifier.clickable {
+                        onClick(task.id)
+                    })
+            }
             if (task.responsibles.isNotEmpty()) {
                 Text(
                     text = task.responsibles[0].displayName + " + "
@@ -80,13 +91,21 @@ fun TaskItem(task: TaskEntity, onClick: (taskId: Int) -> Unit) {
                 )
             }
         }
-        Column(Modifier.weight(0.5f)) {
+        Column(Modifier.weight(0.5f), horizontalAlignment = Alignment.CenterHorizontally) {
             task.subtasks?.let {
                 Text(
+                    textAlign = TextAlign.Center,
                     text = "${it.size} Subtasks",
                     style = MaterialTheme.typography.overline
                 )
             }
         }
+    }
+    Row(Modifier.padding(horizontal = 12.dp)) {
+        Column(Modifier.weight(0.3F)) {}
+        Column(Modifier.weight(2F)) {
+            Divider()
+        }
+        Column(Modifier.weight(0.5F)) {}
     }
 }

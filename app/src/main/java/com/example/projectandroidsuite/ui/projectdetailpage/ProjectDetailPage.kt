@@ -1,10 +1,8 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -19,22 +17,18 @@ import com.example.domain.repository.Failure
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.makeToast
 import com.example.projectandroidsuite.ui.parts.*
+import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
 
 @Composable
 fun ProjectDetailPage(
     projectId: Int?,
     viewModel: ProjectDetailViewModel,
-    navController: NavHostController,
-    toggleSearch: () -> Unit,
-    toggleFab: Pair<Boolean, () -> Unit>,
-    onProjectDeletedOrEdited: (String) -> Unit = { }
+    navController: NavHostController
 ) {
 
     if (projectId != null && viewModel.projectId.value == null) {
         viewModel.setProject(projectId)
     }
-
-    //Log.d("deleteProject", "Recompose ProjectDetailPage")
 
     val context = LocalContext.current
 
@@ -53,23 +47,16 @@ fun ProjectDetailPage(
     val listFiles by viewModel.listFiles.observeAsState(listOf())
     val projectDeletionStatus by viewModel.projectDeletionStatus.observeAsState()
 
-    ScaffoldTopBarWrapper(
-        false,
-        {},
-        toggleSearch
-    ) {
-        Column(if (toggleFab.first || expandButtons)
-            Modifier.clickable {
-                expandButtons = false
-                toggleFab.second()
-            } else Modifier.padding()) {
-            Row() {
+    CustomScaffold (navController = navController, viewModel = hiltViewModel()){
+        Column {
+            Row {
                 Column(Modifier.weight(5F)) {
                     DetailHeaderWrapper(
-                        project?.title,
-                        project?.description,
-                        project?.responsible,
-                        project?.team
+                        title = project?.title,
+                        description = project?.description,
+                        responsible = project?.responsible,
+                        team = project?.team,
+                        projectStatus = project?.status
                     )
                 }
             }
@@ -78,7 +65,6 @@ fun ProjectDetailPage(
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-
                             text = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(title)
@@ -132,14 +118,14 @@ fun ProjectDetailPage(
                 hiltViewModel(),
                 { showUpdateProjectDialog = false },
                 viewModel.currentProject.value,
-                { string -> onProjectDeletedOrEdited(string) }
+                { string -> makeToast(string, context) }
             )
         }
         if (projectDeletionStatus != null) {
             when (projectDeletionStatus) {
                 is Success -> {
                     Log.d("deleteProject", projectDeletionStatus.toString())
-                    onProjectDeletedOrEdited((projectDeletionStatus as Success<String>).value)
+                    makeToast((projectDeletionStatus as Success<String>).value, context)
                     viewModel.resetState()
                     navController.navigate("Projects")
                 }

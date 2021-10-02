@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.projectdetailpage
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,8 +13,9 @@ import androidx.compose.ui.unit.dp
 import com.example.database.entities.MessageEntity
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.ui.parts.TeamMemberRow
+import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
-import com.example.projectandroidsuite.ui.projectdetailpage.MessageCreateEditViewModel
 
 @Composable
 fun CreateMessageDialog(
@@ -26,8 +27,8 @@ fun CreateMessageDialog(
 ) {
     viewModel.setProjectId(projectId)
 
-    val messageUpdatingStatus by viewModel.subtaskUpdatingStatus.observeAsState()
-    val messageCreationStatus by viewModel.subtaskCreationStatus.observeAsState()
+    val messageUpdatingStatus by viewModel.updatingStatus.observeAsState()
+    val messageCreationStatus by viewModel.creationStatus.observeAsState()
 
     if (messageCreationStatus is Success<String>) {
         onMessageDeletedOrEdited((messageCreationStatus as Success<String>).value)
@@ -89,22 +90,17 @@ fun CreateMessageDialogInput(viewModel: MessageCreateEditViewModel) {
     Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(text = "Title", modifier = Modifier.weight(2F))
-            CustomTextField(modifier = Modifier
-                .fillMaxWidth()
-                .weight(4F),
+            CustomTextField(
                 value = title,
                 onValueChange = { text -> viewModel.setTitle(text) })
         }
 
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(text = "Description", modifier = Modifier.weight(2F))
-            CustomTextField(modifier = Modifier
-                .fillMaxWidth()
-                .weight(4F),
-                value = description, onValueChange = { text ->
-                    run {
-                        viewModel.setDescription(text)
-                    }
+            CustomTextField(
+                value = description,
+                onValueChange = { text ->
+                    viewModel.setDescription(text)
                 })
         }
 
@@ -116,15 +112,13 @@ fun CreateMessageDialogInput(viewModel: MessageCreateEditViewModel) {
                         .align(Alignment.CenterVertically)
                         .weight(2F))
 
-                chosenUserList?.let { it -> TeamMemberRow(it) }
+                chosenUserList?.let { it -> TeamMemberRow(it, modifier = Modifier.weight(4F)) }
                 if (showTeamPicker) {
                     TeamPickerDialog(
                         list = it,
                         onSubmitList = { },
                         onClick = { user ->
-                            run {
                                 viewModel.addOrRemoveUser(user)
-                            }
                         },
                         closeDialog = { showTeamPicker = false },
                         pickerType = PickerType.MULTIPLE,

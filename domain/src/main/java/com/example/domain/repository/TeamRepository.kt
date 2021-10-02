@@ -5,13 +5,19 @@ import com.example.database.dao.TaskDao
 import com.example.database.dao.TeamDao
 import com.example.database.dao.UserDao
 import com.example.database.entities.TaskOrMilestoneEntity
+import com.example.database.entities.UserEntity
 import com.example.domain.mappers.toListEntities
 import com.example.domain.mappers.toListUserEntity
+import com.example.domain.mappers.toUserEntity
 import com.example.network.dto.Team
 import com.example.network.dto.UserDto
+import com.example.network.dto.UserTransporter
 import com.example.network.endpoints.MilestoneEndPoint
 import com.example.network.endpoints.TaskEndPoint
 import com.example.network.endpoints.TeamEndPoint
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -47,4 +53,8 @@ class TeamRepository @Inject constructor(
     }
 
     fun getAllPortalUsers() = userDao.getAll()
+
+    suspend fun getSelfProfile(): UserEntity? {
+        return teamEndPoint.getSelfProfile().user?.toUserEntity()
+    }
 }

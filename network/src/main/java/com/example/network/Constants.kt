@@ -5,6 +5,8 @@ object Constants {
 
     const val LOGIN_URL = "api/2.0/authentication.json"
 
+    const val TRY_PORTAL_URL = "api/2.0/portal"
+
 
     // Projects
     const val GET_PROJECTS_URL = "api/2.0/project/@self"

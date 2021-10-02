@@ -10,6 +10,7 @@
         android:name=".ProjectApplication"
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjectAndroidSuite">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

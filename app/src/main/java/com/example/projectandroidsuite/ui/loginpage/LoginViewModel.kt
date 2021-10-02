@@ -37,8 +37,11 @@ class LoginViewModel @Inject constructor(
     private var _canConnectToPortal = MutableLiveData<Boolean>(false)
     val canConnectToPortal: LiveData<Boolean> = _canConnectToPortal
 
-    private var _loginPortalInput = MutableLiveData<String>()
-    val loginPortalInput: LiveData<String> = _loginPortalInput
+    private var _portalAddress = MutableLiveData<String>()
+    val portalAddress: LiveData<String> = _portalAddress
+
+    private var _portalAddressForLocal = MutableLiveData<String>()
+    val portalAddressForLocal: LiveData<String> = _portalAddressForLocal
 
     private var _emailInput = MutableLiveData<String>()
     val emailInput: LiveData<String> = _emailInput
@@ -46,12 +49,14 @@ class LoginViewModel @Inject constructor(
     private var _passwordInput = MutableLiveData<String>()
     val passwordInput: LiveData<String> = _passwordInput
 
+    private var _portalIsInCloud = MutableLiveData<Int>(0)
+    val portalIsInCloud: LiveData<Int> = _portalIsInCloud
+
     val authenticated = sessionManager.authenticated
 
     init {
         sessionManager.logOut()
     }
-
 
     fun checkIfAuthenticated(): Boolean {
         Log.d("checkIfAuthenticated",sessionManager.isAuthenticated().toString())
@@ -59,8 +64,8 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onChangePortalAddress(sequence: CharSequence) {
-        _loginPortalInput.value = sequence.toString()
-        val isValidated = validatePortalNameInput(sequence.toString())
+        _portalAddress.value = sequence.toString()
+        val isValidated = validatePortalNameInput(sequence.toString()) || portalIsInCloud.value == 1
         _inputPortalValidated.value = isValidated
         if (_canConnectToPortal.value == true) {
             _canConnectToPortal.value = false
@@ -68,7 +73,11 @@ class LoginViewModel @Inject constructor(
         if (isValidated) {
             tryIfPortalExists()
         }
-        Log.d("LoginViewModel", "portal address is valid" + inputPortalValidated.value.toString())
+        //Log.d("LoginViewModel", "portal address is valid" + inputPortalValidated.value.toString())
+    }
+
+    fun setPortalIsInCloud(value : Int) {
+        _portalIsInCloud.value = value
     }
 
     fun onChangeEmail(sequence: CharSequence) {
@@ -83,26 +92,26 @@ class LoginViewModel @Inject constructor(
         //Log.d("LoginViewModel", passwordInput.value.toString())
     }
 
-    private fun tryIfPortalExists() {
+    fun tryIfPortalExists() {
         val apiClient = ApiClientAuth()
         Log.d("LoginViewModel", "try portal")
-        loginPortalInput.value?.toString()?.let { Log.d("LoginViewModel", it) }
-        apiClient.getApiService(loginPortalInput.value?.trim() ?: "")
-            .tryLogin(LoginRequest("", ""))
+        portalAddress.value?.toString()?.let { Log.d("LoginViewModel", it) }
+        apiClient.getApiService(portalAddress.value?.trim() ?: "")
+            .tryLogin()
             .enqueue(
                 (object : Callback<LoginResponse> {
                     override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                        Log.d("LoginViewModel", t.toString())
                         if (inputPortalValidated.value == true)
                             _canConnectToPortal.value = false
-                        Log.d("LoginViewModel", t.toString())
                     }
 
                     override fun onResponse(
                         call: Call<LoginResponse>,
                         response: Response<LoginResponse>
                     ) {
-                        if (response.code() == 500) {
-                            Log.d("LoginViewModel", response.toString())
+                        Log.d("LoginViewModel", response.toString())
+                        if (response.code() == 401) {
                             _canConnectToPortal.value = true
                         }
                     }
@@ -111,9 +120,18 @@ class LoginViewModel @Inject constructor(
     }
 
     fun authenticate(
-        //context: Context,
         onCompleteLogin: () -> Unit
     ) {
+        Log.d("LoginFragment",  "inputPortalValidated" + inputPortalValidated.value.toString())
+        Log.d("LoginFragment",  "canConnectToPortal" + canConnectToPortal.value.toString())
+        Log.d("LoginFragment",  "inputEmailValidated" + inputEmailValidated.value.toString())
+        Log.d("LoginFragment",  "inputPasswordValidated" + inputPasswordValidated.value.toString())
+
+        inputPortalValidated.value == true &&
+                canConnectToPortal.value == true &&
+                inputEmailValidated.value == true &&
+                inputPasswordValidated.value == true
+
         if (inputPortalValidated.value == true &&
             canConnectToPortal.value == true &&
             inputEmailValidated.value == true &&
@@ -126,9 +144,9 @@ class LoginViewModel @Inject constructor(
                         emailInput.value!!,
                         passwordInput.value!!
                     ), ProjectApplication.applicationContext(),
-                    loginPortalInput.value!!
+                    portalAddress.value!!
                 )
-                sessionManager.rememberPortalAddress(loginPortalInput.value!!)
+                sessionManager.rememberPortalAddress(portalAddress.value!!)
                 onCompleteLogin()
             }
         }

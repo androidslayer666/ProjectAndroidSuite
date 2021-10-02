@@ -15,6 +15,7 @@ fun authTokenInterceptor(token: String): OkHttpClient =
         chain.proceed(newRequest)
     }).build()
 
+
 fun <EndPoint> buildEndPoint(endPoint: Class<EndPoint>, token: String, baseUrl:String): EndPoint {
     return Retrofit.Builder()
         .client(authTokenInterceptor(token))
@@ -23,3 +24,4 @@ fun <EndPoint> buildEndPoint(endPoint: Class<EndPoint>, token: String, baseUrl:S
         .build()
         .create(endPoint)
 }
+
