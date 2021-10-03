@@ -14,9 +14,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class
-SessionManager @Inject constructor(context: Context) {
+class SessionManager @Inject constructor(context: Context) {
 
+
+    //todo remove lateinit
     private lateinit var apiService: Auth
 
     private var prefs: SharedPreferences =

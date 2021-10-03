@@ -13,5 +13,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="CalenderViewCustom" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <item name="colorAccent">@color/red</item>
+        <item name="colorOnPrimary">@color/grey</item>
+        <item name="colorSurface">@color/light</item>
+
+        <item name="colorButtonNormal">@color/light</item>
+    </style>
+
 
 </resources>

@@ -11,7 +11,7 @@ data class MessageEntity(
     val canEdit: Boolean? = null,
     @PrimaryKey
     val id: Int,
-    val title: String ="",
+    var title: String ="",
     val description: String? = null,
     @Embedded(prefix = "projectOwner")
     val projectOwner: UserEntity? = null,

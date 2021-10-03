@@ -22,6 +22,8 @@ import com.example.projectandroidsuite.logic.ProjectSorting
 import com.example.projectandroidsuite.logic.ProjectStatus
 import com.example.projectandroidsuite.ui.parts.TeamMemberCard
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
+import com.example.projectandroidsuite.ui.parts.customitems.CustomSortButton
 
 @Composable
 fun FilterProjects(
@@ -37,148 +39,114 @@ fun FilterProjects(
 
     Surface(
         elevation = 10.dp,
-        shape = RoundedCornerShape(
-            topStart = 0.dp,
-            topEnd = 0.dp,
-            bottomEnd = 16.dp,
-            bottomStart = 16.dp
-        ),
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
                 .background(MaterialTheme.colors.primary)
         ) {
+            Text(text = "Stage", color = MaterialTheme.colors.onPrimary)
+            CustomButton(
+                text = "Active",
+                clicked = (stage == ProjectStatus.ACTIVE),
+                onClick = { viewModel.setStageForFiltering(ProjectStatus.ACTIVE) })
+            Spacer(Modifier.size(12.dp))
+            CustomButton(
+                text = "Paused",
+                clicked = (stage == ProjectStatus.PAUSED),
+                onClick = { viewModel.setStageForFiltering(ProjectStatus.PAUSED) })
+            Spacer(Modifier.size(12.dp))
+            CustomButton(
+                text = "Stopped",
+                clicked = (stage == ProjectStatus.STOPPED),
+                onClick = { viewModel.setStageForFiltering(ProjectStatus.STOPPED) }
+            )
 
 
-            Row {
-                Row(Modifier.weight(2F)) {
-                    Text(text = "Stage", color = MaterialTheme.colors.onPrimary)
-                }
-                Row(
-                    Modifier
-                        .selectableGroup()
-                        .weight(4F)
-                ) {
-                    RadioButton(
-                        (stage == ProjectStatus.ACTIVE),
-                        { viewModel.setStageForFiltering(ProjectStatus.ACTIVE) }
-                    )
-                    Text(text = "Active", color = MaterialTheme.colors.onPrimary)
 
 
-                    RadioButton(
-                        (stage == ProjectStatus.PAUSED),
-                        { viewModel.setStageForFiltering(ProjectStatus.PAUSED) }
-                    )
-                    Text(text = "Paused", color = MaterialTheme.colors.onPrimary)
-
-                    RadioButton(
-                        (stage == ProjectStatus.STOPPED),
-                        { viewModel.setStageForFiltering(ProjectStatus.STOPPED) }
-                    )
-                    Text(text = "Stopped", color = MaterialTheme.colors.onPrimary)
-
-                }
-            }
             listUsersFlow?.let {
-                Row {
-                    Row(
-                        Modifier
-                            .clickable { showUserPicker = true }
-                            .weight(2F)) {
-                        Text(text = "Choose team", color = MaterialTheme.colors.onPrimary)
-                        user?.let { it1 -> TeamMemberCard(user = it1) }
-                    }
+                Column() {
+                    Text(
+                        text = "Responsible",
+                        color = MaterialTheme.colors.onPrimary,
+                        modifier = Modifier.clickable { showUserPicker = true })
+                    Spacer(Modifier.size(12.dp))
+                    user?.let { it1 -> TeamMemberCard(user = it1) }
                     if (showUserPicker) {
-                        Row(Modifier.weight(4F)) {
-                            TeamPickerDialog(
-                                list = it,
-                                onSubmitList = { },
-                                onClick = { user -> viewModel.setUserForFilteringProject(user) },
-                                closeDialog = { showUserPicker = false },
-                                pickerType = PickerType.SINGLE,
-                                userSearch,
-                                { query -> viewModel.setUserSearch(query) }
-                            )
-                        }
+                        TeamPickerDialog(
+                            list = it,
+                            onSubmitList = { },
+                            onClick = { user -> viewModel.setUserForFilteringProject(user) },
+                            closeDialog = { showUserPicker = false },
+                            pickerType = PickerType.SINGLE,
+                            userSearch,
+                            { query -> viewModel.setUserSearch(query) }
+                        )
                     }
                 }
             }
-            Text(text = "ClearFilters", color = MaterialTheme.colors.onPrimary, modifier = Modifier
-                .clickable { viewModel.clearFiltersProject() }
-                .padding(vertical = 12.dp))
 
+            Spacer(Modifier.size(12.dp))
+            Surface(
+                elevation = 10.dp,
+                color = MaterialTheme.colors.primaryVariant
+            ) {
+                Text(text = "ClearFilters",
+                    color = MaterialTheme.colors.onPrimary,
+                    modifier = Modifier
+                        .clickable { viewModel.clearFiltersProject() }
+                        .padding(vertical = 12.dp))
+            }
+
+            Spacer(Modifier.size(12.dp))
             Text(
                 text = "Sorting",
                 color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
-            Row {
+            Column() {
 
-                Row(Modifier.weight(2F)) {
+                Row() {
                     Text(text = "Created ", color = MaterialTheme.colors.onPrimary)
-
                 }
-                Row(Modifier.weight(4F)) {
+                Row() {
+                    CustomSortButton(
+                        ascending = true, clicked = (sorting == ProjectSorting.CREATED_ASC)
+                    ) { viewModel.setProjectSorting(ProjectSorting.CREATED_ASC) }
 
-                    RadioButton(
-                        (sorting == ProjectSorting.CREATED_ASC),
-                        { viewModel.setProjectSorting(ProjectSorting.CREATED_ASC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_variant),
-                        contentDescription = "Status"
-                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    CustomSortButton(
+                        ascending = false, clicked = (sorting == ProjectSorting.CREATED_DESC)
+                    ) { viewModel.setProjectSorting(ProjectSorting.CREATED_DESC) }
 
-                    Spacer(modifier = Modifier.width(6.dp))
-                    RadioButton(
-                        (sorting == ProjectSorting.CREATED_DESC),
-                        { viewModel.setProjectSorting(ProjectSorting.CREATED_DESC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_reverse_variant),
-                        contentDescription = "Status"
-                    )
                 }
             }
 
-            Row {
+            Column() {
 
                 Row(
                     Modifier
                         .padding(bottom = 20.dp)
-                        .weight(2F)
                 ) {
                     Text(text = "Stage ", color = MaterialTheme.colors.onPrimary)
                 }
 
-                Row(Modifier.weight(4F)) {
-                    RadioButton(
-                        (sorting == ProjectSorting.STAGE_ASC),
-                        { viewModel.setProjectSorting(ProjectSorting.STAGE_ASC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_variant),
-                        contentDescription = "Status"
-                    )
+                Row() {
+                    CustomSortButton(
+                        ascending = true, clicked = (sorting == ProjectSorting.STAGE_ASC)
+                    ) { viewModel.setProjectSorting(ProjectSorting.STAGE_ASC) }
 
-                    Spacer(modifier = Modifier.width(6.dp))
-                    RadioButton(
-                        (sorting == ProjectSorting.STAGE_DESC),
-                        { viewModel.setProjectSorting(ProjectSorting.STAGE_DESC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_reverse_variant),
-                        contentDescription = "Status"
-                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    CustomSortButton(
+                        ascending = false, clicked = (sorting == ProjectSorting.STAGE_DESC)
+                    ) { viewModel.setProjectSorting(ProjectSorting.STAGE_DESC) }
                 }
             }
         }
     }
-
-
 }
+
+
 

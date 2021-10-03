@@ -72,6 +72,10 @@ class TaskCreateEditViewModel @Inject constructor(
     private var _endDate = MutableLiveData(Date())
     val endDate: LiveData<Date> = _endDate
 
+    val userList = project.switchMap { project ->
+       liveData{emit (project?.team)}
+    }
+
     val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
         .combineWith(chosenUserList) { users, chosenUsers ->
             users?.forEach { user ->
@@ -92,7 +96,7 @@ class TaskCreateEditViewModel @Inject constructor(
 
     val milestonesList = project.switchMap {
         if (it?.id != null)
-             milestoneRepository.getMilestonesByProjectFlow(it.id).asLiveData()
+            milestoneRepository.getMilestonesByProjectFlow(it.id).asLiveData()
         else
             liveData { }
     }
@@ -100,8 +104,8 @@ class TaskCreateEditViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(IO) {
-            teamRepository.populateAllPortalUsers()
             projectRepository.getProjects()
+            teamRepository.populateAllPortalUsers()
             //if(projectResponse is Failure<String>) _problemWithFetchingProjects.value = projectResponse.reason!!
         }
     }
@@ -143,7 +147,7 @@ class TaskCreateEditViewModel @Inject constructor(
         Log.d("setProject", _project.value.toString())
     }
 
-    fun setMilestone(milestone:MilestoneEntity) {
+    fun setMilestone(milestone: MilestoneEntity) {
         _milestone.value = milestone
         Log.d("setProject", _milestone.value.toString())
     }
@@ -208,8 +212,8 @@ class TaskCreateEditViewModel @Inject constructor(
                         title = title.value,
                         responsibles = chosenUserList.value?.fromListUsersToStrings(),
                         startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date()),
-                        milestoneid = milestone.value?.id ?:0,
-                        priority = priorityToString(priority.value?:0)
+                        milestoneid = milestone.value?.id ?: 0,
+                        priority = priorityToString(priority.value ?: 0)
                     )
                 )
                 withContext(Dispatchers.Main) {
@@ -233,8 +237,8 @@ class TaskCreateEditViewModel @Inject constructor(
                     title = title.value,
                     responsibles = chosenUserList.value?.fromListUsersToStrings(),
                     startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date()),
-                    milestoneid = milestone.value?.id ?:0,
-                    priority = priorityToString(priority.value?:0)
+                    milestoneid = milestone.value?.id ?: 0,
+                    priority = priorityToString(priority.value ?: 0)
                 ),
                 when (taskStatus.value) {
                     TaskStatus.ACTIVE -> "Open"

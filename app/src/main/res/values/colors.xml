@@ -4,4 +4,6 @@
     <color name="light">#000000</color>
     <color name="red">#eb7304</color>
     <color name="primary">#435F7D</color>
+    <color name="grey">#4B4B4B</color>
+
 </resources>

@@ -103,8 +103,8 @@ class MessageCreateEditViewModel @Inject constructor(
     //todo only users
     fun clearInput() {
         projectId = null
-        _title.value = null
-        _description.value = null
+        _title.value = ""
+        _description.value = ""
         _chosenUserList.value = mutableListOf()
         _creationStatus.value = null
         _updatingStatus.value = null

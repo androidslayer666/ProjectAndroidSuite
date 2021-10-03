@@ -1,9 +1,6 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.taskdetailpage
 
-import android.util.Log
-import android.view.ContextThemeWrapper
-import android.widget.CalendarView
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
@@ -13,31 +10,26 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.database.entities.TaskEntity
-import com.example.database.entities.UserEntity
 import com.example.domain.repository.Success
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
-import com.example.projectandroidsuite.logic.ProjectStatus
 import com.example.projectandroidsuite.logic.TaskStatus
+import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
-import com.example.projectandroidsuite.ui.taskdetailpage.TaskCreateEditViewModel
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Composable
-fun CreateTaskDialog(
+fun CreateUpdateTaskDialog(
     viewModel: TaskCreateEditViewModel,
     closeDialog: () -> Unit,
     task: TaskEntity? = null,
-    onTaskDeletedOrEdited: (String) -> Unit = { }
+    onTaskDeletedOrEdited: (String) -> Unit = { },
+    onDeleteClick: (() -> Unit)? = null
 ) {
-    //viewModel.clearInput()
     task?.let { viewModel.setTask(it) }
 
     val taskUpdatingStatus by viewModel.taskUpdatingStatus.observeAsState()
@@ -50,7 +42,7 @@ fun CreateTaskDialog(
         viewModel.clearInput()
     }
 
-    if (taskUpdatingStatus != null) {
+    if (taskUpdatingStatus is Success<String>) {
         //Log.d("CreateTaskDialog ", "Task updating " + taskUpdatingStatus.toString())
         onTaskDeletedOrEdited((taskUpdatingStatus as Success<String>).value)
         closeDialog()
@@ -58,37 +50,94 @@ fun CreateTaskDialog(
     }
 
     AlertDialog(
+        shape = RoundedCornerShape(10.dp),
         onDismissRequest = {
             closeDialog()
         },
         title = {
-            if (task == null) Text(text = "Create Task") else Text(text = "Update Task")
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp),
+                color = MaterialTheme.colors.primary,
+                elevation = 10.dp,
+                shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
+            ) {
+                Row {
+                    Row(
+                        Modifier
+                            .weight(4F)
+                            .padding(6.dp)
+                    ) {
+                        if (task == null) Text(text = "Create Task") else Text(text = "Update Task")
+                    }
+                }
+            }
         },
         text = {
             CreateTaskDialogInput(viewModel)
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    //closeDialog()
-                    if (task == null) {
-                        viewModel.createTask()
-                    } else {
-                        viewModel.updateTask()
+            Row {
+                if (onDeleteClick != null) {
+                    Image(
+                        painterResource(
+                            R.drawable.ic_baseline_delete_36_red
+                        ),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .weight(0.7F)
+                            .clickable { onDeleteClick() }
+                    )
+                }
+                Spacer(Modifier.size(12.dp))
+
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .weight(1F)
+                        .clickable { closeDialog() },
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
+                    ) {
+                        Spacer(Modifier.size(12.dp))
+                        Text("Dismiss", style = MaterialTheme.typography.caption)
+                        Spacer(Modifier.size(12.dp))
+                        Image(painterResource(R.drawable.window_close), "")
                     }
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                Text("Confirm")
+                }
+                Spacer(Modifier.size(12.dp))
+
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .weight(1F)
+                        .clickable {
+                            if (task == null) {
+                                viewModel.createTask()
+                            } else {
+                                viewModel.updateTask()
+                            }
+                        },
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
+                    ) {
+                        Spacer(Modifier.size(12.dp))
+                        Text("Confirm", style = MaterialTheme.typography.caption)
+                        Spacer(Modifier.size(12.dp))
+                        Image(painterResource(R.drawable.ic_project_status_done), "")
+                    }
+                }
             }
         },
         dismissButton = {
-            Button(
-                onClick = {
-                    closeDialog()
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                Text("Dismiss")
-            }
+
         }
     )
 }
@@ -104,7 +153,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
     val description by viewModel.description.observeAsState("")
     val listProjects by viewModel.projectList.observeAsState()
     val project by viewModel.project.observeAsState()
-    val listUsersFlow by viewModel.userListFlow.observeAsState()
+    val listUsersFlow by viewModel.userList.observeAsState()
     val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf())
     val endDate by viewModel.endDate.observeAsState(Date())
     val projectSearch by viewModel.projectSearchQuery.observeAsState("")
@@ -164,46 +213,6 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
             )
         }
 
-        if (listUsersFlow != null) {
-
-            Row(Modifier.padding(vertical = 12.dp)) {
-                Text(text = "Team",
-                    Modifier
-                        .clickable { showTeamPicker = true }
-                        .align(Alignment.CenterVertically)
-                        .weight(2F))
-
-                TeamMemberRow(
-                    list = listChosenUsers,
-                    Modifier
-                        .weight(4F)
-                )
-            }
-            if (showTeamPicker) {
-                TeamPickerDialog(
-                    list = listUsersFlow!!,
-                    onSubmitList = { },
-                    onClick = { user ->
-                        run {
-                            viewModel.addOrRemoveUser(user)
-                        }
-                    },
-                    closeDialog = { showTeamPicker = false },
-                    pickerType = PickerType.MULTIPLE,
-                    userSearch,
-                    { query -> viewModel.setUserSearch(query) }
-                )
-            }
-
-
-        } else {
-            Row(Modifier.padding(vertical = 12.dp)) {
-                Text(
-                    text = "",
-                )
-            }
-        }
-
         if (listProjects != null) {
 
             Row(Modifier.padding(vertical = 12.dp)) {
@@ -244,6 +253,48 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                 )
             }
         }
+
+        if (listUsersFlow != null) {
+
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Text(text = "Team",
+                    Modifier
+                        .clickable { showTeamPicker = true }
+                        .align(Alignment.CenterVertically)
+                        .weight(2F))
+
+                TeamMemberRow(
+                    list = listChosenUsers,
+                    Modifier
+                        .weight(4F)
+                )
+            }
+            if (showTeamPicker) {
+                TeamPickerDialog(
+                    list = listUsersFlow!!,
+                    onSubmitList = { },
+                    onClick = { user ->
+                        run {
+                            viewModel.addOrRemoveUser(user)
+                        }
+                    },
+                    closeDialog = { showTeamPicker = false },
+                    pickerType = PickerType.MULTIPLE,
+                    userSearch,
+                    { query -> viewModel.setUserSearch(query) }
+                )
+            }
+
+
+        } else {
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Text(
+                    text = "",
+                )
+            }
+        }
+
+
 
         if (listMilestones != null) {
             Row(Modifier.padding(vertical = 12.dp)) {

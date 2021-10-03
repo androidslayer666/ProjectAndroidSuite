@@ -54,6 +54,7 @@ class ProjectCreateEditViewModel @Inject constructor(
 
     val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
         .combineWith(chosenUserList) { users, chosenUsers ->
+            Log.d("ProjectCreateEditModel", chosenUsers?.map{it.displayName}.toString())
             users?.forEach { user ->
                 user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
             }
@@ -119,6 +120,7 @@ class ProjectCreateEditViewModel @Inject constructor(
         if (listIds.contains(user.id)) {
             _chosenUserList.value!!.remove(_chosenUserList.value!!.getUserById(user.id))
             Log.d("addOrRemoveUser", "remove user " + user.toString())
+            Log.d("addOrRemoveUser", "list users  " + _chosenUserList.value!!.map{it.displayName}.toString())
             _chosenUserList.forceRefresh()
         } else {
             _chosenUserList.value!!.add(user)
@@ -150,6 +152,7 @@ class ProjectCreateEditViewModel @Inject constructor(
     }
 
     fun updateProject() {
+        Log.d("addOrRemoveUser", "list users  " + _chosenUserList.value!!.map{it.displayName}.toString())
         CoroutineScope(IO).launch {
             val response = projectRepository.updateProject(
                 //todo should not be null

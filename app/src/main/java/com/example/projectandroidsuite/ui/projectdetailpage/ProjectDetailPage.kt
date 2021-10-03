@@ -1,8 +1,11 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -11,10 +14,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.domain.repository.Failure
 import com.example.domain.repository.Success
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.makeToast
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
@@ -36,7 +42,6 @@ fun ProjectDetailPage(
     val titles = listOf("Milestones", "Messages", "Files")
 
     var showUpdateProjectDialog by remember { mutableStateOf(false) }
-    var expandButtons by remember { mutableStateOf(false) }
     var showCreateMessageDialog by remember { mutableStateOf(false) }
     var showCreateMilestoneDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -47,7 +52,7 @@ fun ProjectDetailPage(
     val listFiles by viewModel.listFiles.observeAsState(listOf())
     val projectDeletionStatus by viewModel.projectDeletionStatus.observeAsState()
 
-    CustomScaffold (navController = navController, viewModel = hiltViewModel()){
+    CustomScaffold(navController = navController, viewModel = hiltViewModel()) {
         Column {
             Row {
                 Column(Modifier.weight(5F)) {
@@ -56,27 +61,38 @@ fun ProjectDetailPage(
                         description = project?.description,
                         responsible = project?.responsible,
                         team = project?.team,
-                        projectStatus = project?.status
+                        projectStatus = project?.status,
+                        onEditClick = {
+                            if (project?.canEdit == true) {
+                                showUpdateProjectDialog = true
+                            }
+                        }
                     )
                 }
             }
-
             Column {
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
+                            modifier = Modifier.height(50.dp),
                             text = {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(title)
                                     if (index == 1 && state == 1) IconButton(onClick = {
                                         showCreateMessageDialog = true
                                     }) {
-                                        Icon(Icons.Default.Add, "")
+                                        Image(
+                                            painterResource(id = R.drawable.plus_circle_outline),
+                                            ""
+                                        )
                                     }
                                     if (index == 0 && state == 0) IconButton(onClick = {
                                         showCreateMilestoneDialog = true
                                     }) {
-                                        Icon(Icons.Default.Add, "")
+                                        Image(
+                                            painterResource(id = R.drawable.plus_circle_outline),
+                                            ""
+                                        )
                                     }
                                 }
                             },
@@ -88,8 +104,8 @@ fun ProjectDetailPage(
                 when (state) {
                     0 -> ListTasksMilestones(
                         listTasksAndMilestones,
-                        navController,
-                        { milestone -> viewModel.deleteMilestone(milestone) })
+                        navController
+                    ) { milestone -> viewModel.deleteMilestone(milestone) }
                     1 -> ListMessages(
                         listMessages,
                         { comment -> viewModel.addCommentToMessage(comment) },
@@ -99,26 +115,14 @@ fun ProjectDetailPage(
                 }
             }
         }
-        Row() {
-            Column(Modifier.weight(5F)) {
-            }
-            Column(Modifier.weight(1F)) {
-                ExpandableButtons(
-                    expandButtons = expandButtons,
-                    expandOrHide = { expandButtons = !expandButtons },
-                    onEditClick = { showUpdateProjectDialog = true },
-                    onDeleteClick = { showDeleteDialog = true },
-                    canEdit = viewModel.currentProject.value?.canEdit,
-                    canDelete = viewModel.currentProject.value?.canDelete
-                )
-            }
-        }
+
         if (showUpdateProjectDialog) {
-            CreateProjectDialog(
+            CreateUpdateProjectDialog(
                 hiltViewModel(),
                 { showUpdateProjectDialog = false },
                 viewModel.currentProject.value,
-                { string -> makeToast(string, context) }
+                { string -> makeToast(string, context) },
+                onDeleteClick = { if (project?.canDelete == true) showDeleteDialog = true }
             )
         }
         if (projectDeletionStatus != null) {
@@ -141,23 +145,30 @@ fun ProjectDetailPage(
                 CreateMessageDialog(
                     projectId = projectId,
                     viewModel = hiltViewModel(),
-                    closeDialog = { showCreateMessageDialog = false })
+                    closeDialog = { showCreateMessageDialog = false }
+                )
             }
         }
+
         if (showCreateMilestoneDialog) {
             if (projectId != null) {
                 CreateMilestoneDialog(
                     projectId = projectId,
                     viewModel = hiltViewModel(),
-                    closeDialog = { showCreateMilestoneDialog = false })
+                    closeDialog = { showCreateMilestoneDialog = false
+                        navController.popBackStack()
+                    }
+                )
             }
         }
-
 
         if (showDeleteDialog) {
             ConfirmationDialog(
                 text = "Do you want to delete the project?",
-                onSubmit = { viewModel.deleteProject() },
+                onSubmit = {
+                    viewModel.deleteProject()
+                    navController.popBackStack()
+                },
                 { showDeleteDialog = false })
         }
     }

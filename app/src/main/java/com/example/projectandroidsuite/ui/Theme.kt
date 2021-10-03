@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui
 
+import android.annotation.SuppressLint
 import android.graphics.Color.parseColor
 import android.os.Build
 import android.util.Log
@@ -39,6 +40,12 @@ private val LightColors = lightColors(
     onBackground = Color(0xFF383838)
 )
 
+@SuppressLint("ConflictingOnColor")
 private val DarkColors = darkColors(
-
-)
+    primary = Color(0xFF003055),
+    primaryVariant = Color(0xFF00185E),
+    secondary = Color(0xFF9B5312),
+    surface = Color(0xFF003055),
+    //onBackground = Color(0xFFC2C2C2),
+    onPrimary = Color(0xFFFFE1E1)
+   )

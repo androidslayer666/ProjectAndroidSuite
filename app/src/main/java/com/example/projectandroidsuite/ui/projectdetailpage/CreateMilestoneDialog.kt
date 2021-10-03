@@ -1,18 +1,20 @@
 package com.example.projectandroidsuite.ui.parts
 
 import android.app.DatePickerDialog
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.MilestoneEntity
 import com.example.domain.repository.Success
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.projectdetailpage.MilestoneCreateEditViewModel
@@ -21,14 +23,15 @@ import java.util.*
 
 @Composable
 fun CreateMilestoneDialog(
-    milestone :MilestoneEntity? = null,
+    milestone: MilestoneEntity? = null,
     projectId: Int,
     viewModel: MilestoneCreateEditViewModel,
     closeDialog: () -> Unit,
-    onMilestoneDeletedOrEdited: (String) -> Unit = { }
+    onMilestoneDeletedOrEdited: (String) -> Unit = { },
+    onDeleteClick: (() -> Unit)? = null
 ) {
     viewModel.setProjectId(projectId)
-    if(milestone != null) viewModel.setMilestone(milestone)
+    if (milestone != null) viewModel.setMilestone(milestone)
 
     val milestoneUpdatingStatus by viewModel.subtaskUpdatingStatus.observeAsState()
     val milestoneCreationStatus by viewModel.subtaskCreationStatus.observeAsState()
@@ -57,25 +60,65 @@ fun CreateMilestoneDialog(
             CreateMilestoneDialogInput(viewModel)
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    closeDialog()
-                    if (milestone != null) viewModel.updateMilestone() else viewModel.createMilestone()
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                Text("Confirm")
+            Row {
+                if (onDeleteClick != null) {
+                    Image(
+                        painterResource(
+                            R.drawable.ic_baseline_delete_36_red
+                        ),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .weight(0.7F)
+                            .clickable { onDeleteClick() }
+                    )
+                }
+                Spacer(Modifier.size(12.dp))
+
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .weight(1F)
+                        .clickable { closeDialog() },
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
+                    ) {
+                        Spacer(Modifier.size(12.dp))
+                        Text("Dismiss", style = MaterialTheme.typography.caption)
+                        Spacer(Modifier.size(12.dp))
+                        Image(painterResource(R.drawable.window_close), "")
+                    }
+                }
+                Spacer(Modifier.size(12.dp))
+
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .weight(1F)
+                        .clickable {
+                            if (milestone == null) {
+                                viewModel.createMilestone()
+                            } else {
+                                viewModel.updateMilestone()
+                            }
+                        },
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
+                    ) {
+                        Spacer(Modifier.size(12.dp))
+                        Text("Confirm", style = MaterialTheme.typography.caption)
+                        Spacer(Modifier.size(12.dp))
+                        Image(painterResource(R.drawable.ic_project_status_done), "")
+                    }
+                }
             }
         },
-        dismissButton = {
-            Button(
-                onClick = {
-                    closeDialog()
-                    viewModel.clearInput()
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                Text("Dismiss")
-            }
-        }
+        dismissButton = { }
     )
 }
 
@@ -92,45 +135,57 @@ fun CreateMilestoneDialogInput(viewModel: MilestoneCreateEditViewModel) {
     val endDate by viewModel.endDate.observeAsState(Date())
     val priority by viewModel.priority.observeAsState()
 
-    Column(Modifier.defaultMinSize(minHeight = 200.dp)) {
-        Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Title", modifier = Modifier.weight(2F))
+    Column(
+//        Modifier.defaultMinSize(minHeight = 200.dp)
+    ) {
+        Row {
             CustomTextField(
                 value = title,
+                label = "Title",
                 onValueChange = { text -> viewModel.setTitle(text) })
         }
 
-        Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Description", modifier = Modifier.weight(2F))
+        Row {
             CustomTextField(
-                value = description, onValueChange = { text ->
-                    run {
-                        viewModel.setDescription(text)
-                    }
+                label = "Description",
+                numberOfLines = 3,
+                height = 100,
+                value = description,
+                onValueChange = { text ->
+                    viewModel.setDescription(text)
                 })
         }
 
-        Row(Modifier.padding(vertical = 12.dp)){
+        Row (
+            Modifier
+                .padding(vertical = 12.dp)
+                ) {
             Text(text = "Key milestone", modifier = Modifier.weight(2F))
             Checkbox(
                 modifier = Modifier.weight(4F),
-                checked = priority?: false,
+                checked = priority ?: false,
                 onCheckedChange = { viewModel.setPriority(it) }
             )
         }
 
-        Row(Modifier.padding(vertical = 12.dp)) {
+        Row(
+            Modifier
+                .padding(vertical = 12.dp)
+                .clickable { showResponsiblePicker = true }) {
             Text(
-                text = "Choose responsible",
-                Modifier
-                    .clickable { showResponsiblePicker = true }
-                    .weight(2F)
+                text = "Responsible",
+                Modifier.weight(2F)
             )
-            responsible?.let { user -> Row( Modifier
-                .weight(4F) ){TeamMemberCard(user = user) }}
+            responsible?.let { user ->
+                Row(
+                    Modifier.weight(4F)
+                ) {
+                    TeamMemberCard(user = user)
+                }
+            }
         }
-        listUsersFlow?.let {
 
+        listUsersFlow?.let {
             if (showResponsiblePicker) {
                 TeamPickerDialog(
                     list = it,
@@ -148,6 +203,7 @@ fun CreateMilestoneDialogInput(viewModel: MilestoneCreateEditViewModel) {
                 )
             }
         }
+
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(
                 text = "End date",
@@ -164,7 +220,7 @@ fun CreateMilestoneDialogInput(viewModel: MilestoneCreateEditViewModel) {
                     .weight(4F)
             )
             if (showDatePicker) {
-                DatePicker({date -> viewModel.setDate(date)},{showDatePicker = false})
+                DatePicker({ date -> viewModel.setDate(date) }, { showDatePicker = false })
             }
         }
     }

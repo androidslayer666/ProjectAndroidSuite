@@ -1,17 +1,19 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.MessageEntity
 import com.example.domain.repository.Success
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.TeamMemberRow
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
@@ -23,7 +25,8 @@ fun CreateMessageDialog(
     viewModel: MessageCreateEditViewModel,
     closeDialog: () -> Unit,
     message: MessageEntity? = null,
-    onMessageDeletedOrEdited: (String) -> Unit = { }
+    onMessageDeletedOrEdited: (String) -> Unit = { },
+    onDeleteClick: (() -> Unit)? = null
 ) {
     viewModel.setProjectId(projectId)
 
@@ -54,26 +57,64 @@ fun CreateMessageDialog(
             CreateMessageDialogInput(viewModel)
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    closeDialog()
-                    //viewModel.clearInput()
-                    if (message != null) viewModel.updateMessage() else viewModel.createMessage()
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                Text("Confirm")
+            Row {
+                if (onDeleteClick != null) {
+                    Image(
+                        painterResource(
+                            R.drawable.ic_baseline_delete_36_red
+                        ),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .weight(0.7F)
+                            .clickable { onDeleteClick() }
+                    )
+                }
+                Spacer(Modifier.size(12.dp))
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .weight(1F)
+                        .clickable { closeDialog() },
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
+                    ) {
+                        Spacer(Modifier.size(12.dp))
+                        Text("Dismiss", style = MaterialTheme.typography.caption)
+                        Spacer(Modifier.size(12.dp))
+                        Image(painterResource(R.drawable.window_close), "")
+                    }
+                }
+                Spacer(Modifier.size(12.dp))
+
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .weight(1F)
+                        .clickable {
+                            if (message == null) {
+                                viewModel.createMessage()
+                            } else {
+                                viewModel.updateMessage()
+                            }
+                        },
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
+                    ) {
+                        Spacer(Modifier.size(12.dp))
+                        Text("Confirm", style = MaterialTheme.typography.caption)
+                        Spacer(Modifier.size(12.dp))
+                        Image(painterResource(R.drawable.ic_project_status_done), "")
+                    }
+                }
             }
         },
-        dismissButton = {
-            Button(
-                onClick = {
-                    closeDialog()
-                    viewModel.clearInput()
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                Text("Dismiss")
-            }
-        }
+        dismissButton = {}
     )
 }
 
@@ -89,15 +130,17 @@ fun CreateMessageDialogInput(viewModel: MessageCreateEditViewModel) {
 
     Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
         Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Title", modifier = Modifier.weight(2F))
             CustomTextField(
                 value = title,
+                label = "Title",
                 onValueChange = { text -> viewModel.setTitle(text) })
         }
 
         Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Description", modifier = Modifier.weight(2F))
             CustomTextField(
+                label = "Description",
+                numberOfLines = 3,
+                height = 100,
                 value = description,
                 onValueChange = { text ->
                     viewModel.setDescription(text)
@@ -118,7 +161,7 @@ fun CreateMessageDialogInput(viewModel: MessageCreateEditViewModel) {
                         list = it,
                         onSubmitList = { },
                         onClick = { user ->
-                                viewModel.addOrRemoveUser(user)
+                            viewModel.addOrRemoveUser(user)
                         },
                         closeDialog = { showTeamPicker = false },
                         pickerType = PickerType.MULTIPLE,

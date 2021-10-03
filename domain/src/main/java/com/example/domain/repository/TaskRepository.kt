@@ -3,6 +3,7 @@ package com.example.domain.repository
 import android.util.Log
 import com.example.database.dao.TaskDao
 import com.example.database.entities.TaskEntity
+import com.example.domain.mappers.toEntity
 import com.example.domain.mappers.toListEntities
 import com.example.network.dto.SubtaskPost
 import com.example.network.dto.TaskDto
@@ -157,6 +158,15 @@ class TaskRepository @Inject constructor(
         } catch (e: java.lang.Exception) {
             Log.d("TaskRepository", "tried to create a task but got an exception ${e.message}")
             return Failure("Error during updating the task")
+        }
+    }
+
+    suspend fun updateTaskStatus(taskId: Int, taskStatus: String) {
+        Log.d("TaskRepository", "updating task status with id ${taskId}")
+        Log.d("TaskRepository", "updating task status with status ${taskStatus}")
+        taskEndPoint.updateTaskStatus(taskId, TaskStatusPost(taskStatus, 1))
+        taskEndPoint.getTaskById(taskId).taskDto?.toEntity().let{
+            taskDao.insertTasks(listOf(it!!))
         }
     }
 

@@ -1,29 +1,34 @@
 package com.example.projectandroidsuite.ui.parts
 
-import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.ProjectEntity
 import com.example.database.entities.UserEntity
 import com.example.domain.repository.Success
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.ProjectStatus
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.projectdetailpage.ProjectCreateEditViewModel
 
 @Composable
-fun CreateProjectDialog(
+fun CreateUpdateProjectDialog(
     viewModel: ProjectCreateEditViewModel,
     closeDialog: () -> Unit,
     project: ProjectEntity? = null,
-    onSuccessProjectCreation: (String) -> Unit
+    onSuccessProjectCreation: (String) -> Unit,
+    onDeleteClick: (() -> Unit)? = null
 ) {
     project?.let { viewModel.setProject(it) }
 
@@ -46,44 +51,99 @@ fun CreateProjectDialog(
     }
 
     AlertDialog(
+        shape = RoundedCornerShape(10.dp),
         onDismissRequest = {
             closeDialog()
         },
         title = {
-            if (project == null) Text(text = "Create Project") else Text(text = "Update Project")
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp),
+                color = MaterialTheme.colors.primary,
+                elevation = 10.dp,
+                shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
+            ) {
+                Row {
+                    Row(
+                        Modifier
+                            .weight(4F)
+                            .padding(6.dp)
+                    ) {
+                        if (project == null) Text(text = "Create project") else Text(text = "Update project")
+                    }
+                }
+            }
         },
         text = {
-            CreateProjectDialogInput(viewModel)
-            if (responsibleIsNotChosen && responsible == null) Text(
-                text = "Please choose responsible",
-                color = Color.Red
-            )
+            Column() {
+                CreateProjectDialogInput(viewModel)
+                if (responsibleIsNotChosen && responsible == null) Text(
+                    text = "Please choose responsible",
+                    color = Color.Red
+                )
+            }
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    Log.d("Responsible", responsible.toString())
-                    if (responsible != null) {
-                        if (project != null) viewModel.updateProject() else viewModel.createProject()
-                    } else {
-                        responsibleIsNotChosen = true
-                    }
+            Row {
+                if (onDeleteClick != null) {
+                    Image(
+                        painterResource(
+                            R.drawable.ic_baseline_delete_36_red
+                        ),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .weight(0.7F)
+                            .clickable { onDeleteClick() }
+                    )
+                }
+                Spacer(Modifier.size(12.dp))
 
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                if (project == null) Text(text = "Create") else Text(text = "Update")
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .weight(1F)
+                        .clickable { closeDialog() },
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
+                    ) {
+                        Spacer(Modifier.size(12.dp))
+                        Text("Dismiss", style = MaterialTheme.typography.caption)
+                        Spacer(Modifier.size(12.dp))
+                        Image(painterResource(R.drawable.window_close), "")
+                    }
+                }
+                Spacer(Modifier.size(12.dp))
+
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .weight(1F)
+                        .clickable {
+                            if (project == null) {
+                                viewModel.createProject()
+                            } else {
+                                viewModel.updateProject()
+                            }
+                        },
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
+                    ) {
+                        Spacer(Modifier.size(12.dp))
+                        Text("Confirm", style = MaterialTheme.typography.caption)
+                        Spacer(Modifier.size(12.dp))
+                        Image(painterResource(R.drawable.ic_project_status_done), "")
+                    }
+                }
             }
         },
-        dismissButton = {
-            Button(
-                onClick = {
-                    closeDialog()
-                    viewModel.clearInput()
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                Text("Dismiss")
-            }
-        }
+        dismissButton = { }
     )
 }
 
@@ -104,6 +164,7 @@ fun CreateProjectDialogInput(
 
 
     Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
+
         CustomTextField(
             label = "Title",
             value = title,

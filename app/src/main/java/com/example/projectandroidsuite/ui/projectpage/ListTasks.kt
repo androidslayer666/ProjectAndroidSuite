@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import com.example.database.entities.TaskEntity
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDivider
+import java.text.SimpleDateFormat
 
 
 @Composable
@@ -41,13 +42,18 @@ fun TaskList(
 }
 
 @Composable
-fun TaskItem(task: TaskEntity, onClick: (taskId: Int) -> Unit) {
+fun TaskItem(
+    task: TaskEntity,
+    showStage: Boolean? = true,
+    onClick: (taskId: Int) -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if(showStage == true)
         Image(
             painterResource(
                 when (task.status) {
@@ -64,7 +70,7 @@ fun TaskItem(task: TaskEntity, onClick: (taskId: Int) -> Unit) {
         Column(modifier = Modifier
             .weight(2f)
             .clickable { onClick(task.id) }) {
-            Row (verticalAlignment = Alignment.CenterVertically){
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 if (task.priority != null && task.priority == 1) {
                     Image(
                         painterResource(
@@ -83,10 +89,19 @@ fun TaskItem(task: TaskEntity, onClick: (taskId: Int) -> Unit) {
                         onClick(task.id)
                     })
             }
-            if (task.responsibles.isNotEmpty()) {
+            Row {
+                if (task.responsibles.isNotEmpty()) {
+                    Text(
+                        text = task.responsibles[0].displayName
+//                            + " + "
+//                            + if (task.responsibles.size > 0) (task.responsibles.size - 1) else ""
+                        ,
+                        style = MaterialTheme.typography.overline,
+                        modifier = Modifier.padding(end = 12.dp)
+                    )
+                }
                 Text(
-                    text = task.responsibles[0].displayName + " + "
-                            + if (task.responsibles.size > 0) (task.responsibles.size - 1) else "",
+                    text = SimpleDateFormat("dd/MM/yyyy").format(task.deadline),
                     style = MaterialTheme.typography.overline
                 )
             }

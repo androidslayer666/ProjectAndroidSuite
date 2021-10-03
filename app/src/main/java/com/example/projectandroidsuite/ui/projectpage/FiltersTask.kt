@@ -7,9 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -18,12 +16,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.PickerType
-import com.example.projectandroidsuite.logic.ProjectSorting
-import com.example.projectandroidsuite.logic.TaskSorting
-import com.example.projectandroidsuite.logic.TaskStatus
+import com.example.projectandroidsuite.logic.*
 import com.example.projectandroidsuite.ui.parts.TeamMemberCard
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
+import com.example.projectandroidsuite.ui.parts.customitems.CustomSortButton
 
 @Composable
 fun FilterTasks(
@@ -39,44 +36,29 @@ fun FilterTasks(
 
     Surface(
         elevation = 10.dp,
-        shape = RoundedCornerShape(
-            topStart = 0.dp,
-            topEnd = 0.dp,
-            bottomEnd = 16.dp,
-            bottomStart = 16.dp
-        ),
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
     ) {
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
                 .background(MaterialTheme.colors.primary)
+                .padding(12.dp)
         ) {
-            Row {
-                Text(text = "stage")
+            CustomButton(
+                text = "Active",
+                clicked = (stage == TaskStatus.ACTIVE),
+                onClick = { viewModel.setStageForFilteringTask(TaskStatus.ACTIVE) })
+            Spacer(Modifier.size(12.dp))
+            CustomButton(
+                text = "Complete",
+                clicked = (stage == TaskStatus.COMPLETE),
+                onClick = { viewModel.setStageForFilteringTask(TaskStatus.COMPLETE) })
 
-                Column(Modifier.selectableGroup()) {
-                    Row() {
-                        RadioButton(
-                            (stage == TaskStatus.ACTIVE),
-                            { viewModel.setStageForFilteringTask(TaskStatus.ACTIVE) }
-                        )
-                        Text(text = "Active")
-                    }
-                    Row() {
-                        RadioButton(
-                            (stage == TaskStatus.COMPLETE),
-                            { viewModel.setStageForFilteringTask(TaskStatus.COMPLETE) }
-                        )
-                        Text(text = "Complete")
-                    }
-                }
-            }
             listUsersFlow?.let {
-                Row() {
-                    Text(text = "Choose team", Modifier.clickable { showUserPicker = true })
+                Column (modifier = Modifier.padding(vertical = 12.dp)) {
+                    Text(text = "Responsible", Modifier.clickable { showUserPicker = true })
+                    Spacer(Modifier.size(12.dp))
                     user?.let { it1 -> TeamMemberCard(user = it1) }
                 }
                 if (showUserPicker) {
@@ -91,107 +73,67 @@ fun FilterTasks(
                     )
                 }
             }
-            Text(
-                text = "ClearFilters",
-                modifier = Modifier.clickable { viewModel.clearFiltersTask() })
 
+            Surface(
+                elevation = 10.dp,
+                color = MaterialTheme.colors.primaryVariant
+            ){
+                Spacer(Modifier.size(12.dp))
+                Text(
+                    text = "ClearFilters",
+                    modifier = Modifier.clickable { viewModel.clearFiltersTask()})
+                Spacer(Modifier.size(12.dp))
+            }
 
             Text(
                 text = "Sorting",
                 color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
-            Row {
-
-                Row(Modifier.weight(2F)) {
+            Column() {
+                Row() {
                     Text(text = "Deadline ", color = MaterialTheme.colors.onPrimary)
-
                 }
-                Row(Modifier.weight(4F)) {
-
-                    RadioButton(
-                        (sorting == TaskSorting.DEADLINE_ASC),
-                        { viewModel.setTaskSorting(TaskSorting.DEADLINE_ASC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_variant),
-                        contentDescription = "Status"
-                    )
-
-                    Spacer(modifier = Modifier.width(6.dp))
-                    RadioButton(
-                        (sorting == TaskSorting.DEADLINE_DESC),
-                        { viewModel.setTaskSorting(TaskSorting.DEADLINE_DESC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_reverse_variant),
-                        contentDescription = "Status"
-                    )
+                Row() {
+                    CustomSortButton(ascending = true, clicked = (sorting == TaskSorting.DEADLINE_ASC)
+                    ) { viewModel.setTaskSorting(TaskSorting.DEADLINE_ASC) }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    CustomSortButton(ascending = false, clicked = (sorting == TaskSorting.DEADLINE_DESC)
+                    ) { viewModel.setTaskSorting(TaskSorting.DEADLINE_DESC) }
                 }
             }
 
-            Row {
-
+            Column() {
                 Row(
                     Modifier
                         .padding(bottom = 20.dp)
-                        .weight(2F)
                 ) {
                     Text(text = "Stage ", color = MaterialTheme.colors.onPrimary)
                 }
 
-                Row(Modifier.weight(4F)) {
-                    RadioButton(
-                        (sorting == TaskSorting.STAGE_ASC),
-                        { viewModel.setTaskSorting(TaskSorting.STAGE_ASC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_variant),
-                        contentDescription = "Status"
-                    )
-
-                    Spacer(modifier = Modifier.width(6.dp))
-                    RadioButton(
-                        (sorting == TaskSorting.STAGE_DESC),
-                        { viewModel.setTaskSorting(TaskSorting.STAGE_DESC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_reverse_variant),
-                        contentDescription = "Status"
-                    )
+                Row() {
+                    CustomSortButton(ascending = true, clicked = (sorting == TaskSorting.STAGE_ASC)
+                    ) { viewModel.setTaskSorting(TaskSorting.STAGE_ASC) }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    CustomSortButton(ascending = false, clicked = (sorting == TaskSorting.STAGE_DESC)
+                    ) { viewModel.setTaskSorting(TaskSorting.STAGE_DESC) }
                 }
             }
 
 
-            Row {
-
+            Column() {
                 Row(
                     Modifier
                         .padding(bottom = 20.dp)
-                        .weight(2F)
                 ) {
                     Text(text = "Importance", color = MaterialTheme.colors.onPrimary)
                 }
-
-                Row(Modifier.weight(4F)) {
-                    RadioButton(
-                        (sorting == TaskSorting.IMPORTANT_ASC),
-                        { viewModel.setTaskSorting(TaskSorting.IMPORTANT_ASC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_variant),
-                        contentDescription = "Status"
-                    )
-
-                    Spacer(modifier = Modifier.width(6.dp))
-                    RadioButton(
-                        (sorting == TaskSorting.IMPORTANT_DESC),
-                        { viewModel.setTaskSorting(TaskSorting.IMPORTANT_DESC) }
-                    )
-                    Image(
-                        painterResource(R.drawable.sort_reverse_variant),
-                        contentDescription = "Status"
-                    )
+                Row() {
+                    CustomSortButton(ascending = true, clicked = (sorting == TaskSorting.IMPORTANT_ASC)
+                    ) { viewModel.setTaskSorting(TaskSorting.IMPORTANT_ASC) }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    CustomSortButton(ascending = false, clicked = (sorting == TaskSorting.IMPORTANT_DESC)
+                    ) { viewModel.setTaskSorting(TaskSorting.IMPORTANT_DESC) }
                 }
             }
         }

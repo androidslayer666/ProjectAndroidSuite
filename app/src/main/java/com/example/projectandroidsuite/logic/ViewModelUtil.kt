@@ -89,9 +89,9 @@ fun arrangeMilestonesAndTasks(
                 listTasksWithoutMilestone.add(task)
             }
         }
-        map[milestone] = listTasksWithMilestone
+        map[milestone] = listTasksWithMilestone.filterTaskByFilter(TaskFilter(status = TaskStatus.ACTIVE))
     }
-    map[null] = listTasksWithoutMilestone
+    map[null] = listTasksWithoutMilestone.filterTaskByFilter(TaskFilter(status = TaskStatus.ACTIVE))
     return map
 }
 

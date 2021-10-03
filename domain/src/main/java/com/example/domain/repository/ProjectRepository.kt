@@ -9,6 +9,7 @@ import com.example.domain.mappers.toProjectEntity
 import com.example.network.dto.ProjectDto
 import com.example.network.dto.ProjectPost
 import com.example.network.dto.ProjectStatusPost
+import com.example.network.dto.ProjectTeamPost
 import com.example.network.endpoints.ProjectEndPoint
 import com.example.network.endpoints.TeamEndPoint
 import kotlinx.coroutines.CoroutineScope
@@ -66,10 +67,14 @@ class ProjectRepository @Inject constructor(
         project: ProjectPost,
         projectStatus: String
     ): Result<String, String> {
+        Log.d("ProjectRepository", "list users  " + project.participants?.toString())
         return networkCaller(
             call = {
                 projectEndPoint.updateProject(projectId, project)
                 updateProjectStatus(projectId, projectStatus)
+                if(project.participants != null)
+                    Log.d("ProjectRepository", project.participants.toString())
+                projectEndPoint.updateProjectTeam(projectId, ProjectTeamPost(project.participants!!, true) )
             },
             onSuccess = { getTeamAndInsertProjectToDb(projectId) }
         )
@@ -105,12 +110,13 @@ class ProjectRepository @Inject constructor(
     }
 
     private suspend fun getTeamAndInsertProjectToDb(projectId: Int) {
-
         networkCaller(
             call = { projectEndPoint.getProjectById(projectId).projectDto?.toProjectEntity() },
             onSuccess = { project ->
                 val team = teamEndPoint.getProjectTeam(projectId)
+                Log.d("getTeamAndInsertToDb", team.toString())
                 project?.team = team.ids?.toListUserEntity()
+                Log.d("getTeamAndInsertToDb", project.toString())
                 if (project != null)
                     projectDao.insertProject(project)
             }

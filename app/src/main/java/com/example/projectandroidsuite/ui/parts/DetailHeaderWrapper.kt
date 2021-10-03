@@ -12,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.UserEntity
 import com.example.projectandroidsuite.R
@@ -31,7 +30,9 @@ fun DetailHeaderWrapper(
     projectStatus: Int? = null,
     project: String? = null,
     milestone: String? = null,
-    priority: Int? = null
+    priority: Int? = null,
+    onEditClick: (()-> Unit)? = null,
+    onStatusClicked: (()-> Unit)? = null
 ) {
 
     var showTitleOverflow by remember { mutableStateOf(false) }
@@ -74,6 +75,7 @@ fun DetailHeaderWrapper(
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 4.dp)
+                            .clickable { if(onStatusClicked != null)onStatusClicked()else {} }
                     )
                 }
                 Row(Modifier.weight(5F), verticalAlignment = Alignment.CenterVertically) {
@@ -90,7 +92,27 @@ fun DetailHeaderWrapper(
                     TitleOverflowedText(title ?: "")
                 }
             }
-            Row(Modifier.weight(1F)) {}
+            Row(Modifier.weight(1F), verticalAlignment = Alignment.CenterVertically) {
+                if(onEditClick != null)
+                Image(
+                    painterResource(
+                        R.drawable.square_edit_outline_active
+                    ),
+                    contentDescription = "Status",
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp, vertical = 12.dp)
+                        .clickable { onEditClick() }
+                )
+                else
+                    Image(
+                        painterResource(
+                            R.drawable.square_edit_outline_passive
+                        ),
+                        contentDescription = "Status",
+                        modifier = Modifier
+                            .padding(horizontal = 2.dp, vertical = 12.dp)
+                    )
+            }
         }
 
         if (description != null && description.isNotEmpty()) {

@@ -61,7 +61,7 @@ fun ListMessages(
                                     }
                                     .weight(5F)
                             )
-                            if(showExpand) {
+                            if(showExpand && message.canEdit == true) {
                                 Image(
                                     painterResource(R.drawable.ic_baseline_keyboard_double_arrow_down_24),
                                     "",
@@ -77,7 +77,7 @@ fun ListMessages(
                                 )
                             }
 
-                            if (showButtons && message.id == activeMessage) {
+                            if (showButtons && message.id == activeMessage && message.canEdit == true) {
                                 Image(
                                     painterResource(R.drawable.ic_baseline_comment_24),
                                     "",
@@ -88,7 +88,7 @@ fun ListMessages(
                                         .weight(1F)
                                 )
                             }
-                            if (showButtons && message.id == activeMessage) {
+                            if (showButtons && message.id == activeMessage && message.canEdit == true) {
                                 Image(
                                     painterResource(R.drawable.ic_baseline_delete_24),
                                     "",

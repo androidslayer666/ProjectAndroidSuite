@@ -38,15 +38,15 @@ class ProjectViewModel @Inject constructor(
 
     private var projectFilter = MutableLiveData<ProjectFilter?>()
 
-    private var taskFilter = MutableLiveData<TaskFilter?>()
+    private var taskFilter = MutableLiveData(TaskFilter(status = TaskStatus.ACTIVE))
 
     private var _problemWithFetchingProjects = MutableLiveData<String>()
     val problemWithFetchingProjects: LiveData<String> = _problemWithFetchingProjects
 
-    private var _projectSorting = MutableLiveData<ProjectSorting>()
+    private var _projectSorting = MutableLiveData(ProjectSorting.STAGE_ASC)
     val projectSorting: LiveData<ProjectSorting> = _projectSorting
 
-    private var _taskSorting = MutableLiveData<TaskSorting>()
+    private var _taskSorting = MutableLiveData(TaskSorting.DEADLINE_ASC)
     val taskSorting: LiveData<TaskSorting> = _taskSorting
 
 

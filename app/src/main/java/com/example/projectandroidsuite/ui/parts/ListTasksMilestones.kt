@@ -46,7 +46,10 @@ fun ListTasksMilestones(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (milestone != null) {
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(5F)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(5F)
+                            ) {
                                 if (milestone.isKey == true) {
                                     Image(
                                         painterResource(
@@ -54,20 +57,20 @@ fun ListTasksMilestones(
                                         ),
                                         "",
                                         modifier = Modifier
-                                            .padding(horizontal = 4.dp))
+                                            .padding(horizontal = 4.dp)
+                                    )
                                 }
                                 Text(
                                     text = milestone.title ?: "",
                                     style = MaterialTheme.typography.h6,
                                     modifier = Modifier
                                         .clickable { showButtons = !showButtons }
-
                                 )
                             }
                         }
-                        if (showButtons) {
+                        if (showButtons && milestone?.canEdit == true) {
                             Image(
-                                Icons.Default.Edit,
+                                painterResource(id = R.drawable.ic_edit_button),
                                 "",
                                 modifier = Modifier
                                     .clickable {
@@ -75,32 +78,25 @@ fun ListTasksMilestones(
                                         showButtons = false
                                     }
                                     .weight(1F))
-                            Image(
-                                Icons.Default.Delete,
-                                "",
-                                modifier = Modifier
-                                    .clickable {
-                                        showDeleteDialog = true
-                                        showButtons = false
-                                    }
-                                    .weight(1F))
-
-
                         }
                         if (showDeleteDialog) {
                             ConfirmationDialog(
-                                text = "Do you want to delete the message?",
+                                text = "Do you want to delete the milestone?",
                                 onSubmit = { onDeleteMilestone(milestone) },
-                                { showDeleteDialog = false })
+                                { showDeleteDialog = false
+                                    showButtons = false
+                                    navController.popBackStack()
+                                })
                         }
                         if (showEditDialog) {
                             CreateMilestoneDialog(
                                 milestone = milestone,
                                 projectId = milestone?.projectId ?: 0,
                                 viewModel = hiltViewModel(),
-                                closeDialog = { showEditDialog = false })
+                                closeDialog = { showEditDialog = false },
+                                onDeleteClick = {if(milestone?.canDelete == true){ showDeleteDialog = true } }
+                            )
                         }
-
                     }
                     for (task in listTasksAndMilestones[milestone]!!) {
                         TaskItem(

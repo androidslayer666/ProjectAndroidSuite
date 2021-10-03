@@ -3,7 +3,7 @@ package com.example.network.dto
 import com.google.gson.annotations.SerializedName
 import com.squareup.moshi.Json
 
-data class ProjectDto (
+data class ProjectDto(
 
     @SerializedName("canEdit")
     val canEdit: Boolean? = null,
@@ -50,7 +50,7 @@ data class ProjectDto (
 
     )
 
-data class ProjectPost (
+data class ProjectPost(
     @SerializedName("title")
     val title: String? = "",
     @SerializedName("description")
@@ -62,9 +62,9 @@ data class ProjectPost (
     @SerializedName("private")
     val private: Boolean? = false,
     @SerializedName("tasks")
-    val taskDtos: List<TaskDto>? =listOf(),
+    val taskDtos: List<TaskDto>? = listOf(),
     @SerializedName("milestones")
-    val milestoneDtos:List<MilestoneDto>? = listOf(),
+    val milestoneDtos: List<MilestoneDto>? = listOf(),
     @SerializedName("participants")
     val participants: List<String>? = null
 )
@@ -72,4 +72,12 @@ data class ProjectPost (
 data class ProjectStatusPost(
     @SerializedName("status")
     val status: String
+)
+
+data class ProjectTeamPost(
+    @SerializedName("participants")
+    val status: List<String>,
+    @SerializedName("notify")
+    val notify: Boolean
+
 )

@@ -1,19 +1,22 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.domain.repository.Failure
 import com.example.domain.repository.Success
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.makeToast
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
@@ -39,6 +42,7 @@ fun TaskDetailPage(
     var expandButtons by remember { mutableStateOf(false) }
     var showCreateSubtaskDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showUpdateStatusDialog by remember { mutableStateOf(false) }
 
     val task by viewModel.currentTask.observeAsState()
     val comments by viewModel.listComments.observeAsState()
@@ -47,7 +51,7 @@ fun TaskDetailPage(
     val taskMilestone by viewModel.taskMilestone.observeAsState()
 
 
-    CustomScaffold(navController = navController, viewModel = hiltViewModel()){
+    CustomScaffold(navController = navController, viewModel = hiltViewModel()) {
         Column {
             Row() {
                 Column(Modifier.weight(5F)) {
@@ -60,7 +64,13 @@ fun TaskDetailPage(
                         taskStatus = task?.status,
                         project = task?.projectOwner?.title,
                         milestone = taskMilestone?.title,
-                        priority = task?.priority
+                        priority = task?.priority,
+                        onEditClick = {
+                            if (task?.canEdit == true) {
+                                showUpdateTaskDialog = true
+                            }
+                        },
+                        onStatusClicked = { showUpdateStatusDialog = true }
                     )
                 }
             }
@@ -69,13 +79,17 @@ fun TaskDetailPage(
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
+                            modifier = Modifier.height(50.dp),
                             text = {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(title)
                                     if (index == 2 && state == 2) IconButton(onClick = {
                                         showCreateSubtaskDialog = true
                                     }) {
-                                        Icon(Icons.Default.Add, "")
+                                        Image(
+                                            painterResource(id = R.drawable.plus_circle_outline),
+                                            ""
+                                        )
                                     }
                                 }
                             },
@@ -94,27 +108,13 @@ fun TaskDetailPage(
                 }
             }
         }
-        Row() {
-            Column(Modifier.weight(5F)) {
-
-            }
-            Column(Modifier.weight(1F)) {
-                ExpandableButtons(
-                    expandButtons,
-                    { expandButtons = !expandButtons },
-                    { showUpdateTaskDialog = true },
-                    { showDeleteDialog = true },
-                    viewModel.currentTask.value?.canEdit,
-                    viewModel.currentTask.value?.canDelete
-                )
-            }
-        }
         if (showUpdateTaskDialog) {
-            CreateTaskDialog(
-                hiltViewModel(),
-                { showUpdateTaskDialog = false },
-                viewModel.currentTask.value,
-                { string -> makeToast(string, context) }
+            CreateUpdateTaskDialog(
+                viewModel = hiltViewModel(),
+                closeDialog = { showUpdateTaskDialog = false },
+                task = viewModel.currentTask.value,
+                onTaskDeletedOrEdited = { string -> makeToast(string, context) },
+                onDeleteClick = { if (task?.canDelete == true) showDeleteDialog = true }
             )
         }
         if (taskDeletionStatus != null) {
@@ -144,8 +144,18 @@ fun TaskDetailPage(
         if (showDeleteDialog) {
             ConfirmationDialog(
                 text = "Do you want to delete the task?",
-                onSubmit = { viewModel.deleteTask() },
+                onSubmit = {
+                    viewModel.deleteTask()
+                    navController.popBackStack()
+                },
                 { showDeleteDialog = false })
+        }
+
+        if (showUpdateStatusDialog) {
+            ConfirmationDialog(
+                text = "Do you want to change the task status?",
+                onSubmit = { viewModel.changeTaskStatus() },
+                { showUpdateStatusDialog = false })
         }
     }
 }

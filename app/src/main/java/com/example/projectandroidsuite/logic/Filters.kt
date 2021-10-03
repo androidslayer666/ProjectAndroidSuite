@@ -60,7 +60,7 @@ data class TaskFilter(
 )
 
 enum class TaskStatus (val index : Int){
-    ACTIVE(1), COMPLETE(0)
+    ACTIVE(1), COMPLETE(2)
 }
 
 fun List<TaskEntity>.filterTaskByFilter(filter: TaskFilter): List<TaskEntity> {

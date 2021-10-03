@@ -31,12 +31,13 @@ fun ProjectsPage(
     val titles = listOf("Projects", "Tasks")
 
     CustomScaffold({ showFilters = !showFilters }, navController, viewModel = hiltViewModel()) {
-        Box() {
+        Box(Modifier.background(MaterialTheme.colors.background)) {
             Column(
                 Modifier
                     .background(MaterialTheme.colors.background)
                     .fillMaxHeight()
-                    .clickable(enabled = showFilters) { showFilters = false }) {
+                    .clickable(enabled = showFilters) { showFilters = false }
+            ) {
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
@@ -57,7 +58,7 @@ fun ProjectsPage(
                 }
                 Surface(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .background(MaterialTheme.colors.background)
                 ) {
                     AnimatedVisibility(
@@ -102,21 +103,29 @@ fun ProjectsPage(
 
             AnimatedVisibility(
                 showFilters,
-                enter = slideInVertically(
+                enter = slideInHorizontally(
                     // Enters by sliding down from offset -fullHeight to 0.
-                    initialOffsetY = { fullHeight -> -fullHeight },
+                    initialOffsetX = { fullHeight -> 2*fullHeight },
                     animationSpec = tween(durationMillis = 400)
                 ),
-                exit = slideOutVertically(
+                exit = slideOutHorizontally(
                     // Exits by sliding up from offset 0 to -fullHeight.
-                    targetOffsetY = { fullHeight -> -fullHeight },
+                    targetOffsetX = { fullHeight -> 2*fullHeight },
                     animationSpec = tween(durationMillis = 400)
                 )
             ) {
-                if (state == 0)
-                    FilterProjects(viewModel = hiltViewModel())
-                if (state == 1)
-                    FilterTasks(viewModel = hiltViewModel())
+                Row{
+                    Row(Modifier.weight(3F)) {
+
+                    }
+                    Row(Modifier.weight(2F)){
+                        if (state == 0)
+                            FilterProjects(viewModel = hiltViewModel())
+                        if (state == 1)
+                            FilterTasks(viewModel = hiltViewModel())
+                    }
+                }
+
             }
         }
     }

@@ -27,10 +27,6 @@ class TeamRepository @Inject constructor(
     private val userDao: UserDao
 ) {
 
-    suspend fun getProjectTeam(projectId : Int): List<UserDto>? {
-        return teamEndPoint.getProjectTeam(projectId).ids
-    }
-
     suspend fun populateAllPortalUsers() : Result<String, String> {
         try {
             val users = teamEndPoint.getAllPortalUsers().ids
