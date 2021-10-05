@@ -38,7 +38,7 @@ class TeamRepository @Inject constructor(
                     }
                 }
                 userDao.insertUsers(newList.toListUserEntity())
-                return Success("Comments are populated")
+                return Success("Users are populated")
             }else {
                 return Failure("Network/server problem")
             }

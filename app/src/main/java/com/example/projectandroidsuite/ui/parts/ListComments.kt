@@ -27,7 +27,6 @@ fun ListComments(
 ) {
     var activeComment by remember { mutableStateOf("")}
 
-
     if (listComments != null) {
         Column() {
             listComments.forEach { comment ->
@@ -41,7 +40,6 @@ fun ListComments(
             }
         }
     }
-
 }
 
 @Composable
@@ -63,7 +61,7 @@ fun CommentItem(
             .padding(start = padding, top = 6.dp)
     ) {
         Card(
-            border = BorderStroke(1.dp, MaterialTheme.colors.primaryVariant),
+            border = BorderStroke(1.dp, MaterialTheme.colors.primary),
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.padding(4.dp),
             backgroundColor = MaterialTheme.colors.background

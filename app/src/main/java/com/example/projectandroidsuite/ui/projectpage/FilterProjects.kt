@@ -45,6 +45,7 @@ fun FilterProjects(
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colors.primary)
+                .padding(12.dp)
         ) {
             Text(text = "Stage", color = MaterialTheme.colors.onPrimary)
             CustomButton(

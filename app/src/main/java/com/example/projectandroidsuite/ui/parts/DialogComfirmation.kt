@@ -18,6 +18,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.UserEntity
 import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialogButton as CustomDialogButton
 
 @Composable
 fun ConfirmationDialog(
@@ -31,58 +33,15 @@ fun ConfirmationDialog(
             closeDialog()
         },
         title = {
-                Text(text = text)
+            Text(text = text)
         },
         text = {
         },
         confirmButton = {
-            Row {
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable { closeDialog() },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Dismiss", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(
-                            painterResource(com.example.projectandroidsuite.R.drawable.window_close),
-                            ""
-                        )
-                    }
-                }
-                Spacer(Modifier.size(12.dp))
-
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable {
-                            onSubmit()
-                            closeDialog()
-                        },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Confirm", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(
-                            painterResource(com.example.projectandroidsuite.R.drawable.ic_project_status_done),
-                            ""
-                        )
-                    }
-                }
-            }
+            DialogButtonRow(
+                onSubmit = { onSubmit() },
+                closeDialog = { closeDialog() }
+            )
         },
         dismissButton = { }
     )

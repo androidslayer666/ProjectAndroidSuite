@@ -167,7 +167,7 @@ fun CustomScaffold(
             closeDialog = { showCreateProjectDialog = false },
             onSuccessProjectCreation = { string ->
                 makeToast(string, context)
-                navController.popBackStack()
+                //navController.popBackStack()
             })
     }
 
@@ -177,7 +177,7 @@ fun CustomScaffold(
             closeDialog = { showCreateTaskDialog = false },
             onTaskDeletedOrEdited = { string ->
                 makeToast(string, context)
-                navController.popBackStack()
+                //navController.popBackStack()
             })
 
     }

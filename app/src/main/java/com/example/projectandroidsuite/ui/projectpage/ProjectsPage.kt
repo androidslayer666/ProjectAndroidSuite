@@ -40,17 +40,19 @@ fun ProjectsPage(
             ) {
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
-                        Tab(
-                            text = {
-                                Row {
-                                    if (index == 0)
-                                        Icon(painterResource(R.drawable.project_icon), "")
-                                    else
-                                        Icon(painterResource(R.drawable.calendar_check_outline), "")
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Text(title)
-                                }
-                            },
+                        Tab(modifier = Modifier
+                            .height(50.dp)
+                            .background(MaterialTheme.colors.primary),
+                                text = {
+                            Row {
+                                if (index == 0)
+                                    Icon(painterResource(R.drawable.project_icon), "")
+                                else
+                                    Icon(painterResource(R.drawable.calendar_check_outline), "")
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(title)
+                            }
+                        },
                             selected = state == index,
                             onClick = { state = index }
                         )
@@ -105,20 +107,20 @@ fun ProjectsPage(
                 showFilters,
                 enter = slideInHorizontally(
                     // Enters by sliding down from offset -fullHeight to 0.
-                    initialOffsetX = { fullHeight -> 2*fullHeight },
+                    initialOffsetX = { fullHeight -> 2 * fullHeight },
                     animationSpec = tween(durationMillis = 400)
                 ),
                 exit = slideOutHorizontally(
                     // Exits by sliding up from offset 0 to -fullHeight.
-                    targetOffsetX = { fullHeight -> 2*fullHeight },
+                    targetOffsetX = { fullHeight -> 2 * fullHeight },
                     animationSpec = tween(durationMillis = 400)
                 )
             ) {
-                Row{
+                Row {
                     Row(Modifier.weight(3F)) {
 
                     }
-                    Row(Modifier.weight(2F)){
+                    Row(Modifier.weight(2F)) {
                         if (state == 0)
                             FilterProjects(viewModel = hiltViewModel())
                         if (state == 1)

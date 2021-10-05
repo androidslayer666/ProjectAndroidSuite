@@ -9,6 +9,8 @@ import com.example.network.dto.CommentDto
 import com.example.network.dto.MessageDto
 import com.example.network.dto.MilestoneDto
 import com.example.network.dto.TaskDto
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -157,17 +159,19 @@ fun List<TaskDto>.setStatus(status: Int): List<TaskDto> {
 
 suspend fun <T> networkCaller(
     call: suspend () -> T,
-    onSuccess: suspend (T) -> Unit
+    onSuccess: suspend (T) -> Unit,
+    onSuccessString: String = "",
+    onFailureString: String = ""
 ): Result<String, String> {
     try {
         val result = call()
         if (result != null) {
             onSuccess(result)
-            return Success("")
+            return Success(onSuccessString)
         } else {
-            return Failure("")
+            return Failure(onFailureString)
         }
-    } catch (e: IOException) {
-        return Failure("")
+    } catch (e: Exception) {
+        return Failure(onFailureString)
     }
 }

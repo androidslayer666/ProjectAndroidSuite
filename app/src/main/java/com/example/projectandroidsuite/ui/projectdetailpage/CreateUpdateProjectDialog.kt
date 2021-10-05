@@ -19,8 +19,12 @@ import com.example.domain.repository.Success
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.ProjectStatus
+import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
 import com.example.projectandroidsuite.ui.projectdetailpage.ProjectCreateEditViewModel
+import com.example.projectandroidsuite.ui.taskdetailpage.CreateTaskDialogInput
 
 @Composable
 fun CreateUpdateProjectDialog(
@@ -50,106 +54,28 @@ fun CreateUpdateProjectDialog(
         viewModel.clearInput()
     }
 
-    AlertDialog(
-        shape = RoundedCornerShape(10.dp),
-        onDismissRequest = {
-            closeDialog()
-        },
-        title = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                color = MaterialTheme.colors.primary,
-                elevation = 10.dp,
-                shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-            ) {
-                Row {
-                    Row(
-                        Modifier
-                            .weight(4F)
-                            .padding(6.dp)
-                    ) {
-                        if (project == null) Text(text = "Create project") else Text(text = "Update project")
-                    }
-                }
+    CustomDialog(
+        show = true,
+        hide = { closeDialog() },
+        text = "Create task",
+        onSubmit = {
+            if (project == null) {
+                viewModel.createProject()
+            } else {
+                viewModel.updateProject()
             }
         },
-        text = {
-            Column() {
-                CreateProjectDialogInput(viewModel)
-                if (responsibleIsNotChosen && responsible == null) Text(
-                    text = "Please choose responsible",
-                    color = Color.Red
-                )
-            }
-        },
-        confirmButton = {
-            Row {
-                if (onDeleteClick != null) {
-                    Image(
-                        painterResource(
-                            R.drawable.ic_baseline_delete_36_red
-                        ),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .weight(0.7F)
-                            .clickable { onDeleteClick() }
-                    )
-                }
-                Spacer(Modifier.size(12.dp))
+        onDeleteClick = onDeleteClick
 
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable { closeDialog() },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Dismiss", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(painterResource(R.drawable.window_close), "")
-                    }
-                }
-                Spacer(Modifier.size(12.dp))
-
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable {
-                            if (project == null) {
-                                viewModel.createProject()
-                            } else {
-                                viewModel.updateProject()
-                            }
-                        },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Confirm", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(painterResource(R.drawable.ic_project_status_done), "")
-                    }
-                }
-            }
-        },
-        dismissButton = { }
-    )
+    ) {
+        CreateProjectDialogInput(viewModel, project != null)
+    }
 }
 
 @Composable
 fun CreateProjectDialogInput(
-    viewModel: ProjectCreateEditViewModel
+    viewModel: ProjectCreateEditViewModel,
+    modeCreate: Boolean
 ) {
     var showTeamPicker by remember { mutableStateOf(false) }
     var showResponsiblePicker by remember { mutableStateOf(false) }
@@ -179,39 +105,31 @@ fun CreateProjectDialogInput(
             onValueChange = { text ->
                 viewModel.setDescription(text)
             })
-        Row(Modifier.padding(vertical = 12.dp)) {
-            Text(
-                text = "Status",
-                modifier = Modifier.weight(2F)
-            )
-            Column(
-                Modifier
-                    .selectableGroup()
-                    .weight(4F)
-            ) {
-                Row() {
-                    RadioButton(
-                        (projectStatus == ProjectStatus.ACTIVE),
-                        { viewModel.setProjectStatus(ProjectStatus.ACTIVE) }
+
+        if (modeCreate)
+            Row(Modifier.padding(vertical = 12.dp)) {
+                Row(
+                    Modifier
+                        .weight(4F)
+                ) {
+                    CustomButton(
+                        text = "Active",
+                        clicked = (projectStatus == ProjectStatus.ACTIVE),
+                        onClick = { viewModel.setProjectStatus(ProjectStatus.ACTIVE) })
+                    Spacer(Modifier.size(12.dp))
+                    CustomButton(
+                        text = "Paused",
+                        clicked = (projectStatus == ProjectStatus.PAUSED),
+                        onClick = { viewModel.setProjectStatus(ProjectStatus.PAUSED) })
+                    Spacer(Modifier.size(12.dp))
+                    CustomButton(
+                        text = "Stopped",
+                        clicked = (projectStatus == ProjectStatus.STOPPED),
+                        onClick = { viewModel.setProjectStatus(ProjectStatus.STOPPED) }
                     )
-                    Text(text = "Active")
-                }
-                Row() {
-                    RadioButton(
-                        (projectStatus == ProjectStatus.PAUSED),
-                        { viewModel.setProjectStatus(ProjectStatus.PAUSED) }
-                    )
-                    Text(text = "Paused")
-                }
-                Row() {
-                    RadioButton(
-                        (projectStatus == ProjectStatus.STOPPED),
-                        { viewModel.setProjectStatus(ProjectStatus.STOPPED) }
-                    )
-                    Text(text = "Stopped")
                 }
             }
-        }
+
 
         if (listUsersFlow != null) {
             Row(Modifier.padding(vertical = 12.dp)) {

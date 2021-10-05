@@ -1,22 +1,21 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.taskdetailpage
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.SubtaskEntity
 import com.example.domain.repository.Success
-import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.ui.parts.TeamMemberCard
+import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
-import com.example.projectandroidsuite.ui.taskdetailpage.SubtaskCreateEditViewModel
+import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
 
 @Composable
 fun CreateSubtaskDialog(
@@ -45,77 +44,22 @@ fun CreateSubtaskDialog(
         closeDialog()
     }
 
-    AlertDialog(
-        onDismissRequest = {
-            closeDialog()
-            //viewModel.clearInput()
-        },
-        title = {
-            if (subtask == null) Text(text = "Create subtask") else Text(text = "Update subtask")
-        },
-        text = {
-            CreateSubtaskDialogInput(viewModel)
-        },
-        confirmButton = {
-            Row {
-                if (onDeleteClick != null) {
-                    Image(
-                        painterResource(
-                            R.drawable.ic_baseline_delete_36_red
-                        ),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .weight(0.7F)
-                            .clickable { onDeleteClick() }
-                    )
-                }
-                Spacer(Modifier.size(12.dp))
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable { closeDialog() },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Dismiss", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(painterResource(R.drawable.window_close), "")
-                    }
-                }
-                Spacer(Modifier.size(12.dp))
-
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable {
-                            if (subtask == null) {
-                                viewModel.createSubtask()
-                            } else {
-                                viewModel.updateSubtask()
-                            }
-                        },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Confirm", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(painterResource(R.drawable.ic_project_status_done), "")
-                    }
-                }
+    CustomDialog(
+        show = true,
+        hide = { closeDialog() },
+        text = "Create task",
+        onSubmit = {
+            if (subtask == null) {
+                viewModel.createSubtask()
+            } else {
+                viewModel.updateSubtask()
             }
         },
-        dismissButton = {}
-    )
+        onDeleteClick = onDeleteClick
+
+    ) {
+        CreateSubtaskDialogInput(viewModel)
+    }
 }
 
 @Composable

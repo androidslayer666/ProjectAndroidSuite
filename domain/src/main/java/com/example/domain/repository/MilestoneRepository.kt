@@ -50,74 +50,40 @@ class MilestoneRepository @Inject constructor(
         projectId: Int,
         milestone: MilestonePost
     ): Result<String, String> {
-        Log.d("ProjectRepository", "Started creating milestone  ${milestone}")
-        try {
-            val response =
-                milestoneEndPoint.putMilestoneToProject(projectId, milestone)
+        Log.d("MilestoneRepository", "Started creating milestone  ${milestone}")
 
-            Log.d("ProjectRepository", response.toString())
-            if (response != null) {
-                Log.d("ProjectRepository", "Project created")
-                //because response from server doesn't give id
-                populateMilestonesByProject(projectId)
-                return Success("Project successfully created")
-            } else {
-                return Failure("Project was not created due to a server problem")
-            }
-        } catch (e: Exception) {
-            Log.d(
-                "ProjectRepository",
-                "tried to create a project but caught an exception: ${e.message}"
-            )
-            return Failure("Project was not created, please check network or ask the developer to fix this")
-        }
+        return networkCaller(
+            call = { milestoneEndPoint.putMilestoneToProject(projectId, milestone) },
+            onSuccess = { populateMilestonesByProject(projectId) },
+            onSuccessString = "Milestone added successfully",
+            onFailureString = "Having problem while creating the milestone, please check the network connection"
+        )
     }
 
     suspend fun deleteMilestone(milestoneId: Int, projectId: Int?): Result<String, String> {
-        try {
-            val response = milestoneEndPoint.deleteMilestone(milestoneId)
-            if (response != null) {
+
+        return networkCaller(
+            call = { milestoneEndPoint.deleteMilestone(milestoneId) },
+            onSuccess = {
                 if (projectId != null) {
                     populateMilestonesByProject(projectId)
                 }
-                return Success("Milestone successfully deleted")
-            } else {
-                return Failure("Milestone was not deleted due to a server problem")
-            }
-        } catch (e: Exception) {
-            Log.d(
-                "MilestoneRepository",
-                "tried to create a project but caught an exception: ${e.message}"
-            )
-            return Failure("Milestone was not deleted, please check network or ask the developer to fix this")
-        }
+            },
+            onSuccessString = "Milestone deleted successfully",
+            onFailureString = "Having problem while creating the milestone, please check the network connection"
+        )
     }
 
     suspend fun updateMilestoneToProject(
         projectId: Int,
         milestone: MilestoneEntity
     ): Result<String, String> {
-        Log.d("ProjectRepository", "Started creating with ${milestone.id}  milestone  ${milestone.toMilestonePost()}")
-        try {
-            val response =
-                milestoneEndPoint.updateMilestone(milestone.id, milestone.toMilestonePost())
-
-            Log.d("ProjectRepository", response.toString())
-            if (response != null) {
-                Log.d("ProjectRepository", "Project created")
-                //because response from server doesn't give id
-                populateMilestonesByProject(projectId)
-                return Success("Project successfully created")
-            } else {
-                return Failure("Project was not created due to a server problem")
-            }
-        } catch (e: Exception) {
-            Log.d(
-                "ProjectRepository",
-                "tried to create a project but caught an exception: ${e.message}"
-            )
-            return Failure("Project was not created, please check network or ask the developer to fix this")
-        }
+        Log.d("MilestoneRepository", "Started creating with ${milestone.id}  milestone  ${milestone.toMilestonePost()}")
+        return networkCaller(
+            call = { milestoneEndPoint.updateMilestone(milestone.id, milestone.toMilestonePost()) },
+            onSuccess = { populateMilestonesByProject(projectId) },
+            onSuccessString = "Milestone updated successfully",
+            onFailureString = "Having problem while updating the milestone, please check the network connection"
+        )
     }
-
 }

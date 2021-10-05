@@ -58,68 +58,38 @@ class CommentRepository @Inject constructor(
 
     suspend fun putCommentToMessage(messageId: Int, comment: CommentEntity): Result<String, String> {
         //Log.d("ProjectRepository", "Started creating pproject" + comment.toCommentPost().toString())
-        try {
-            val response = commentEndPoint.putCommentToMessage(messageId, comment.toCommentPost())
-            //Log.d("ProjectRepository", response.toString())
-            if (response != null) {
-                Log.d("ProjectRepository", "Comment created")
-                //because response from server doesn't give id
-                //getProjects()
-                return Success("Comment successfully create")
-            } else {
-                return Failure("Comment was not created due to a server problem")
-            }
-        } catch (e: Exception) {
-//            Log.d(
-//                "ProjectRepository",
-//                "tried to create a Comment but caught an exception: ${e.message}"
-//            )
-            return Failure("Comment was not created, please check network or ask the developer to fix this")
-        }
+
+        return networkCaller(
+            call = { commentEndPoint.putCommentToMessage(messageId, comment.toCommentPost()) },
+            onSuccess = {  },
+            onSuccessString = "Comment added successfully",
+            onFailureString = "Having problem while creating the comment, please check the network connection"
+        )
     }
 
     suspend fun putCommentToTask(taskId: Int, comment: CommentEntity) : Result<String, String> {
         Log.d("CommentRepository", "Started creating comment" + taskId.toString())
-        try {
-            val response = commentEndPoint.putCommentToTask(taskId, comment.toCommentPost())
-            //Log.d("ProjectRepository", response.toString())
-            if (response != null) {
-                Log.d("ProjectRepository", "Comment created")
-                //because response from server doesn't give id
-                //getProjects()
-                return Success("Comment successfully create")
-            } else {
-                return Failure("Comment was not created due to a server problem")
-            }
-        } catch (e: Exception) {
-            Log.d(
-                "CommentRepository",
-                "tried to create a Comment but caught an exception: ${e.message}"
-            )
-            return Failure("Comment was not created, please check network or ask the developer to fix this")
-        }
+
+        return networkCaller(
+            call = { commentEndPoint.putCommentToTask(taskId, comment.toCommentPost()) },
+            onSuccess = {  },
+            onSuccessString = "Comment added successfully",
+            onFailureString = "Having problem while creating the comment, please check the network connection"
+        )
     }
 
     suspend fun deleteComment(commentId: String, taskId: Int? = null): Result<String, String> {
-        try {
-            Log.d("TaskRepository", "Start deleting the comment with id : $commentId")
-            val response = commentEndPoint.deleteComment(commentId)
-            if (response != null) {
-                Log.d("CommentRepository", "Task deleted")
+
+        //todo is it necessary to be nullable?
+        return networkCaller(
+            call = { commentEndPoint.deleteComment(commentId) },
+            onSuccess = {
                 if (taskId != null) {
                     populateCommentsWithTaskId(taskId)
                 }
-
-                return Success("The comment successfully deleted")
-            } else {
-                Log.d("CommentRepository", "Failed to delete the comment")
-                return Failure("Unable to delete the task")
-            }
-        } catch (e: Exception) {
-            Log.d("CommentRepository", "tried to create a comment but got an exception ${e.message}")
-            return Failure("Unable to delete the comment")
-        }
+            },
+            onSuccessString = "Comment added successfully",
+            onFailureString = "Having problem while вулуештп the comment, please check the network connection"
+        )
     }
-
-
 }

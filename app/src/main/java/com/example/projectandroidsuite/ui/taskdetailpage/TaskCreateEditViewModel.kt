@@ -17,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -73,10 +74,9 @@ class TaskCreateEditViewModel @Inject constructor(
     val endDate: LiveData<Date> = _endDate
 
     val userList = project.switchMap { project ->
-       liveData{emit (project?.team)}
+        Log.d("TaskCreateEditViewModel", project.toString())
+        liveData { emit(project?.team) }
     }
-
-    val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
         .combineWith(chosenUserList) { users, chosenUsers ->
             users?.forEach { user ->
                 user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
@@ -87,6 +87,7 @@ class TaskCreateEditViewModel @Inject constructor(
             if (filter != null) users?.filterUsersByFilter(filter)
             else users
         }
+
 
     val projectList = projectRepository.getAllStoredProjects().asLiveData()
         .combineWith(projectSearch) { listProject, filter ->
@@ -118,7 +119,13 @@ class TaskCreateEditViewModel @Inject constructor(
         _chosenUserList.value = task.responsibles
         _endDate.value = task.deadline
         _priority.value = task.priority
-        task.projectOwner?.let { _project.value = it }
+        task.projectOwner?.let { projectOwner ->
+            viewModelScope.launch {
+                projectRepository.getProjectFromDbById(projectOwner.id).collectLatest { project ->
+                    _project.value = project
+                }
+            }
+        }
         task.milestoneId?.let {
             viewModelScope.launch {
                 val milestone = milestoneRepository.getMilestoneById(task.milestoneId!!)

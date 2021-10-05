@@ -62,13 +62,13 @@ class MessageRepository @Inject constructor(
                     }
                     messageDao.insertMessages(listOf(message))
                 }
-                Success("Comments are populated")
+                Success("Messages are populated")
             } else {
-                Failure("Can't download comments")
+                Failure("Can't download messages")
             }
         } catch (e: Exception) {
             Log.d("MessageRepository", "caught an exception : ${e.message}")
-            return Failure("Can't download comments")
+            return Failure("Can't download messages")
         }
     }
 
@@ -83,43 +83,23 @@ class MessageRepository @Inject constructor(
         message: MessageEntity,
         participants: List<UserEntity>
     ): Result<String, String> {
-        Log.d("ProjectRepository", "Started creating milestone  $message")
-        try {
-            val response =
-                messageEndPoint.putMessageToProject(projectId, message.toMessagePost(participants))
+        Log.d("ProjectRepository", "Started creating message  $message")
 
-            Log.d("ProjectRepository", response.toString())
-            if (response != null) {
-                Log.d("ProjectRepository", "Project created")
-                //because response from server doesn't give id
-                populateMessageWithProjectId(projectId)
-                return Success("Project successfully created")
-            } else {
-                return Failure("Project was not created due to a server problem")
-            }
-        } catch (e: Exception) {
-            Log.d(
-                "ProjectRepository",
-                "tried to create a project but caught an exception: ${e.message}"
-            )
-            return Failure("Project was not created, please check network or ask the developer to fix this")
-        }
+        return networkCaller(
+            call = { messageEndPoint.putMessageToProject(projectId, message.toMessagePost(participants)) },
+            onSuccess = { populateMessageWithProjectId(projectId) },
+            onSuccessString = "Message added successfully",
+            onFailureString = "Having problem while creating the message, please check the network connection"
+        )
     }
 
     suspend fun deleteMessage( messageId: Int): Result<String, String>{
-        try {
-            Log.d("TaskRepository", "Start deleting the comment with id : $messageId")
-            val response = messageEndPoint.deleteMessage(messageId)
-            if (response != null) {
-                Log.d("CommentRepository", "message deleted")
-                return Success("The message successfully deleted")
-            } else {
-                Log.d("CommentRepository", "Failed to delete the message")
-                return Failure("Unable to delete the message")
-            }
-        } catch (e: Exception) {
-            Log.d("CommentRepository", "tried to delete a message but got an exception ${e.message}")
-            return Failure("Unable to delete the message")
-        }
+
+        return networkCaller(
+            call = { messageEndPoint.deleteMessage(messageId) },
+            onSuccess = {  },
+            onSuccessString = "Message deleted successfully",
+            onFailureString = "Having problem while deleting the message, please check the network connection"
+        )
     }
 }

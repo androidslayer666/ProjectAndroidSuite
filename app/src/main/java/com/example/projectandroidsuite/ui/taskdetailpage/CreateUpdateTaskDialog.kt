@@ -18,7 +18,10 @@ import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.TaskStatus
 import com.example.projectandroidsuite.ui.parts.*
+import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,97 +52,23 @@ fun CreateUpdateTaskDialog(
         viewModel.clearInput()
     }
 
-    AlertDialog(
-        shape = RoundedCornerShape(10.dp),
-        onDismissRequest = {
-            closeDialog()
-        },
-        title = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                color = MaterialTheme.colors.primary,
-                elevation = 10.dp,
-                shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-            ) {
-                Row {
-                    Row(
-                        Modifier
-                            .weight(4F)
-                            .padding(6.dp)
-                    ) {
-                        if (task == null) Text(text = "Create Task") else Text(text = "Update Task")
-                    }
-                }
+    CustomDialog(
+        show = true,
+        hide = { closeDialog() },
+        text = "Create task",
+        onSubmit = {
+            if (task == null) {
+                viewModel.createTask()
+            } else {
+                viewModel.updateTask()
             }
         },
-        text = {
-            CreateTaskDialogInput(viewModel)
-        },
-        confirmButton = {
-            Row {
-                if (onDeleteClick != null) {
-                    Image(
-                        painterResource(
-                            R.drawable.ic_baseline_delete_36_red
-                        ),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .weight(0.7F)
-                            .clickable { onDeleteClick() }
-                    )
-                }
-                Spacer(Modifier.size(12.dp))
+        onDeleteClick = onDeleteClick
 
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable { closeDialog() },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Dismiss", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(painterResource(R.drawable.window_close), "")
-                    }
-                }
-                Spacer(Modifier.size(12.dp))
+    ) {
+        CreateTaskDialogInput(viewModel)
+    }
 
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable {
-                            if (task == null) {
-                                viewModel.createTask()
-                            } else {
-                                viewModel.updateTask()
-                            }
-                        },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Confirm", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(painterResource(R.drawable.ic_project_status_done), "")
-                    }
-                }
-            }
-        },
-        dismissButton = {
-
-        }
-    )
 }
 
 @Composable
@@ -181,27 +110,16 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
         }
 
         Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Status", modifier = Modifier.weight(2F))
-            Column(
-                Modifier
-                    .selectableGroup()
-                    .weight(4F)
-            ) {
-                Row() {
-                    RadioButton(
-                        (taskStatus == TaskStatus.ACTIVE),
-                        { viewModel.setTaskStatus(TaskStatus.ACTIVE) }
-                    )
-                    Text(text = "Active")
-                }
-                Row() {
-                    RadioButton(
-                        (taskStatus == TaskStatus.COMPLETE),
-                        { viewModel.setTaskStatus(TaskStatus.COMPLETE) }
-                    )
-                    Text(text = "Complete")
-                }
-            }
+            CustomButton(
+                text = "Active",
+                clicked = (taskStatus == TaskStatus.ACTIVE),
+                onClick = { viewModel.setTaskStatus(TaskStatus.ACTIVE) })
+            Spacer(Modifier.size(12.dp))
+            CustomButton(
+                text = "Complete",
+                clicked = (taskStatus == TaskStatus.COMPLETE),
+                onClick = { viewModel.setTaskStatus(TaskStatus.COMPLETE) })
+
         }
 
         Row(Modifier.padding(vertical = 12.dp)) {

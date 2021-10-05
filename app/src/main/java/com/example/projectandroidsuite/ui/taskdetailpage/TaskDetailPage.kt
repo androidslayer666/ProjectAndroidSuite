@@ -1,6 +1,7 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -36,7 +37,7 @@ fun TaskDetailPage(
     val context = LocalContext.current
 
     var state by remember { mutableStateOf(0) }
-    val titles = listOf("Comments", "Files", "Subtasks")
+    val titles = listOf( "Subtasks","Comments", "Files" )
 
     var showUpdateTaskDialog by remember { mutableStateOf(false) }
     var expandButtons by remember { mutableStateOf(false) }
@@ -79,11 +80,11 @@ fun TaskDetailPage(
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            modifier = Modifier.height(50.dp),
+                            modifier = Modifier.height(50.dp).background(MaterialTheme.colors.primary),
                             text = {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(title)
-                                    if (index == 2 && state == 2) IconButton(onClick = {
+                                    if (index == 0 && state == 0) IconButton(onClick = {
                                         showCreateSubtaskDialog = true
                                     }) {
                                         Image(
@@ -99,15 +100,16 @@ fun TaskDetailPage(
                     }
                 }
                 when (state) {
-                    0 -> ListComments(
+                    0 -> ListSubtask(task?.subtasks ?: listOf())
+                    1 -> ListFiles(listFiles = files)
+                    2 -> ListComments(
                         listComments = comments,
                         onReplyClick = { comment -> viewModel.addCommentToTask(comment) },
                         onDeleteClick = { comment -> viewModel.deleteComment(comment) })
-                    1 -> ListFiles(listFiles = files)
-                    2 -> ListSubtask(task?.subtasks ?: listOf())
                 }
             }
         }
+
         if (showUpdateTaskDialog) {
             CreateUpdateTaskDialog(
                 viewModel = hiltViewModel(),
@@ -123,7 +125,7 @@ fun TaskDetailPage(
                     //Log.d("delete task", taskDeletionStatus.toString())
                     makeToast((taskDeletionStatus as Success<String>).value, context)
                     viewModel.resetState()
-                    navController.popBackStack()
+                    //navController.popBackStack()
                 }
                 is Failure -> {
                     //Log.d("delete task", taskDeletionStatus.toString())
@@ -137,8 +139,7 @@ fun TaskDetailPage(
                 CreateSubtaskDialog(
                     taskId = it,
                     viewModel = hiltViewModel(),
-                    closeDialog = { showCreateSubtaskDialog = false })
-            }
+                    closeDialog = { showCreateSubtaskDialog = false })            }
         }
 
         if (showDeleteDialog) {

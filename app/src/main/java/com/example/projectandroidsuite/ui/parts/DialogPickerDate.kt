@@ -17,6 +17,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.projectandroidsuite.R
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialogButton
+import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,53 +37,14 @@ fun DatePicker(onDateSelected: (Date) -> Unit, onDismissRequest: () -> Unit) {
             })
         },
         buttons = {
-            Row {
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable { onDismissRequest() },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Dismiss", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(
-                            painterResource(R.drawable.window_close),
-                            ""
-                        )
-                    }
-                }
-                Spacer(Modifier.size(12.dp))
-
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable {
-                            onDateSelected(selDate)
-                            onDismissRequest()
-                        },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Confirm", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(
-                            painterResource(R.drawable.ic_project_status_done),
-                            ""
-                        )
-                    }
-                }
-            }
+            CustomDialogButton(
+                onClick = {
+                    onDateSelected(selDate)
+                    onDismissRequest()
+                },
+                text = "Confirm",
+                typeConfirm = true
+            )
 
         })
 

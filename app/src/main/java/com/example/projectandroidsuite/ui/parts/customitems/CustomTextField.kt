@@ -14,13 +14,14 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomTextField(
-    height:Int = 50,
+    height:Int = 70,
     numberOfLines: Int = 1,
     label : String = "",
     value: String,
     onValueChange: ((text: String) -> Unit)
     ) {
     TextField(
+        textStyle = MaterialTheme.typography.body1,
         value = value,
         onValueChange = { input -> onValueChange(input) },
         label = {Text(label)},

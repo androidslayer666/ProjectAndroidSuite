@@ -25,7 +25,7 @@ fun CustomButton(
         elevation = if (clicked) 0.dp else 10.dp,
         modifier = Modifier
             .clickable { onClick() }
-            .size(width = 70.dp, height = 30.dp),
+            .size(width = 90.dp, height = 30.dp),
         shape = RoundedCornerShape(10.dp)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

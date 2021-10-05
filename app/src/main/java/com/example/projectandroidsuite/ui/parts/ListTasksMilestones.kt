@@ -2,6 +2,7 @@ package com.example.projectandroidsuite.ui.parts
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,7 +31,7 @@ import com.example.projectandroidsuite.ui.projectpage.TaskItem
 fun ListTasksMilestones(
     listTasksAndMilestones: Map<MilestoneEntity?, List<TaskEntity>>?,
     navController: NavHostController,
-    onDeleteMilestone: (milestone: MilestoneEntity?) -> Unit = {}
+    onEditMilestone: (milestone: MilestoneEntity?) -> Unit = {},
 ) {
     listTasksAndMilestones?.let {
         LazyColumn() {
@@ -44,64 +45,61 @@ fun ListTasksMilestones(
                     color = MaterialTheme.colors.primary,
                     width = 20F
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (milestone != null) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.weight(5F)
-                            ) {
-                                if (milestone.isKey == true) {
-                                    Image(
-                                        painterResource(
-                                            R.drawable.ic_baseline_key_24
-                                        ),
-                                        "",
+                    Box {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (milestone != null) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(5F)
+                                ) {
+                                    if (milestone.isKey == true) {
+                                        Image(
+                                            painterResource(
+                                                R.drawable.ic_baseline_key_24
+                                            ),
+                                            "",
+                                            modifier = Modifier
+                                                .padding(horizontal = 4.dp)
+                                        )
+                                    }
+                                    Text(
+                                        text = milestone.title ?: "",
+                                        style = MaterialTheme.typography.h6,
                                         modifier = Modifier
-                                            .padding(horizontal = 4.dp)
+                                            .clickable { showButtons = !showButtons }
                                     )
                                 }
-                                Text(
-                                    text = milestone.title ?: "",
-                                    style = MaterialTheme.typography.h6,
-                                    modifier = Modifier
-                                        .clickable { showButtons = !showButtons }
-                                )
                             }
-                        }
-                        if (showButtons && milestone?.canEdit == true) {
-                            Image(
-                                painterResource(id = R.drawable.ic_edit_button),
-                                "",
-                                modifier = Modifier
-                                    .clickable {
-                                        showEditDialog = true
-                                        showButtons = false
-                                    }
-                                    .weight(1F))
-                        }
-                        if (showDeleteDialog) {
-                            ConfirmationDialog(
-                                text = "Do you want to delete the milestone?",
-                                onSubmit = { onDeleteMilestone(milestone) },
-                                { showDeleteDialog = false
-                                    showButtons = false
-                                    navController.popBackStack()
-                                })
-                        }
-                        if (showEditDialog) {
-                            CreateMilestoneDialog(
-                                milestone = milestone,
-                                projectId = milestone?.projectId ?: 0,
-                                viewModel = hiltViewModel(),
-                                closeDialog = { showEditDialog = false },
-                                onDeleteClick = {if(milestone?.canDelete == true){ showDeleteDialog = true } }
-                            )
+                            if (showButtons && milestone?.canEdit == true) {
+                                Image(
+                                    painterResource(id = R.drawable.ic_edit_button),
+                                    "",
+                                    modifier = Modifier
+                                        .clickable {
+                                            onEditMilestone(milestone)
+                                        }
+                                        .weight(1F))
+                            }
                         }
                     }
                     for (task in listTasksAndMilestones[milestone]!!) {
                         TaskItem(
                             task = task,
                             onClick = { navController.navigate("tasks/${task.id}") })
+                    }
+
+                    if (showEditDialog) {
+                        CreateMilestoneDialog(
+                            milestone = milestone,
+                            projectId = milestone?.projectId ?: 0,
+                            viewModel = hiltViewModel(),
+                            closeDialog = { showEditDialog = false },
+                            onDeleteClick = {
+                                if (milestone?.canDelete == true) {
+                                    showDeleteDialog = true
+                                }
+                            }
+                        )
                     }
                 }
             }

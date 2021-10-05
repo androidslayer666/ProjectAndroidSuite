@@ -16,7 +16,9 @@ import com.example.database.entities.MilestoneEntity
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
 import com.example.projectandroidsuite.ui.projectdetailpage.MilestoneCreateEditViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,78 +50,25 @@ fun CreateMilestoneDialog(
         closeDialog()
     }
 
-    AlertDialog(
-        onDismissRequest = {
-            closeDialog()
-            viewModel.clearInput()
-        },
-        title = {
-            if (milestone == null) Text(text = "Create milestone") else Text(text = "Update milestone")
-        },
-        text = {
-            CreateMilestoneDialogInput(viewModel)
-        },
-        confirmButton = {
-            Row {
-                if (onDeleteClick != null) {
-                    Image(
-                        painterResource(
-                            R.drawable.ic_baseline_delete_36_red
-                        ),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .weight(0.7F)
-                            .clickable { onDeleteClick() }
-                    )
-                }
-                Spacer(Modifier.size(12.dp))
 
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable { closeDialog() },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Dismiss", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(painterResource(R.drawable.window_close), "")
-                    }
-                }
-                Spacer(Modifier.size(12.dp))
-
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .weight(1F)
-                        .clickable {
-                            if (milestone == null) {
-                                viewModel.createMilestone()
-                            } else {
-                                viewModel.updateMilestone()
-                            }
-                        },
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 30.dp)
-                    ) {
-                        Spacer(Modifier.size(12.dp))
-                        Text("Confirm", style = MaterialTheme.typography.caption)
-                        Spacer(Modifier.size(12.dp))
-                        Image(painterResource(R.drawable.ic_project_status_done), "")
-                    }
-                }
+    CustomDialog(
+        show = true,
+        hide = { closeDialog() },
+        text = "Create task",
+        onSubmit = {
+            if (milestone == null) {
+                viewModel.createMilestone()
+            } else {
+                viewModel.updateMilestone()
             }
         },
-        dismissButton = { }
-    )
+        onDeleteClick = onDeleteClick
+
+    ) {
+        CreateMilestoneDialogInput(viewModel)
+    }
+
+
 }
 
 @Composable

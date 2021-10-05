@@ -45,7 +45,7 @@ private val DarkColors = darkColors(
     primary = Color(0xFF003055),
     primaryVariant = Color(0xFF00185E),
     secondary = Color(0xFF9B5312),
-    surface = Color(0xFF003055),
+    surface = Color(0xFF000000),
     //onBackground = Color(0xFFC2C2C2),
     onPrimary = Color(0xFFFFE1E1)
    )

@@ -83,14 +83,18 @@ class ProjectRepository @Inject constructor(
     suspend fun createProject(project: ProjectPost): Result<String, String> {
         return networkCaller(
             call = { projectEndPoint.createProject(project) },
-            onSuccess = { getProjects() }
+            onSuccess = { getProjects() },
+            onSuccessString = "Project created successfully",
+            onFailureString = "Having problem while creating the project, please check the network connection"
         )
     }
 
     suspend fun deleteProject(projectId: Int): Result<String, String> {
         return networkCaller(
             call = { projectEndPoint.deleteProject(projectId) },
-            onSuccess = { }
+            onSuccess = { },
+            onSuccessString = "Project deleted successfully",
+            onFailureString = "Having problem while deleting the project, please check the network connection"
         )
     }
 
@@ -105,7 +109,9 @@ class ProjectRepository @Inject constructor(
                     ProjectStatusPost(projectStatus)
                 )
             },
-            onSuccess = { getTeamAndInsertProjectToDb(projectId) }
+            onSuccess = { getTeamAndInsertProjectToDb(projectId) },
+            onSuccessString = "Project status updated successfully",
+            onFailureString = "Having problem while deleting the project, please check the network connection"
         )
     }
 

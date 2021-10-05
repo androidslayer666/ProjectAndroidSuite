@@ -2,6 +2,7 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -18,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.database.entities.MilestoneEntity
 import com.example.domain.repository.Failure
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.R
@@ -45,6 +47,9 @@ fun ProjectDetailPage(
     var showCreateMessageDialog by remember { mutableStateOf(false) }
     var showCreateMilestoneDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var rememberMilestone by remember { mutableStateOf(MilestoneEntity(id=0)) }
+    var showEditMilestoneDialog by remember { mutableStateOf(false) }
+
 
     val project by viewModel.currentProject.observeAsState()
     val listTasksAndMilestones by viewModel.taskAndMilestones.observeAsState()
@@ -74,7 +79,7 @@ fun ProjectDetailPage(
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            modifier = Modifier.height(50.dp),
+                            modifier = Modifier.height(50.dp).background(MaterialTheme.colors.primary),
                             text = {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(title)
@@ -105,7 +110,12 @@ fun ProjectDetailPage(
                     0 -> ListTasksMilestones(
                         listTasksAndMilestones,
                         navController
-                    ) { milestone -> viewModel.deleteMilestone(milestone) }
+                    ) { milestone ->
+                        if (milestone != null) {
+                            rememberMilestone = milestone
+                            showEditMilestoneDialog = true
+                        }
+                    }
                     1 -> ListMessages(
                         listMessages,
                         { comment -> viewModel.addCommentToMessage(comment) },
@@ -145,7 +155,8 @@ fun ProjectDetailPage(
                 CreateMessageDialog(
                     projectId = projectId,
                     viewModel = hiltViewModel(),
-                    closeDialog = { showCreateMessageDialog = false }
+                    closeDialog = { showCreateMessageDialog = false },
+                    onMessageDeletedOrEdited = {string -> makeToast(string, context)}
                 )
             }
         }
@@ -155,19 +166,33 @@ fun ProjectDetailPage(
                 CreateMilestoneDialog(
                     projectId = projectId,
                     viewModel = hiltViewModel(),
-                    closeDialog = { showCreateMilestoneDialog = false
-                        navController.popBackStack()
-                    }
+                    closeDialog = { showCreateMilestoneDialog = false},
+                    onMilestoneDeletedOrEdited = {string -> makeToast(string, context)}
                 )
             }
         }
+
+        if (showEditMilestoneDialog) {
+            if (projectId != null) {
+                CreateMilestoneDialog(
+                    milestone = rememberMilestone,
+                    projectId = projectId,
+                    viewModel = hiltViewModel(),
+                    closeDialog = { showEditMilestoneDialog = false},
+                    onMilestoneDeletedOrEdited = {string -> makeToast(string, context)},
+                    onDeleteClick = {viewModel.deleteMilestone(rememberMilestone)}
+                )
+            }
+        }
+
+
 
         if (showDeleteDialog) {
             ConfirmationDialog(
                 text = "Do you want to delete the project?",
                 onSubmit = {
                     viewModel.deleteProject()
-                    navController.popBackStack()
+                    //navController.popBackStack()
                 },
                 { showDeleteDialog = false })
         }
