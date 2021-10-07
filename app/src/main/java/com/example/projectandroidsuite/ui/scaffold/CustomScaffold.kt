@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.scaffold
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -113,7 +114,7 @@ fun CustomScaffold(
                         modifier = Modifier.padding(bottom = 12.dp),
                         onClick = { showCreateProjectDialog = true }
                     ) {
-                        Icon(painterResource(R.drawable.project_icon), "")
+                        Icon(painterResource(R.drawable.clipboard_list_outline), "")
                     }
                 }
                 AnimatedVisibility(
@@ -166,8 +167,8 @@ fun CustomScaffold(
             viewModel = hiltViewModel(),
             closeDialog = { showCreateProjectDialog = false },
             onSuccessProjectCreation = { string ->
+                Log.d("CustomScaffold", string)
                 makeToast(string, context)
-                //navController.popBackStack()
             })
     }
 
@@ -176,8 +177,8 @@ fun CustomScaffold(
             viewModel = hiltViewModel(),
             closeDialog = { showCreateTaskDialog = false },
             onTaskDeletedOrEdited = { string ->
+                Log.d("CustomScaffold", string)
                 makeToast(string, context)
-                //navController.popBackStack()
             })
 
     }

@@ -9,8 +9,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,10 +34,14 @@ fun TeamMemberRow(
 }
 
 @Composable
-fun TeamMemberCard(user: UserEntity) {
+fun TeamMemberCard(
+    user: UserEntity,
+    showFullName : Boolean? = false
+    ) {
 
     Card(
         elevation = 1.dp,
+        backgroundColor= MaterialTheme.colors.primary,
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier.padding(6.dp, 0.dp, 6.dp, 0.dp)
     ) {
@@ -56,7 +61,9 @@ fun TeamMemberCard(user: UserEntity) {
                 )
             }
             Text(
-                text = user.displayName.substringBefore(' '),
+                text = if(showFullName != true) {
+                    user.displayName.substringBefore(' ')
+                } else user.displayName,
                 Modifier
                     .clip(CircleShape)
                     .padding(start = 6.dp, end = 6.dp)

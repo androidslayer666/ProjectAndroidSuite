@@ -60,7 +60,7 @@ fun ProjectItem(project: ProjectEntity, onClick: (projectId: Int) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
             .background(MaterialTheme.colors.background),
         verticalAlignment = Alignment.CenterVertically
     )
@@ -83,7 +83,9 @@ fun ProjectItem(project: ProjectEntity, onClick: (projectId: Int) -> Unit) {
         Column(
             Modifier
                 .weight(2f)
+                .fillMaxSize()
                 .clickable { onClick(project.id) }) {
+            Spacer(Modifier.size(6.dp))
             project.title.let {
                 Text(
                     text = it,
@@ -98,6 +100,7 @@ fun ProjectItem(project: ProjectEntity, onClick: (projectId: Int) -> Unit) {
                     style = MaterialTheme.typography.overline
                 )
             }
+            Spacer(Modifier.size(6.dp))
         }
         Column(Modifier.weight(0.5f), horizontalAlignment = Alignment.CenterHorizontally) {
             project.taskCount?.let {
@@ -108,7 +111,7 @@ fun ProjectItem(project: ProjectEntity, onClick: (projectId: Int) -> Unit) {
             }
         }
     }
-    Row(Modifier.padding(horizontal= 12.dp)){
+    Row(Modifier.padding(horizontal = 12.dp)) {
         Column(Modifier.weight(0.3F)) {}
         Column(Modifier.weight(2F)) {
             Divider()

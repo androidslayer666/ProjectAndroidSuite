@@ -6,10 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -24,6 +21,7 @@ import com.example.domain.repository.Failure
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.makeToast
+import com.example.projectandroidsuite.logic.showResultToast
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
 
@@ -47,7 +45,7 @@ fun ProjectDetailPage(
     var showCreateMessageDialog by remember { mutableStateOf(false) }
     var showCreateMilestoneDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var rememberMilestone by remember { mutableStateOf(MilestoneEntity(id=0)) }
+    var rememberMilestone by remember { mutableStateOf(MilestoneEntity(id = 0)) }
     var showEditMilestoneDialog by remember { mutableStateOf(false) }
 
 
@@ -56,6 +54,36 @@ fun ProjectDetailPage(
     val listMessages by viewModel.listDiscussions.observeAsState(null)
     val listFiles by viewModel.listFiles.observeAsState(listOf())
     val projectDeletionStatus by viewModel.projectDeletionStatus.observeAsState()
+    val milestoneDeletionStatus by viewModel.milestoneDeletionStatus.observeAsState()
+    val messageDeletionStatus by viewModel.messageDeletionStatus.observeAsState()
+    val commentDeletionStatus by viewModel.commentDeletionStatus.observeAsState()
+
+    showResultToast(
+        result = milestoneDeletionStatus,
+        onSuccess = { showEditMilestoneDialog = false },
+        context = context
+    )
+
+    showResultToast(
+        result = commentDeletionStatus,
+        onSuccess = {},
+        context = context
+    )
+
+    showResultToast(
+        result = messageDeletionStatus,
+        onSuccess = {},
+        context = context
+    )
+
+    showResultToast(
+        result = projectDeletionStatus,
+        onSuccess = {
+            viewModel.resetState()
+            navController.navigate("Projects")
+        },
+        context = context
+    )
 
     CustomScaffold(navController = navController, viewModel = hiltViewModel()) {
         Column {
@@ -79,7 +107,9 @@ fun ProjectDetailPage(
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            modifier = Modifier.height(50.dp).background(MaterialTheme.colors.primary),
+                            modifier = Modifier
+                                .height(50.dp)
+                                .background(MaterialTheme.colors.primary),
                             text = {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(title)
@@ -135,20 +165,7 @@ fun ProjectDetailPage(
                 onDeleteClick = { if (project?.canDelete == true) showDeleteDialog = true }
             )
         }
-        if (projectDeletionStatus != null) {
-            when (projectDeletionStatus) {
-                is Success -> {
-                    Log.d("deleteProject", projectDeletionStatus.toString())
-                    makeToast((projectDeletionStatus as Success<String>).value, context)
-                    viewModel.resetState()
-                    navController.navigate("Projects")
-                }
-                is Failure -> {
-                    Log.d("deleteProject", projectDeletionStatus.toString())
-                    makeToast((projectDeletionStatus as Failure<String>).reason, context)
-                }
-            }
-        }
+
 
         if (showCreateMessageDialog) {
             if (projectId != null) {
@@ -156,7 +173,7 @@ fun ProjectDetailPage(
                     projectId = projectId,
                     viewModel = hiltViewModel(),
                     closeDialog = { showCreateMessageDialog = false },
-                    onMessageDeletedOrEdited = {string -> makeToast(string, context)}
+                    onMessageDeletedOrEdited = { string -> makeToast(string, context) }
                 )
             }
         }
@@ -166,8 +183,8 @@ fun ProjectDetailPage(
                 CreateMilestoneDialog(
                     projectId = projectId,
                     viewModel = hiltViewModel(),
-                    closeDialog = { showCreateMilestoneDialog = false},
-                    onMilestoneDeletedOrEdited = {string -> makeToast(string, context)}
+                    closeDialog = { showCreateMilestoneDialog = false },
+                    onMilestoneDeletedOrEdited = { string -> makeToast(string, context) }
                 )
             }
         }
@@ -178,9 +195,9 @@ fun ProjectDetailPage(
                     milestone = rememberMilestone,
                     projectId = projectId,
                     viewModel = hiltViewModel(),
-                    closeDialog = { showEditMilestoneDialog = false},
-                    onMilestoneDeletedOrEdited = {string -> makeToast(string, context)},
-                    onDeleteClick = {viewModel.deleteMilestone(rememberMilestone)}
+                    closeDialog = { showEditMilestoneDialog = false },
+                    onMilestoneDeletedOrEdited = { string -> makeToast(string, context) },
+                    onDeleteClick = { viewModel.deleteMilestone(rememberMilestone) }
                 )
             }
         }

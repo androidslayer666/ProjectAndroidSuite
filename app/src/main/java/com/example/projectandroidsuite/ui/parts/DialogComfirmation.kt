@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.UserEntity
 import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialogButton as CustomDialogButton
 
@@ -27,22 +28,10 @@ fun ConfirmationDialog(
     onSubmit: () -> Unit,
     closeDialog: () -> Unit
 ) {
-
-    AlertDialog(
-        onDismissRequest = {
-            closeDialog()
-        },
-        title = {
-            Text(text = text)
-        },
-        text = {
-        },
-        confirmButton = {
-            DialogButtonRow(
-                onSubmit = { onSubmit() },
-                closeDialog = { closeDialog() }
-            )
-        },
-        dismissButton = { }
-    )
+    CustomDialog(
+        show = true,
+        hide = { closeDialog() },
+        text = text,
+        onSubmit = { onSubmit() }) {
+    }
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.projectandroidsuite.logic.BackHandler
 
 
 @Composable
@@ -24,6 +25,7 @@ fun CustomDialog(
     content: @Composable () -> Unit
 ) {
 
+    BackHandler(true) {hide()}
     if (show) {
         Surface(
             color = Color.Black.copy(alpha = 0.8F),
@@ -56,7 +58,7 @@ fun CustomDialog(
                 Column(
                     modifier = Modifier
                         .background(MaterialTheme.colors.primary)
-                        .padding(12.dp)
+                        .padding(20.dp)
                 ) {
                     content()
                     DialogButtonRow(

@@ -120,9 +120,9 @@ class ProjectRepository @Inject constructor(
             call = { projectEndPoint.getProjectById(projectId).projectDto?.toProjectEntity() },
             onSuccess = { project ->
                 val team = teamEndPoint.getProjectTeam(projectId)
-                Log.d("getTeamAndInsertToDb", team.toString())
+                //Log.d("getTeamAndInsertToDb", team.toString())
                 project?.team = team.ids?.toListUserEntity()
-                Log.d("getTeamAndInsertToDb", project.toString())
+                //Log.d("getTeamAndInsertToDb", project.toString())
                 if (project != null)
                     projectDao.insertProject(project)
             }

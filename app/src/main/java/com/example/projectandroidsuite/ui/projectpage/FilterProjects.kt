@@ -22,6 +22,7 @@ import com.example.projectandroidsuite.logic.ProjectSorting
 import com.example.projectandroidsuite.logic.ProjectStatus
 import com.example.projectandroidsuite.ui.parts.TeamMemberCard
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
 import com.example.projectandroidsuite.ui.parts.customitems.CustomSortButton
 
@@ -47,7 +48,6 @@ fun FilterProjects(
                 .background(MaterialTheme.colors.primary)
                 .padding(12.dp)
         ) {
-            Text(text = "Stage", color = MaterialTheme.colors.onPrimary)
             CustomButton(
                 text = "Active",
                 clicked = (stage == ProjectStatus.ACTIVE),
@@ -63,16 +63,15 @@ fun FilterProjects(
                 clicked = (stage == ProjectStatus.STOPPED),
                 onClick = { viewModel.setStageForFiltering(ProjectStatus.STOPPED) }
             )
-
-
-
+            Spacer(Modifier.size(24.dp))
 
             listUsersFlow?.let {
                 Column() {
-                    Text(
-                        text = "Responsible",
-                        color = MaterialTheme.colors.onPrimary,
-                        modifier = Modifier.clickable { showUserPicker = true })
+
+                    ButtonUsers(
+                        singleUser = true,
+                        onClicked = { showUserPicker = true }
+                    )
                     Spacer(Modifier.size(12.dp))
                     user?.let { it1 -> TeamMemberCard(user = it1) }
                     if (showUserPicker) {
@@ -89,7 +88,7 @@ fun FilterProjects(
                 }
             }
 
-            Spacer(Modifier.size(12.dp))
+            Spacer(Modifier.size(24.dp))
             Surface(
                 elevation = 10.dp,
                 color = MaterialTheme.colors.primaryVariant
@@ -101,7 +100,7 @@ fun FilterProjects(
                         .padding(vertical = 12.dp))
             }
 
-            Spacer(Modifier.size(12.dp))
+            Spacer(Modifier.size(24.dp))
             Text(
                 text = "Sorting",
                 color = MaterialTheme.colors.onPrimary,
@@ -125,12 +124,10 @@ fun FilterProjects(
                 }
             }
 
-            Column() {
+            Spacer(Modifier.size(24.dp))
 
-                Row(
-                    Modifier
-                        .padding(bottom = 20.dp)
-                ) {
+            Column() {
+                Row{
                     Text(text = "Stage ", color = MaterialTheme.colors.onPrimary)
                 }
 

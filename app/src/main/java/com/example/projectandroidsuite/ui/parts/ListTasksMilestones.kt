@@ -9,9 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,11 +16,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.ImagePainter
 import com.example.database.entities.MilestoneEntity
 import com.example.database.entities.TaskEntity
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.DrawSideLine
+import com.example.projectandroidsuite.ui.projectdetailpage.CreateMilestoneDialog
 import com.example.projectandroidsuite.ui.projectpage.TaskItem
 
 

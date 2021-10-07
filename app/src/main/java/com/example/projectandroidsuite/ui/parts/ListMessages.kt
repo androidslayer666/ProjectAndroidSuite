@@ -61,7 +61,7 @@ fun ListMessages(
                                     }
                                     .weight(5F)
                             )
-                            if(showExpand && message.canEdit == true) {
+                            if (showExpand && message.canEdit == true) {
                                 Image(
                                     painterResource(R.drawable.ic_baseline_keyboard_double_arrow_down_24),
                                     "",
@@ -135,7 +135,10 @@ fun ListMessages(
                         if (showDeleteDialog) {
                             ConfirmationDialog(
                                 text = "Do you want to delete the message?",
-                                onSubmit = { onDeleteMessageClick(message) },
+                                onSubmit = {
+                                    onDeleteMessageClick(message)
+                                    showDeleteDialog = false
+                                },
                                 { showDeleteDialog = false })
                         }
                     }

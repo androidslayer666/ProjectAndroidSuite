@@ -40,6 +40,15 @@ class ProjectDetailViewModel @Inject constructor(
     private var _projectDeletionStatus = MutableLiveData<Result<String, String>?>()
     val projectDeletionStatus: LiveData<Result<String, String>?> = _projectDeletionStatus
 
+    private var _messageDeletionStatus = MutableLiveData<Result<String, String>?>()
+    val messageDeletionStatus: LiveData<Result<String, String>?> = _messageDeletionStatus
+
+    private var _commentDeletionStatus = MutableLiveData<Result<String, String>?>()
+    val commentDeletionStatus: LiveData<Result<String, String>?> = _commentDeletionStatus
+
+    private var _milestoneDeletionStatus = MutableLiveData<Result<String, String>?>()
+    val milestoneDeletionStatus: LiveData<Result<String, String>?> = _milestoneDeletionStatus
+
     val taskAndMilestones: LiveData<Map<MilestoneEntity?, List<TaskEntity>>> =
         _projectId.switchMap { projectId ->
             taskRepository.getTasksByProject(projectId)
@@ -85,8 +94,12 @@ class ProjectDetailViewModel @Inject constructor(
 
     fun deleteMilestone(milestoneEntity: MilestoneEntity?) {
         CoroutineScope(IO).launch {
-            if(milestoneEntity != null)
-            milestoneRepository.deleteMilestone(milestoneEntity.id, projectId.value)
+            if(milestoneEntity != null){
+                val response = milestoneRepository.deleteMilestone(milestoneEntity.id, projectId.value)
+                withContext(Main){
+                    _milestoneDeletionStatus.value = response
+                }
+            }
         }
     }
 
@@ -98,7 +111,10 @@ class ProjectDetailViewModel @Inject constructor(
         CoroutineScope(IO).launch {
             commentRepository.deleteComment(commentEntity.id)
             if(projectId.value != null) {
-                messageRepository.populateMessageWithProjectId(projectId.value!!)
+                val response = messageRepository.populateMessageWithProjectId(projectId.value!!)
+                withContext(Main){
+                    _commentDeletionStatus.value = response
+                }
             }
         }
     }
@@ -107,7 +123,10 @@ class ProjectDetailViewModel @Inject constructor(
         CoroutineScope(IO).launch {
             messageRepository.deleteMessage(message.id)
             if(projectId.value != null) {
-                messageRepository.populateMessageWithProjectId(projectId.value!!)
+                val response = messageRepository.populateMessageWithProjectId(projectId.value!!)
+                withContext(Main){
+                    _messageDeletionStatus.value = response
+                }
             }
         }
     }

@@ -34,7 +34,7 @@ fun CustomDialogButton(
             modifier = Modifier.defaultMinSize(minHeight = 30.dp)
         ) {
             Spacer(Modifier.size(12.dp))
-            Text(text, style = MaterialTheme.typography.caption, modifier = Modifier.weight(2F))
+            Text(text, style = MaterialTheme.typography.caption, modifier = Modifier.weight(3F))
             Spacer(Modifier.size(12.dp))
             Image(
                 painterResource(if(typeConfirm) R.drawable.ic_project_status_done else R.drawable.window_close),

@@ -2,10 +2,7 @@ package com.example.projectandroidsuite.ui.parts
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -38,7 +35,6 @@ fun DetailHeaderWrapper(
     var showTitleOverflow by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.defaultMinSize(minHeight = 100.dp)) {
-
         Row() {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -56,7 +52,7 @@ fun DetailHeaderWrapper(
                                 else -> R.drawable.ic_project_status_active
                             }
                         ),
-                        contentDescription = "Status",
+                        contentDescription = "",
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 4.dp)
@@ -71,20 +67,24 @@ fun DetailHeaderWrapper(
                                 else -> R.drawable.ic_project_status_active
                             }
                         ),
-                        contentDescription = "Status",
+                        contentDescription = "",
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 4.dp)
-                            .clickable { if(onStatusClicked != null)onStatusClicked()else {} }
+                            .clickable {
+                                if (onStatusClicked != null) onStatusClicked() else {
+                                }
+                            }
                     )
                 }
+
                 Row(Modifier.weight(5F), verticalAlignment = Alignment.CenterVertically) {
                     if (priority != null && priority == 1) {
                         Image(
                             painterResource(
                                 R.drawable.ic_baseline_flag_24
                             ),
-                            contentDescription = "Status",
+                            contentDescription = "",
                             modifier = Modifier
                                 .padding(horizontal = 2.dp)
                         )
@@ -98,9 +98,9 @@ fun DetailHeaderWrapper(
                     painterResource(
                         R.drawable.square_edit_outline_active
                     ),
-                    contentDescription = "Status",
+                    contentDescription = "",
                     modifier = Modifier
-                        .padding(horizontal = 2.dp, vertical = 12.dp)
+                        .padding(top = 12.dp)
                         .clickable { onEditClick() }
                 )
                 else
@@ -108,13 +108,13 @@ fun DetailHeaderWrapper(
                         painterResource(
                             R.drawable.square_edit_outline_passive
                         ),
-                        contentDescription = "Status",
+                        contentDescription = "",
                         modifier = Modifier
-                            .padding(horizontal = 2.dp, vertical = 12.dp)
+                            .padding(top = 12.dp)
                     )
             }
         }
-
+        Spacer(modifier = Modifier.size(6.dp))
         if (description != null && description.isNotEmpty()) {
             Row(modifier = Modifier.padding(top = 12.dp, start = 6.dp)) {
                 TitleOverflowedText(
@@ -123,15 +123,18 @@ fun DetailHeaderWrapper(
                 )
             }
         }
+        Spacer(modifier = Modifier.size(6.dp))
         if (responsible != null)
             Row(Modifier.padding(top = 12.dp)) {
                 Text(text = "Responsible", Modifier.padding(end = 12.dp, start = 6.dp))
                 TeamMemberCard(responsible)
             }
+        Spacer(modifier = Modifier.size(6.dp))
         Row {
             Text(text = "Team", Modifier.padding(end = 12.dp, top = 12.dp, start = 6.dp))
             team?.let { TeamMemberRow(it, Modifier.padding(bottom = 12.dp, top = 12.dp)) }
         }
+        Spacer(modifier = Modifier.size(6.dp))
 
         if (endDate != null)
             Row(Modifier.padding(vertical = 6.dp)) {
@@ -144,17 +147,20 @@ fun DetailHeaderWrapper(
                     Modifier
                 )
             }
+        Spacer(modifier = Modifier.size(6.dp))
         if (project != null) {
             Row(Modifier.padding(vertical = 6.dp)) {
                 Text(text = "Project", Modifier.padding(end = 12.dp, start = 6.dp))
                 Text(project)
             }
         }
+        Spacer(modifier = Modifier.size(6.dp))
         if (milestone != null) {
             Row(Modifier.padding(vertical = 6.dp)) {
                 Text(text = "Milestone", Modifier.padding(end = 12.dp, start = 6.dp))
                 Text(milestone)
             }
         }
+        Spacer(modifier = Modifier.size(6.dp))
     }
 }

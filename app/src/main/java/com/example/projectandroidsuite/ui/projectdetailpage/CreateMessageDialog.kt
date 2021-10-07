@@ -18,6 +18,7 @@ import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.TeamMemberRow
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
@@ -96,11 +97,11 @@ fun CreateMessageDialogInput(viewModel: MessageCreateEditViewModel) {
 
         listUsersFlow?.let {
             Row(Modifier.padding(vertical = 12.dp)) {
-                Text(text = "Team",
-                    Modifier
-                        .clickable { showTeamPicker = true }
-                        .align(Alignment.CenterVertically)
-                        .weight(2F))
+
+                ButtonUsers(
+                    singleUser = false,
+                    onClicked = { showTeamPicker = true }
+                )
 
                 chosenUserList?.let { it -> TeamMemberRow(it, modifier = Modifier.weight(4F)) }
                 if (showTeamPicker) {

@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.projectpage
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.UserEntity
 import com.example.domain.repository.Failure
@@ -79,7 +80,7 @@ class ProjectViewModel @Inject constructor(
         }
 
     init {
-        //Log.d("ProjectViewModel", "Starting populating tasks and projects")
+        Log.d("ProjectViewModel", this.toString())
         viewModelScope.launch(IO) {
             val projectResponse = repository.getProjects()
             if(projectResponse is Failure<String>) _problemWithFetchingProjects.value = projectResponse.reason!!

@@ -145,7 +145,7 @@ class ProjectCreateEditViewModel @Inject constructor(
                 )
             )
             withContext(Main) {
-                Log.d("", response.toString())
+                Log.d("createProject", response.toString())
                 _projectCreationStatus.value = response
             }
         }
@@ -171,9 +171,8 @@ class ProjectCreateEditViewModel @Inject constructor(
                 }
             )
 
-
-            Log.d("updateProject", response.toString())
             withContext(Main) {
+                Log.d("updateProject", response.toString())
                 _projectUpdatingStatus.value = response
             }
         }

@@ -28,7 +28,7 @@ class ScaffoldViewModel @Inject constructor(
     fun getSelf() {
         viewModelScope.launch {
             val self = teamRepository.getSelfProfile()
-            Log.d("ScaffoldViewModel", self.toString())
+            //Log.d("ScaffoldViewModel", self.toString())
             withContext(Main){
                 if(self != null)
                 _self.value = self!!

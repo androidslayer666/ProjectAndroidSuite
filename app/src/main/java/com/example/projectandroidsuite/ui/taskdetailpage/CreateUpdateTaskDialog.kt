@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,10 +19,7 @@ import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.TaskStatus
 import com.example.projectandroidsuite.ui.parts.*
-import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
-import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
-import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
-import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
+import com.example.projectandroidsuite.ui.parts.customitems.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,15 +36,17 @@ fun CreateUpdateTaskDialog(
     val taskUpdatingStatus by viewModel.taskUpdatingStatus.observeAsState()
     val taskCreationStatus by viewModel.taskCreationStatus.observeAsState()
 
-    if (taskCreationStatus is Success<String>) {
-        //Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
+    Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
+
+    if (taskCreationStatus is Success) {
+        Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
         onTaskDeletedOrEdited((taskCreationStatus as Success<String>).value)
         closeDialog()
         viewModel.clearInput()
     }
 
-    if (taskUpdatingStatus is Success<String>) {
-        //Log.d("CreateTaskDialog ", "Task updating " + taskUpdatingStatus.toString())
+    if (taskUpdatingStatus is Success) {
+        Log.d("CreateTaskDialog ", "Task updating " + taskUpdatingStatus.toString())
         onTaskDeletedOrEdited((taskUpdatingStatus as Success<String>).value)
         closeDialog()
         viewModel.clearInput()
@@ -64,7 +64,6 @@ fun CreateUpdateTaskDialog(
             }
         },
         onDeleteClick = onDeleteClick
-
     ) {
         CreateTaskDialogInput(viewModel)
     }
@@ -174,12 +173,11 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
 
         if (listUsersFlow != null) {
 
-            Row(Modifier.padding(vertical = 12.dp)) {
-                Text(text = "Team",
-                    Modifier
-                        .clickable { showTeamPicker = true }
-                        .align(Alignment.CenterVertically)
-                        .weight(2F))
+            Row(Modifier.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                ButtonUsers(
+                    singleUser = false,
+                    onClicked = { showTeamPicker = true }
+                )
 
                 TeamMemberRow(
                     list = listChosenUsers,
@@ -249,7 +247,6 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                 )
             }
         }
-
 
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(

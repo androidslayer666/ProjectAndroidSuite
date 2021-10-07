@@ -38,7 +38,7 @@ fun ProjectNavHost(
         }
 
         composable(route = ProjectsScreens.Projects.name + "taskTab") {
-            ProjectsPage(navController, 1)
+            ProjectsPage(navController)
         }
 
         composable(

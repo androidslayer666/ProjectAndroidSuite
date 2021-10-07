@@ -10,12 +10,13 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
-import androidx.compose.runtime.R
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.UserEntity
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
 
@@ -73,26 +74,32 @@ fun TeamPickerBody(
         LazyColumn {
             items(list) { user ->
                 var chosen by remember { mutableStateOf(user.chosen == true) }
-                Row(Modifier.padding(12.dp)) {
+                Row(
+                    Modifier
+                        .padding(12.dp)
+                        .clickable {
+                            when (pickerType) {
+                                PickerType.SINGLE -> {
+                                    onClick(user)
+                                    closeDialog()
+                                }
+                                PickerType.MULTIPLE -> {
+                                    onClick(user)
+                                    chosen = !chosen
+                                }
+                            }
+                        },
+                verticalAlignment = Alignment.CenterVertically
+                    ) {
+
                     when (pickerType) {
                         PickerType.SINGLE -> {
                         }
                         PickerType.MULTIPLE -> if (chosen) {
-                            Image(imageVector = Icons.Default.Star, contentDescription = "star")
+                            Image(painterResource(id = R.drawable.ic_user_chosen), contentDescription = "star")
                         }
                     }
-                    Text(text = user.displayName, Modifier.clickable {
-                        when (pickerType) {
-                            PickerType.SINGLE -> {
-                                onClick(user)
-                                closeDialog()
-                            }
-                            PickerType.MULTIPLE -> {
-                                onClick(user)
-                                chosen = !chosen
-                            }
-                        }
-                    })
+                    TeamMemberCard(user = user, true)
                 }
             }
         }

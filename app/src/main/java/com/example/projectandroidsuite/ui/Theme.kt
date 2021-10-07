@@ -22,7 +22,6 @@ fun ProjectTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-
     MaterialTheme(
         colors = if (darkTheme) DarkColors else LightColors,
         /*...*/
@@ -33,7 +32,7 @@ fun ProjectTheme(
 private val LightColors = lightColors(
     primary = Color(0xFF10446c),
     secondary = Color(0xFFeb7304),
-    primaryVariant = Color(0xFF4B4B4B),
+    primaryVariant = Color(0xFF0F3D61),
     error = Color(0xFFA43F6C),
     background = Color(0xFFFFFCF9),
     onPrimary = Color(0xFFCECECE),
@@ -43,7 +42,7 @@ private val LightColors = lightColors(
 @SuppressLint("ConflictingOnColor")
 private val DarkColors = darkColors(
     primary = Color(0xFF003055),
-    primaryVariant = Color(0xFF00185E),
+    primaryVariant = Color(0xFF002B4D),
     secondary = Color(0xFF9B5312),
     surface = Color(0xFF000000),
     //onBackground = Color(0xFFC2C2C2),

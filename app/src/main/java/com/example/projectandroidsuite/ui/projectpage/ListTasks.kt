@@ -50,7 +50,7 @@ fun TaskItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if(showStage == true)
@@ -71,6 +71,7 @@ fun TaskItem(
             .weight(2f)
             .clickable { onClick(task.id) }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(Modifier.size(6.dp))
                 if (task.priority != null && task.priority == 1) {
                     Image(
                         painterResource(
@@ -105,6 +106,7 @@ fun TaskItem(
                     style = MaterialTheme.typography.overline
                 )
             }
+            Spacer(Modifier.size(6.dp))
         }
         Column(Modifier.weight(0.5f), horizontalAlignment = Alignment.CenterHorizontally) {
             task.subtasks?.let {

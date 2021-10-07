@@ -1,34 +1,71 @@
 package com.example.projectandroidsuite.ui.projectpage
 
+import android.util.Log
 import androidx.compose.animation.*
+import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
+import com.example.projectandroidsuite.logic.BackHandler
 import com.example.projectandroidsuite.logic.SwipeDirections
+import com.example.projectandroidsuite.logic.expandScrollingViewportWidthBy
 import com.example.projectandroidsuite.logic.swipeToChangeScreen
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProjectsPage(
-    navController: NavHostController,
-    state: Int? = null
+    navController: NavHostController
 ) {
 
     var showFilters by remember { mutableStateOf(false) }
-    var state by rememberSaveable { mutableStateOf(state ?: 0) }
+    var state by rememberSaveable { mutableStateOf(0) }
+    var initialOffset by rememberSaveable { mutableStateOf(0F) }
+    val offset = remember { androidx.compose.animation.core.Animatable(0F) }
     val titles = listOf("Projects", "Tasks")
+    var direction by remember { mutableStateOf(SwipeDirections.RIGHT) }
+    var sizeMeasured by remember { mutableStateOf(0) }
+    val context = LocalContext.current
+
+    BackHandler(showFilters) { showFilters = !showFilters }
+
+    Log.d("ProjectsPage", sizeMeasured.toString())
+
+    if (state == 0)
+        LaunchedEffect(offset) {
+            offset.animateTo(0F)
+            direction = SwipeDirections.RIGHT
+        }
+    if (state == 1)
+        LaunchedEffect(offset) {
+            offset.animateTo(-sizeMeasured.toFloat())
+            direction = SwipeDirections.LEFT
+        }
+
+
 
     CustomScaffold({ showFilters = !showFilters }, navController, viewModel = hiltViewModel()) {
         Box(Modifier.background(MaterialTheme.colors.background)) {
@@ -43,60 +80,143 @@ fun ProjectsPage(
                         Tab(modifier = Modifier
                             .height(50.dp)
                             .background(MaterialTheme.colors.primary),
-                                text = {
-                            Row {
-                                if (index == 0)
-                                    Icon(painterResource(R.drawable.project_icon), "")
-                                else
-                                    Icon(painterResource(R.drawable.calendar_check_outline), "")
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(title)
-                            }
-                        },
+                            text = {
+                                Row {
+                                    if (index == 0)
+                                        Icon(painterResource(R.drawable.clipboard_list_outline), "")
+                                    else
+                                        Icon(painterResource(R.drawable.calendar_check_outline), "")
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(title)
+                                }
+                            },
                             selected = state == index,
                             onClick = { state = index }
                         )
                     }
                 }
-                Surface(
+
+
+                Row(
                     modifier = Modifier
-                        .fillMaxSize()
                         .background(MaterialTheme.colors.background)
+                        .expandScrollingViewportWidthBy(440.dp)
+                        .fillMaxHeight()
                 ) {
-                    AnimatedVisibility(
-                        state == 0,
-                        enter = slideInHorizontally(
-                            initialOffsetX = { fullWidth -> -fullWidth * 2 },
-                            animationSpec = tween(durationMillis = 500)
-                        ),
-                        exit = slideOutHorizontally(
-                            targetOffsetX = { fullWidth -> -fullWidth * 2 },
-                            animationSpec = tween(durationMillis = 500)
-                        )
+
+                    Card(
+                        Modifier
+                            .width(LocalContext.current.resources.displayMetrics.xdpi.dp - 55.dp)
+                            .fillMaxHeight()
+                            .background(MaterialTheme.colors.background)
+                            .offset {
+                                IntOffset(offset.value.roundToInt(), 0)
+                            }
+                            .pointerInput(Unit) {
+                                sizeMeasured = size.width
+                                val decay = splineBasedDecay<Float>(this)
+                                while (true) {
+
+                                    coroutineScope {
+                                        val pointerId =
+                                            awaitPointerEventScope { awaitFirstDown().id }
+                                        offset.stop()
+                                        awaitPointerEventScope {
+                                            horizontalDrag(pointerId) { change ->
+                                                val horizontalDragOffset =
+                                                    offset.value + change.positionChange().x
+                                                launch {
+                                                    if (horizontalDragOffset < 0) {
+                                                        offset.snapTo(horizontalDragOffset)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        val velocityTracker = VelocityTracker()
+                                        val velocity = velocityTracker.calculateVelocity().x
+                                        val targetOffsetX =
+                                            decay.calculateTargetValue(offset.value, velocity)
+
+                                        launch {
+                                            if (targetOffsetX.absoluteValue <= size.width / 4) {
+                                                offset.animateTo(
+                                                    targetValue = 0f,
+                                                    initialVelocity = velocity
+                                                )
+                                            } else {
+                                                initialOffset = -size.width.toFloat()
+                                                state = 1
+                                                offset.animateTo(
+                                                    targetValue = -size.width.toFloat(),
+                                                    initialVelocity = velocity
+                                                )
+
+                                                direction = SwipeDirections.LEFT
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                     ) {
-                        Surface(
-                            Modifier
-                                .background(MaterialTheme.colors.background)
-                                .swipeToChangeScreen(SwipeDirections.RIGHT) { state = 1 }) {
+                        Column {
                             ProjectList(hiltViewModel(), navController)
                         }
                     }
 
-                    AnimatedVisibility(
-                        state == 1,
-                        enter = slideInHorizontally(
-                            initialOffsetX = { fullWidth -> fullWidth * 2 },
-                            animationSpec = tween(durationMillis = 200)
-                        ),
-                        exit = slideOutHorizontally(
-                            targetOffsetX = { fullWidth -> fullWidth * 2 },
-                            animationSpec = tween(durationMillis = 200)
-                        )
+                    Card(
+                        Modifier
+                            .width(LocalContext.current.resources.displayMetrics.xdpi.dp - 55.dp)
+                            .fillMaxHeight()
+                            .background(MaterialTheme.colors.background)
+                            .offset {
+                                IntOffset(offset.value.roundToInt(), 0)
+                            }
+                            .pointerInput(Unit) {
+                                val decay = splineBasedDecay<Float>(this)
+                                while (true) {
+                                    coroutineScope {
+                                        val pointerId =
+                                            awaitPointerEventScope { awaitFirstDown().id }
+                                        offset.stop()
+                                        awaitPointerEventScope {
+                                            horizontalDrag(pointerId) { change ->
+                                                val horizontalDragOffset =
+                                                    offset.value + change.positionChange().x
+                                                launch {
+                                                    if (horizontalDragOffset > -size.width) {
+                                                        offset.snapTo(horizontalDragOffset)
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        val velocityTracker = VelocityTracker()
+                                        val velocity = velocityTracker.calculateVelocity().x
+                                        val targetOffsetX =
+                                            decay.calculateTargetValue(offset.value, velocity)
+
+                                        launch {
+                                            if (size.width - targetOffsetX.absoluteValue < size.width / 4) {
+                                                offset.animateTo(
+                                                    targetValue = -size.width.toFloat(),
+                                                    initialVelocity = velocity / 3
+                                                )
+                                            } else {
+                                                initialOffset = 0F
+                                                state = 0
+                                                offset.animateTo(
+                                                    targetValue = 0F,
+                                                    initialVelocity = velocity
+                                                )
+                                                direction = SwipeDirections.RIGHT
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                     ) {
-                        Surface(
-                            Modifier
-                                .background(MaterialTheme.colors.background)
-                                .swipeToChangeScreen(SwipeDirections.LEFT) { state = 0 }) {
+                        Column {
                             TaskList(hiltViewModel(), navController)
                         }
                     }
@@ -106,20 +226,17 @@ fun ProjectsPage(
             AnimatedVisibility(
                 showFilters,
                 enter = slideInHorizontally(
-                    // Enters by sliding down from offset -fullHeight to 0.
-                    initialOffsetX = { fullHeight -> 2 * fullHeight },
+
+                    initialOffsetX = { fullWidth -> fullWidth * 2 },
                     animationSpec = tween(durationMillis = 400)
                 ),
                 exit = slideOutHorizontally(
-                    // Exits by sliding up from offset 0 to -fullHeight.
-                    targetOffsetX = { fullHeight -> 2 * fullHeight },
+                    targetOffsetX = { fullWidth -> fullWidth * 2 },
                     animationSpec = tween(durationMillis = 400)
                 )
             ) {
                 Row {
-                    Row(Modifier.weight(3F)) {
-
-                    }
+                    Row(Modifier.weight(3F)) {}
                     Row(Modifier.weight(2F)) {
                         if (state == 0)
                             FilterProjects(viewModel = hiltViewModel())
@@ -127,7 +244,6 @@ fun ProjectsPage(
                             FilterTasks(viewModel = hiltViewModel())
                     }
                 }
-
             }
         }
     }

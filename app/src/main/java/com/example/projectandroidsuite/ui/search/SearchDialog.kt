@@ -1,22 +1,25 @@
 package com.example.projectandroidsuite.ui.search
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.projectandroidsuite.R
+import com.example.projectandroidsuite.logic.BackHandler
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDivider
 
 @Composable
@@ -25,20 +28,10 @@ fun SearchDialog(
     navController: NavHostController,
     closeDialog: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = {
-            closeDialog()
-            viewModel.clearSearchString()
-        },
-        title = {
-            Text(text = "Search")
-        },
-        text = {
-            SearchBody(viewModel, navController)
-        },
-        confirmButton = {},
-        dismissButton = {}
-    )
+
+    CustomDialog(show = true, hide = { closeDialog() }, text = "Search", onSubmit = { }) {
+        SearchBody(viewModel, navController)
+    }
 }
 
 @Composable
@@ -58,7 +51,18 @@ fun SearchBody(
     Column(Modifier.defaultMinSize(minHeight = 600.dp)) {
         TextField(
             value = searchString,
-            onValueChange = { string -> viewModel.setSearchString(string) })
+            onValueChange = { string -> viewModel.setSearchString(string) },
+            trailingIcon = {
+                Image(painterResource(R.drawable.ic_cancel),
+                    contentDescription = "clear text",
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .clickable {
+                            viewModel.setSearchString("")
+                        }
+                )
+            }
+        )
         if (!projects.isNullOrEmpty() && searchString.isNotEmpty()) {
             Text(
                 text = "Projects",
@@ -68,12 +72,13 @@ fun SearchBody(
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary)
             )
-            LazyColumn (
+            LazyColumn(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp)){
+                    .padding(start = 12.dp)
+            ) {
                 items(projects!!) {
-                    Text(text = it.title , Modifier
+                    Text(text = it.title, Modifier
                         .fillMaxWidth()
                         .clickable { navController.navigate("project/${it.id}") }
                         .padding(12.dp))
@@ -94,7 +99,7 @@ fun SearchBody(
             LazyColumn(
                 Modifier
                     .fillMaxWidth()
-                    ) {
+            ) {
                 items(tasks!!) {
                     Text(text = it.title, Modifier
                         .fillMaxWidth()
@@ -114,14 +119,17 @@ fun SearchBody(
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary)
             )
-            LazyColumn (
+            LazyColumn(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp)){
+                    .padding(start = 12.dp)
+            ) {
                 items(milestones!!) {
-                    Text(text = it.title ?:"" , Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp))
+                    Text(
+                        text = it.title ?: "", Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    )
                     CustomDivider()
                 }
             }
@@ -136,14 +144,17 @@ fun SearchBody(
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary)
             )
-            LazyColumn (
+            LazyColumn(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp)){
+                    .padding(start = 12.dp)
+            ) {
                 items(files!!) {
-                    Text(text = it.title ?:"" , Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp))
+                    Text(
+                        text = it.title ?: "", Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    )
                     CustomDivider()
                 }
             }

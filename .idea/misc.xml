@@ -3,7 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/account.xml" value="0.2212962962962963" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/account_group.xml" value="0.2212962962962963" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/calendar_check_outline.xml" value="0.262037037037037" />
+        <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/clipboard_list_outline.xml" value="0.2518518518518518" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/dots_vertical.xml" value="0.24717948717948718" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/file_document_outline.xml" value="0.262037037037037" />
         <entry key="..\:/AndroidProjects/ProjectAndroidSuite/app/src/main/res/drawable-v24/file_powerpoint_outline.xml" value="0.262037037037037" />

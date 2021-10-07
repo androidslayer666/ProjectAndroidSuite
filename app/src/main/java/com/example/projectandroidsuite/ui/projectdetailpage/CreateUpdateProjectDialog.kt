@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.parts
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,10 +20,7 @@ import com.example.domain.repository.Success
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.ProjectStatus
-import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
-import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
-import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
-import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
+import com.example.projectandroidsuite.ui.parts.customitems.*
 import com.example.projectandroidsuite.ui.projectdetailpage.ProjectCreateEditViewModel
 import com.example.projectandroidsuite.ui.taskdetailpage.CreateTaskDialogInput
 
@@ -36,19 +34,18 @@ fun CreateUpdateProjectDialog(
 ) {
     project?.let { viewModel.setProject(it) }
 
-    val responsible by viewModel.responsible.observeAsState()
-    var responsibleIsNotChosen by remember { mutableStateOf(false) }
     val projectUpdatingStatus by viewModel.projectUpdatingStatus.observeAsState()
     val projectCreationStatus by viewModel.projectCreationStatus.observeAsState()
 
-
     if (projectCreationStatus is Success<String>) {
+        Log.d("CreateUpdateectDialog", "Success"+(projectCreationStatus as Success<String>).value)
         onSuccessProjectCreation((projectCreationStatus as Success<String>).value)
         closeDialog()
         viewModel.clearInput()
     }
 
     if (projectUpdatingStatus is Success<String>) {
+        Log.d("CreateUpdateectDialog", "Success"+(projectUpdatingStatus as Success<String>).value)
         onSuccessProjectCreation((projectUpdatingStatus as Success<String>).value)
         closeDialog()
         viewModel.clearInput()
@@ -66,7 +63,6 @@ fun CreateUpdateProjectDialog(
             }
         },
         onDeleteClick = onDeleteClick
-
     ) {
         CreateProjectDialogInput(viewModel, project != null)
     }
@@ -75,7 +71,7 @@ fun CreateUpdateProjectDialog(
 @Composable
 fun CreateProjectDialogInput(
     viewModel: ProjectCreateEditViewModel,
-    modeCreate: Boolean
+    modeCreate: Boolean,
 ) {
     var showTeamPicker by remember { mutableStateOf(false) }
     var showResponsiblePicker by remember { mutableStateOf(false) }
@@ -130,18 +126,14 @@ fun CreateProjectDialogInput(
                 }
             }
 
-
         if (listUsersFlow != null) {
-            Row(Modifier.padding(vertical = 12.dp)) {
-
-                Text(
-                    text = "Team",
-                    Modifier
-                        .clickable { showTeamPicker = true }
-                        .weight(2F)
+            Row(Modifier.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                ButtonUsers(
+                    singleUser = false,
+                    onClicked = {showTeamPicker = true }
                 )
                 Row(
-                    Modifier
+                    modifier = Modifier
                         .weight(4F)
                 ) {
                     TeamMemberRow(
@@ -151,7 +143,7 @@ fun CreateProjectDialogInput(
                 if (showTeamPicker) {
                     TeamPickerDialog(
                         list = listUsersFlow!!,
-                        onSubmitList = { },
+                        onSubmitList = { showTeamPicker = false},
                         onClick = { user ->
                             viewModel.addOrRemoveUser(user)
                         },
@@ -161,18 +153,16 @@ fun CreateProjectDialogInput(
                         { query -> viewModel.setUserSearch(query) }
                     )
                 }
-
             }
-            Row(Modifier.padding(vertical = 12.dp)) {
-                Text(
-                    text = "Choose responsible",
-                    Modifier
-                        .clickable { showResponsiblePicker = true }
-                        .weight(2F)
+            Row(Modifier.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                ButtonUsers(
+                    singleUser = true,
+                    onClicked = { showResponsiblePicker = true }
                 )
+                Spacer(Modifier.size(12.dp))
                 responsible?.let { user ->
                     Row(
-                        Modifier
+                        modifier = Modifier
                             .weight(4F)
                     ) { TeamMemberCard(user = user) }
                 }

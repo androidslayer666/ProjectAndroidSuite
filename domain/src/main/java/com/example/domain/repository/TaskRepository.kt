@@ -149,8 +149,8 @@ class TaskRepository @Inject constructor(
         return networkCaller(
             call = { taskEndPoint.deleteTask(taskId) },
             onSuccess = { populateTasks() },
-            onSuccessString = "Subtask created successfully",
-            onFailureString = "Having problem while creating the subtask, please check the network connection"
+            onSuccessString = "Task deleted successfully",
+            onFailureString = "Having problem while deleting the task, please check the network connection"
         )
     }
 

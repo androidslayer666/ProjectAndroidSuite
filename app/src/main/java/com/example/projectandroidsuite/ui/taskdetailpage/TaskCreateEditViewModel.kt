@@ -74,7 +74,6 @@ class TaskCreateEditViewModel @Inject constructor(
     val endDate: LiveData<Date> = _endDate
 
     val userList = project.switchMap { project ->
-        Log.d("TaskCreateEditViewModel", project.toString())
         liveData { emit(project?.team) }
     }
         .combineWith(chosenUserList) { users, chosenUsers ->
@@ -224,7 +223,7 @@ class TaskCreateEditViewModel @Inject constructor(
                     )
                 )
                 withContext(Dispatchers.Main) {
-                    Log.d("", response.toString())
+                    Log.d("TaskCreateEditViewModel", response.toString())
                     _taskCreationStatus.value = response
                 }
             } else {
@@ -254,7 +253,7 @@ class TaskCreateEditViewModel @Inject constructor(
                 }
             )
             withContext(Main) {
-                //Log.d("TaskCreateEditViewModel", response.toString())
+                Log.d("TaskCreateEditViewModel", response.toString())
                 _taskUpdatingStatus.value = response
             }
         }

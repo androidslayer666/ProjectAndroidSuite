@@ -1,25 +1,21 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.projectdetailpage
 
-import android.app.DatePickerDialog
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.MilestoneEntity
 import com.example.domain.repository.Success
-import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.ui.parts.DatePicker
+import com.example.projectandroidsuite.ui.parts.TeamMemberCard
+import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
-import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
-import com.example.projectandroidsuite.ui.projectdetailpage.MilestoneCreateEditViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -50,7 +46,6 @@ fun CreateMilestoneDialog(
         closeDialog()
     }
 
-
     CustomDialog(
         show = true,
         hide = { closeDialog() },
@@ -63,12 +58,9 @@ fun CreateMilestoneDialog(
             }
         },
         onDeleteClick = onDeleteClick
-
     ) {
         CreateMilestoneDialogInput(viewModel)
     }
-
-
 }
 
 @Composable
@@ -121,9 +113,9 @@ fun CreateMilestoneDialogInput(viewModel: MilestoneCreateEditViewModel) {
             Modifier
                 .padding(vertical = 12.dp)
                 .clickable { showResponsiblePicker = true }) {
-            Text(
-                text = "Responsible",
-                Modifier.weight(2F)
+            ButtonUsers(
+                singleUser = true,
+                onClicked = {showResponsiblePicker = true }
             )
             responsible?.let { user ->
                 Row(

@@ -13,6 +13,7 @@ import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.TeamMemberCard
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
@@ -71,27 +72,26 @@ fun CreateSubtaskDialogInput(viewModel: SubtaskCreateEditViewModel) {
     val userSearch by viewModel.userSearchQuery.observeAsState("")
     val responsible by viewModel.responsible.observeAsState()
 
-    Column() {
+    Column {
         Row(Modifier.padding(vertical = 12.dp)) {
-            Text(text = "Title", modifier = Modifier.weight(2F))
             CustomTextField(
+                label = "Title",
                 value = title,
                 onValueChange = { text -> viewModel.setTitle(text) })
         }
 
         listUsersFlow?.let {
             Row(Modifier.padding(vertical = 12.dp)) {
-                Text(text = "Team",
-                    Modifier
-                        .clickable { showTeamPicker = true }
-                        .align(Alignment.CenterVertically)
-                        .weight(2F))
+                ButtonUsers(
+                    singleUser = true,
+                    onClicked = { showTeamPicker = true }
+                )
 
                 responsible?.let { user ->
                     Row(
                         Modifier
                             .weight(4F)
-                    ) { TeamMemberCard(user = user) }
+                    ) { TeamMemberCard(user = user, showFullName = true) }
                 }
             }
             if (showTeamPicker) {

@@ -19,6 +19,7 @@ import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.*
 import com.example.projectandroidsuite.ui.parts.TeamMemberCard
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
 import com.example.projectandroidsuite.ui.parts.customitems.CustomSortButton
 
@@ -54,10 +55,13 @@ fun FilterTasks(
                 text = "Complete",
                 clicked = (stage == TaskStatus.COMPLETE),
                 onClick = { viewModel.setStageForFilteringTask(TaskStatus.COMPLETE) })
-
+            Spacer(Modifier.size(24.dp))
             listUsersFlow?.let {
                 Column (modifier = Modifier.padding(vertical = 12.dp)) {
-                    Text(text = "Responsible", Modifier.clickable { showUserPicker = true })
+                    ButtonUsers(
+                        singleUser = true,
+                        onClicked = { showUserPicker = true }
+                    )
                     Spacer(Modifier.size(12.dp))
                     user?.let { it1 -> TeamMemberCard(user = it1) }
                 }
@@ -74,16 +78,24 @@ fun FilterTasks(
                 }
             }
 
+            Spacer(Modifier.size(12.dp))
+
             Surface(
                 elevation = 10.dp,
                 color = MaterialTheme.colors.primaryVariant
             ){
-                Spacer(Modifier.size(12.dp))
-                Text(
-                    text = "ClearFilters",
-                    modifier = Modifier.clickable { viewModel.clearFiltersTask()})
-                Spacer(Modifier.size(12.dp))
+                Row {
+                    Image(
+                        painterResource(id = R.drawable.ic_cancel), ""
+                    )
+                    Spacer(Modifier.size(12.dp))
+                    Text(
+                        text = "Clear filters",
+                        modifier = Modifier.clickable { viewModel.clearFiltersTask() })
+                }
             }
+
+            Spacer(Modifier.size(24.dp))
 
             Text(
                 text = "Sorting",
@@ -103,14 +115,12 @@ fun FilterTasks(
                 }
             }
 
+            Spacer(Modifier.size(24.dp))
+
             Column() {
-                Row(
-                    Modifier
-                        .padding(bottom = 20.dp)
-                ) {
+                Row {
                     Text(text = "Stage ", color = MaterialTheme.colors.onPrimary)
                 }
-
                 Row() {
                     CustomSortButton(ascending = true, clicked = (sorting == TaskSorting.STAGE_ASC)
                     ) { viewModel.setTaskSorting(TaskSorting.STAGE_ASC) }
@@ -120,12 +130,10 @@ fun FilterTasks(
                 }
             }
 
+            Spacer(Modifier.size(24.dp))
 
             Column() {
-                Row(
-                    Modifier
-                        .padding(bottom = 20.dp)
-                ) {
+                Row{
                     Text(text = "Importance", color = MaterialTheme.colors.onPrimary)
                 }
                 Row() {

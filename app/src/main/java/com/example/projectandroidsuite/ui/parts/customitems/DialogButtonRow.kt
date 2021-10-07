@@ -42,7 +42,6 @@ fun DialogButtonRow(
             CustomDialogButton(
                 onClick = {
                     onSubmit()
-                    closeDialog()
                 },
                 text = "Confirm",
                 typeConfirm = true
