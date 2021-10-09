@@ -1,7 +1,8 @@
 package com.example.domain.di
 
 import android.content.Context
-import com.example.domain.SessionManager
+import com.example.domain.AuthCredentialsProvider
+import com.example.domain.repository.AuthRepositoryImpl
 import com.example.network.buildEndPoint
 import com.example.network.endpoints.*
 import dagger.Module
@@ -9,6 +10,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -17,56 +20,107 @@ class NetworkApiProvider {
 
     @Provides
     @Singleton
-    fun projectEndPointProvider(manager: SessionManager): ProjectEndPoint {
-        return buildEndPoint(ProjectEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
+    fun projectEndPointProvider(provider: AuthCredentialsProvider): ProjectEndPoint {
+        return buildEndPoint(
+            ProjectEndPoint::class.java,
+            provider.fetchAuthToken() ?: "",
+            provider.fetchPortalAddress() ?: ""
+        )
     }
 
     @Provides
     @Singleton
-    fun taskEndPointProvider(manager: SessionManager): TaskEndPoint {
-        return buildEndPoint(TaskEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
+    fun taskEndPointProvider(provider: AuthCredentialsProvider): TaskEndPoint {
+        return buildEndPoint(
+            TaskEndPoint::class.java,
+            provider.fetchAuthToken() ?: "",
+            provider.fetchPortalAddress() ?: ""
+        )
     }
 
     @Provides
     @Singleton
-    fun milestoneEndPointProvider(manager: SessionManager): MilestoneEndPoint {
-        return buildEndPoint(MilestoneEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
+    fun milestoneEndPointProvider(provider: AuthCredentialsProvider): MilestoneEndPoint {
+        return buildEndPoint(
+            MilestoneEndPoint::class.java,
+            provider.fetchAuthToken() ?: "",
+            provider.fetchPortalAddress() ?: ""
+        )
     }
 
     @Provides
     @Singleton
-    fun fileEndPointProvider(manager: SessionManager): FileEndPoint {
-        return buildEndPoint(FileEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
+    fun fileEndPointProvider(provider: AuthCredentialsProvider): FileEndPoint {
+        return buildEndPoint(
+            FileEndPoint::class.java,
+            provider.fetchAuthToken() ?: "",
+            provider.fetchPortalAddress() ?: ""
+        )
     }
 
     @Provides
     @Singleton
-    fun messageEndPointProvider(manager: SessionManager): MessageEndPoint {
-        return buildEndPoint(MessageEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
+    fun messageEndPointProvider(provider: AuthCredentialsProvider): MessageEndPoint {
+        return buildEndPoint(
+            MessageEndPoint::class.java,
+            provider.fetchAuthToken() ?: "",
+            provider.fetchPortalAddress() ?: ""
+        )
     }
 
     @Provides
     @Singleton
-    fun subtaskEndPointProvider(manager: SessionManager): SubtaskEndPoint {
-        return buildEndPoint(SubtaskEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
+    fun subtaskEndPointProvider(provider: AuthCredentialsProvider): SubtaskEndPoint {
+        return buildEndPoint(
+            SubtaskEndPoint::class.java,
+            provider.fetchAuthToken() ?: "",
+            provider.fetchPortalAddress() ?: ""
+        )
     }
 
     @Provides
     @Singleton
-    fun teamEndPointProvider(manager: SessionManager): TeamEndPoint {
-        return buildEndPoint(TeamEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
+    fun teamEndPointProvider(provider: AuthCredentialsProvider): TeamEndPoint {
+        return buildEndPoint(
+            TeamEndPoint::class.java,
+            provider.fetchAuthToken() ?: "",
+            provider.fetchPortalAddress() ?: ""
+        )
     }
 
     @Provides
     @Singleton
-    fun commentEndPointProvider(manager: SessionManager): CommentEndPoint {
-        return buildEndPoint(CommentEndPoint::class.java, manager.fetchAuthToken()?:"", manager.fetchPortalAddress()?:"")
+    fun commentEndPointProvider(provider: AuthCredentialsProvider): CommentEndPoint {
+        return buildEndPoint(
+            CommentEndPoint::class.java,
+            provider.fetchAuthToken() ?: "",
+            provider.fetchPortalAddress() ?: ""
+        )
     }
 
     @Provides
     @Singleton
-    fun provideSessionManager(@ApplicationContext context: Context) : SessionManager{
-        return SessionManager(context)
+    fun provideSessionManager(@ApplicationContext context: Context): AuthCredentialsProvider {
+        return AuthCredentialsProvider(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        @ApplicationContext context: Context,
+        authEndPoint: AuthEndPoint
+    ): AuthRepositoryImpl {
+        return AuthRepositoryImpl(context, authEndPoint)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthEndPoint(provider: AuthCredentialsProvider): AuthEndPoint {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(provider.fetchPortalAddress() ?: "")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        return retrofit.create(AuthEndPoint::class.java)
     }
 
 }

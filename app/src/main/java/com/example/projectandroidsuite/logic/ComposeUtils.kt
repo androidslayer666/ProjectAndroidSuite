@@ -16,22 +16,20 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainWidth
 import coil.request.ImageRequest
-import com.example.domain.SessionManager
+import com.example.domain.AuthCredentialsProvider
 import com.example.domain.repository.Failure
 import com.example.domain.repository.Result
 import com.example.domain.repository.Success
+import com.example.network.Constants.PORTAL_ADDRESS
+import com.example.network.Constants.USER_TOKEN
 
 
 enum class PickerType {
     MULTIPLE, SINGLE
 }
 
-fun coilRequestBuilder(uri: String, context: Context): ImageRequest {
+fun coilRequestBuilder(uri: String, context: Context, portalAddress: String, token: String): ImageRequest {
 
-    val prefs: SharedPreferences =
-        context.getSharedPreferences("AuthToken", Context.MODE_PRIVATE)
-    val portalAddress = prefs.getString(SessionManager.PORTAL_ADDRESS, null)?.dropLast(1)
-    val token = prefs.getString(SessionManager.USER_TOKEN, null)
 
     return ImageRequest.Builder(context)
         .data("$portalAddress$uri")

@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import com.example.projectandroidsuite.ui.loginpage.LoginPage
+import com.example.projectandroidsuite.ui.loginpage.LoginViewModel
 import com.example.projectandroidsuite.ui.projectpage.ProjectsPage
 import com.example.projectandroidsuite.ui.taskdetailpage.TaskDetailPage
 import com.example.projectandroidsuite.ui.projectdetailpage.ProjectDetailPage
@@ -21,12 +22,12 @@ enum class ProjectsScreens() {
 @Composable
 fun ProjectNavHost(
     navController: NavHostController,
-    isAuthenticated: Boolean
+    loginViewModel: LoginViewModel
 ) {
 
     NavHost(
         navController = navController,
-        startDestination = if (isAuthenticated) ProjectsScreens.Projects.name
+        startDestination = if (loginViewModel.checkIfAuthenticated()) ProjectsScreens.Projects.name
         else ProjectsScreens.Login.name
     ) {
 

@@ -40,7 +40,6 @@ fun TaskDetailPage(
     val titles = listOf( "Subtasks","Comments", "Files" )
 
     var showUpdateTaskDialog by remember { mutableStateOf(false) }
-    var expandButtons by remember { mutableStateOf(false) }
     var showCreateSubtaskDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showUpdateStatusDialog by remember { mutableStateOf(false) }
@@ -141,7 +140,7 @@ fun TaskDetailPage(
                 CreateSubtaskDialog(
                     taskId = it,
                     viewModel = hiltViewModel(),
-                    closeDialog = { showCreateSubtaskDialog = false })            }
+                    closeDialog = { showCreateSubtaskDialog = false }) }
         }
 
         if (showDeleteDialog) {
@@ -157,7 +156,7 @@ fun TaskDetailPage(
             ConfirmationDialog(
                 text = "Do you want to change the task status?",
                 onSubmit = { viewModel.changeTaskStatus()
-                    showDeleteDialog = false},
+                    showUpdateStatusDialog = false},
                 { showUpdateStatusDialog = false })
         }
     }

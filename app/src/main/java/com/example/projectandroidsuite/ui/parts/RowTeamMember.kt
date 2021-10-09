@@ -17,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
 import com.example.database.entities.UserEntity
 import com.example.projectandroidsuite.logic.coilRequestBuilder
+import com.example.projectandroidsuite.ui.loginpage.LoginViewModel
 
 @Composable
 fun RowTeamMember(
@@ -28,7 +30,7 @@ fun RowTeamMember(
 ) {
     LazyRow(modifier = modifier) {
         items(list) { user ->
-            CardTeamMember(user)
+            CardTeamMember(user = user, viewModel = hiltViewModel())
         }
     }
 }
@@ -36,7 +38,8 @@ fun RowTeamMember(
 @Composable
 fun CardTeamMember(
     user: UserEntity,
-    showFullName : Boolean? = false
+    showFullName : Boolean? = false,
+    viewModel: CoilViewModel = hiltViewModel()
     ) {
 
     Card(
@@ -53,7 +56,9 @@ fun CardTeamMember(
                     painter = rememberImagePainter(
                         coilRequestBuilder(
                             user.avatarSmall!!,
-                            LocalContext.current
+                            LocalContext.current,
+                            viewModel.fetchPortalAddress()?.dropLast(1)?:"",
+                            viewModel.fetchToken()?:""
                         )
                     ),
                     contentDescription = null,

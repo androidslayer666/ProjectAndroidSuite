@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.database.entities.UserEntity
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.TitleOverflowedText
@@ -127,7 +128,7 @@ fun DetailHeaderWrapper(
         if (responsible != null)
             Row(Modifier.padding(top = 12.dp)) {
                 Text(text = "Responsible", Modifier.padding(end = 12.dp, start = 6.dp))
-                CardTeamMember(responsible)
+                CardTeamMember(responsible, viewModel = hiltViewModel())
             }
         Spacer(modifier = Modifier.size(6.dp))
         Row {

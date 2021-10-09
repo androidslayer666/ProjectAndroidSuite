@@ -10,7 +10,9 @@ import com.example.domain.repository.TeamRepository
 import com.example.projectandroidsuite.logic.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,7 +54,7 @@ class ProjectViewModel @Inject constructor(
 
 
     val projects =
-        repository.projectsFromDb.asLiveData().combineWith(projectFilter) { listProjects, filter ->
+        repository.projectsFromDb().asLiveData().combineWith(projectFilter) { listProjects, filter ->
                 if (filter != null) {
                     listProjects?.filterProjectsByFilter(filter)
                 } else {
@@ -83,7 +85,10 @@ class ProjectViewModel @Inject constructor(
         Log.d("ProjectViewModel", this.toString())
         viewModelScope.launch(IO) {
             val projectResponse = repository.getProjects()
-            if(projectResponse is Failure<String>) _problemWithFetchingProjects.value = projectResponse.reason!!
+            if(projectResponse is Failure<String>)
+                withContext(Main) {
+                    _problemWithFetchingProjects.value = projectResponse.reason!!
+                }
             taskRepository.populateTasks()
             teamRepository.populateAllPortalUsers()
         }

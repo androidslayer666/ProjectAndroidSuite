@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.ui.ProjectsScreens
 
-@ExperimentalComposeUiApi
-@OptIn(ExperimentalAnimationApi::class)
+
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun LoginPage(
     viewModel: LoginViewModel,
@@ -102,7 +102,7 @@ fun LoginPage(
                 .padding(bottom = 20.dp),
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = MaterialTheme.colors.background,
-                textColor = MaterialTheme.colors.onPrimary
+                textColor = MaterialTheme.colors.onBackground
             ),
             isError = !addressIsValid && portalAddress.isNotEmpty()
         )
@@ -143,7 +143,8 @@ fun LoginPage(
                     },
                     label = { Text("Email") },
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = MaterialTheme.colors.background
+                        backgroundColor = MaterialTheme.colors.background,
+                        textColor = MaterialTheme.colors.onBackground
                     ),
                     isError = !emailIsValid ,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -184,7 +185,8 @@ fun LoginPage(
                             } else false
                         },
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = MaterialTheme.colors.background
+                        backgroundColor = MaterialTheme.colors.background,
+                        textColor = MaterialTheme.colors.onBackground
                     ),
                     isError = !passwordIsValid
                 )
@@ -197,7 +199,6 @@ fun LoginPage(
                 }
             }
         }
-
     }
 }
 

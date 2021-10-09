@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.makeToast
+import com.example.projectandroidsuite.ui.ProjectsScreens
 import com.example.projectandroidsuite.ui.parts.CreateUpdateProjectDialog
 import com.example.projectandroidsuite.ui.taskdetailpage.CreateUpdateTaskDialog
 import com.example.projectandroidsuite.ui.search.SearchDialog
@@ -42,152 +43,172 @@ fun CustomScaffold(
     var showCreateProjectDialog by remember { mutableStateOf(false) }
     var showFabOptions by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var showUserOptions by remember { mutableStateOf(false) }
 
     val self by viewModel.self.observeAsState()
 
-    Scaffold(
-        topBar = {
-            Row(
-                modifier = Modifier
-                    .height(50.dp)
-                    .background(MaterialTheme.colors.primary),
-                verticalAlignment = Alignment.CenterVertically
-            )
-
-            {
-                Column(
+    Box {
+        Scaffold(
+            topBar = {
+                Row(
                     modifier = Modifier
-                        .weight(if (onFilterClick != null) 10F else 12F)
-                        .padding(start = 12.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                        .height(50.dp)
+                        .background(MaterialTheme.colors.primary),
+                    verticalAlignment = Alignment.CenterVertically
+                )
+
+                {
+                    Column(
+                        modifier = Modifier
+                            .weight(if (onFilterClick != null) 10F else 12F)
+                            .padding(start = 12.dp)
                     ) {
-                        Text(
-                            text = self?.displayName ?: "",
-                            color = MaterialTheme.colors.onPrimary
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = self?.displayName ?: "",
+                                color = MaterialTheme.colors.onPrimary
+                            )
+                            Image(
+                                painterResource(R.drawable.ic_baseline_arrow_drop_down_24),
+                                "",
+                                modifier = Modifier
+                                    .clickable { showUserOptions = true }
+                                    .height(50.dp)
+                                    .padding(start = 12.dp, end = 12.dp)
+                                    .weight(2F)
+                            )
+                        }
+                    }
+
+                    if (onFilterClick != null) {
+                        Image(
+                            painterResource(R.drawable.ic_baseline_filter_alt_24),
+                            "",
+                            modifier = Modifier
+                                .clickable { onFilterClick() }
+                                .height(50.dp)
+                                .padding(start = 12.dp, end = 12.dp)
+                                .weight(2F)
                         )
                     }
-                }
-
-                if (onFilterClick != null) {
                     Image(
-                        painterResource(R.drawable.ic_baseline_filter_alt_24),
-                        "",
+                        painterResource(R.drawable.ic_baseline_search_24), "",
                         modifier = Modifier
-                            .clickable { onFilterClick() }
+                            .clickable { showSearch = true }
                             .height(50.dp)
                             .padding(start = 12.dp, end = 12.dp)
                             .weight(2F)
                     )
                 }
-                Image(
-                    painterResource(R.drawable.ic_baseline_search_24), "",
-                    modifier = Modifier
-                        .clickable { showSearch = true }
-                        .height(50.dp)
-                        .padding(start = 12.dp, end = 12.dp)
-                        .weight(2F)
-                )
+            },
+            modifier = if (showFabOptions) Modifier.clickable {
+                showFabOptions = false
+            } else Modifier.padding(),
+            floatingActionButton = {
+                Column {
+
+                    AnimatedVisibility(
+                        showFabOptions,
+                        enter = slideInVertically(
+                            // Enters by sliding down from offset -fullHeight to 0.
+                            initialOffsetY = { fullHeight -> fullHeight * 2 },
+                            animationSpec = tween(durationMillis = 250)
+                        ),
+                        exit = slideOutVertically(
+                            // Exits by sliding up from offset 0 to -fullHeight.
+                            targetOffsetY = { fullHeight -> fullHeight * 2 },
+                            animationSpec = tween(durationMillis = 250)
+                        )
+                    ) {
+                        FloatingActionButton(
+                            modifier = Modifier.padding(bottom = 12.dp),
+                            onClick = { showCreateProjectDialog = true }
+                        ) {
+                            Icon(painterResource(R.drawable.clipboard_list_outline), "")
+                        }
+                    }
+                    AnimatedVisibility(
+                        showFabOptions,
+                        enter = slideInVertically(
+                            // Enters by sliding down from offset -fullHeight to 0.
+                            initialOffsetY = { fullHeight -> fullHeight },
+                            animationSpec = tween(durationMillis = 250)
+                        ),
+                        exit = slideOutVertically(
+                            // Exits by sliding up from offset 0 to -fullHeight.
+                            targetOffsetY = { fullHeight -> fullHeight },
+                            animationSpec = tween(durationMillis = 250)
+                        )
+                    ) {
+                        FloatingActionButton(
+                            modifier = Modifier.padding(bottom = 12.dp),
+                            onClick = { showCreateTaskDialog = true }
+                        ) {
+                            Icon(painterResource(R.drawable.calendar_check_outline), "")
+                        }
+                    }
+
+                    FloatingActionButton(
+                        onClick = { showFabOptions = !showFabOptions }
+                    ) {
+                        Icon(Icons.Filled.Add, "")
+                    }
+                }
             }
-        },
-        modifier = if (showFabOptions) Modifier.clickable {
-            showFabOptions = false
-        } else Modifier.padding(),
-        floatingActionButton = {
-            Column {
-
-                AnimatedVisibility(
-                    showFabOptions,
-                    enter = slideInVertically(
-                        // Enters by sliding down from offset -fullHeight to 0.
-                        initialOffsetY = { fullHeight -> fullHeight * 2 },
-                        animationSpec = tween(durationMillis = 250)
-                    ),
-                    exit = slideOutVertically(
-                        // Exits by sliding up from offset 0 to -fullHeight.
-                        targetOffsetY = { fullHeight -> fullHeight * 2 },
-                        animationSpec = tween(durationMillis = 250)
-                    )
-                ) {
-                    FloatingActionButton(
-                        modifier = Modifier.padding(bottom = 12.dp),
-                        onClick = { showCreateProjectDialog = true }
-                    ) {
-                        Icon(painterResource(R.drawable.clipboard_list_outline), "")
-                    }
-                }
-                AnimatedVisibility(
-                    showFabOptions,
-                    enter = slideInVertically(
-                        // Enters by sliding down from offset -fullHeight to 0.
-                        initialOffsetY = { fullHeight -> fullHeight },
-                        animationSpec = tween(durationMillis = 250)
-                    ),
-                    exit = slideOutVertically(
-                        // Exits by sliding up from offset 0 to -fullHeight.
-                        targetOffsetY = { fullHeight -> fullHeight },
-                        animationSpec = tween(durationMillis = 250)
-                    )
-                ) {
-                    FloatingActionButton(
-                        modifier = Modifier.padding(bottom = 12.dp),
-                        onClick = { showCreateTaskDialog = true }
-                    ) {
-                        Icon(painterResource(R.drawable.calendar_check_outline), "")
-                    }
-                }
-
-                FloatingActionButton(
-                    onClick = { showFabOptions = !showFabOptions }
-                ) {
-                    Icon(Icons.Filled.Add, "")
+        ) {
+            Box(Modifier.background(MaterialTheme.colors.background)) {
+                content()
+                // catching click outside for hiding fabs
+                if (showFabOptions) {
+                    Surface(
+                        Modifier
+                            .fillMaxSize()
+                            .clickable(enabled = showFabOptions) {
+                                showFabOptions = false
+                            },
+                        color = Color.Black.copy(alpha = 0f)
+                    ) {}
                 }
             }
         }
-    ) {
-        Box(Modifier.background(MaterialTheme.colors.background)) {
-            content()
-            // catching click outside for hiding fabs
-            if (showFabOptions) {
-                Surface(
-                    Modifier
-                        .fillMaxSize()
-                        .clickable(enabled = showFabOptions) {
-                            showFabOptions = false
-                        },
-                    color = Color.Black.copy(alpha = 0f)
-                ) {}
+
+        if (showCreateProjectDialog) {
+            CreateUpdateProjectDialog(
+                viewModel = hiltViewModel(),
+                closeDialog = { showCreateProjectDialog = false },
+                onSuccessProjectCreation = { string ->
+                    Log.d("CustomScaffold", string)
+                    makeToast(string, context)
+                })
+        }
+
+        if (showCreateTaskDialog) {
+            CreateUpdateTaskDialog(
+                viewModel = hiltViewModel(),
+                closeDialog = { showCreateTaskDialog = false },
+                onTaskDeletedOrEdited = { string ->
+                    Log.d("CustomScaffold", string)
+                    makeToast(string, context)
+                })
+
+        }
+
+        if (showSearch) {
+            SearchDialog(
+                viewModel = hiltViewModel(),
+                closeDialog = { showSearch = false },
+                navController = navController
+            )
+        }
+        if (showUserOptions) {
+            Button(onClick = {
+                viewModel.logOut()
+                navController.navigate(ProjectsScreens.Login.name)
+            }) {
+                Text("Log Out")
             }
         }
-    }
-
-    if (showCreateProjectDialog) {
-        CreateUpdateProjectDialog(
-            viewModel = hiltViewModel(),
-            closeDialog = { showCreateProjectDialog = false },
-            onSuccessProjectCreation = { string ->
-                Log.d("CustomScaffold", string)
-                makeToast(string, context)
-            })
-    }
-
-    if (showCreateTaskDialog) {
-        CreateUpdateTaskDialog(
-            viewModel = hiltViewModel(),
-            closeDialog = { showCreateTaskDialog = false },
-            onTaskDeletedOrEdited = { string ->
-                Log.d("CustomScaffold", string)
-                makeToast(string, context)
-            })
-
-    }
-
-    if (showSearch) {
-        SearchDialog(
-            viewModel = hiltViewModel(),
-            closeDialog = { showSearch = false },
-            navController = navController
-        )
     }
 }

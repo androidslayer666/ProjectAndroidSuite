@@ -1,11 +1,11 @@
 package com.example.projectandroidsuite.ui.scaffold
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.database.entities.UserEntity
+import com.example.domain.repository.AuthRepositoryImpl
 import com.example.domain.repository.TeamRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.Main
@@ -15,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScaffoldViewModel @Inject constructor(
-    private val teamRepository: TeamRepository
+    private val teamRepository: TeamRepository,
+    private val authRepository: AuthRepositoryImpl
 ) :ViewModel(){
 
     private var _self = MutableLiveData<UserEntity>()
@@ -34,6 +35,10 @@ class ScaffoldViewModel @Inject constructor(
                 _self.value = self!!
             }
         }
+    }
+
+    fun logOut(){
+        authRepository.logOut()
     }
 
 

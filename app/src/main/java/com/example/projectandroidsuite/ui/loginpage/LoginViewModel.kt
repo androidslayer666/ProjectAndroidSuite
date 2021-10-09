@@ -5,11 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.domain.SessionManager
+import com.example.domain.AuthCredentialsProvider
+import com.example.domain.repository.AuthRepository
+import com.example.domain.repository.AuthRepositoryImpl
 import com.example.network.dto.auth.LoginRequest
 import com.example.network.dto.auth.LoginResponse
 import com.example.network.services.ApiClientAuth
-import com.example.projectandroidsuite.ProjectApplication
 import com.example.projectandroidsuite.logic.validateEmail
 import com.example.projectandroidsuite.logic.validatePassword
 import com.example.projectandroidsuite.logic.validatePortalNameInput
@@ -22,7 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val sessionManager: SessionManager
+    private val authRepository: AuthRepository,
+    private val authCredentialsProvider: AuthCredentialsProvider
 ) : ViewModel() {
 
     private var _inputPortalValidated = MutableLiveData<Boolean>(null)
@@ -52,14 +54,10 @@ class LoginViewModel @Inject constructor(
     private var _portalIsInCloud = MutableLiveData<Int>(0)
     val portalIsInCloud: LiveData<Int> = _portalIsInCloud
 
-    init {
-        sessionManager.logOut()
+    fun checkIfAuthenticated(): Boolean {
+        Log.d("checkIfAuthenticated",authRepository.isAuthenticated().toString())
+        return authRepository.isAuthenticated()
     }
-
-//    fun checkIfAuthenticated(): Boolean {
-//        Log.d("checkIfAuthenticated",sessionManager.isAuthenticated().toString())
-//        return sessionManager.isAuthenticated()
-//    }
 
     fun onChangePortalAddress(sequence: CharSequence) {
         _portalAddress.value = sequence.toString()
@@ -73,6 +71,7 @@ class LoginViewModel @Inject constructor(
         }
         //Log.d("LoginViewModel", "portal address is valid" + inputPortalValidated.value.toString())
     }
+
 
     fun setPortalIsInCloud(value : Int) {
         _portalIsInCloud.value = value
@@ -124,27 +123,22 @@ class LoginViewModel @Inject constructor(
         Log.d("LoginFragment",  "canConnectToPortal" + canConnectToPortal.value.toString())
         Log.d("LoginFragment",  "inputEmailValidated" + inputEmailValidated.value.toString())
         Log.d("LoginFragment",  "inputPasswordValidated" + inputPasswordValidated.value.toString())
-
-//        inputPortalValidated.value == true &&
-//                canConnectToPortal.value == true &&
-//                inputEmailValidated.value == true &&
-//                inputPasswordValidated.value == true
-
+        Log.d("LoginFragment",  "inputPasswordValidated" + portalAddress.value.toString())
         if (inputPortalValidated.value == true &&
             canConnectToPortal.value == true &&
             inputEmailValidated.value == true &&
             inputPasswordValidated.value == true
         ) {
             viewModelScope.launch{
+                authRepository.rememberPortalAddress(portalAddress.value!!)
                 Log.d("LoginFragment", "all is well")
-                sessionManager.authenticate(
+                authRepository.authenticate(
                     LoginRequest(
                         emailInput.value!!,
                         passwordInput.value!!
-                    ), ProjectApplication.applicationContext(),
-                    portalAddress.value!!
+                    )
                 )
-                sessionManager.rememberPortalAddress(portalAddress.value!!)
+
                 onCompleteLogin()
             }
         }
