@@ -29,5 +29,24 @@ import com.example.projectandroidsuite.ui.projectpage.TaskList
 @Composable
 fun preview() {
 
+    var text by remember {mutableStateOf("")}
+
+    TextField(
+        value = text,
+        onValueChange = { input ->
+            text = input
+        },
+        singleLine = true,
+        modifier = Modifier
+            .defaultMinSize(minWidth = 300.dp)
+            .padding(bottom = 20.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = MaterialTheme.colors.background,
+            textColor = MaterialTheme.colors.onPrimary,
+            focusedIndicatorColor = MaterialTheme.colors.error,
+
+        ),
+    isError  = true
+    )
 
 }

@@ -69,5 +69,4 @@ class NetworkApiProvider {
         return SessionManager(context)
     }
 
-
 }

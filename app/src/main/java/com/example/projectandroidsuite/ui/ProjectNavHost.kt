@@ -14,7 +14,8 @@ import com.example.projectandroidsuite.ui.projectdetailpage.ProjectDetailPage
 
 
 enum class ProjectsScreens() {
-    Projects(), Login()
+    Projects, Login, Project, Task
+
 }
 
 @Composable
@@ -37,12 +38,8 @@ fun ProjectNavHost(
             ProjectsPage(navController)
         }
 
-        composable(route = ProjectsScreens.Projects.name + "taskTab") {
-            ProjectsPage(navController)
-        }
-
         composable(
-            route = "project/{id}",
+            route = ProjectsScreens.Project.name + "/{id}",
             arguments = listOf(
                 navArgument("id") {
                     type = NavType.IntType
@@ -57,7 +54,7 @@ fun ProjectNavHost(
         }
 
         composable(
-            route = "tasks/{id}",
+            route = ProjectsScreens.Task.name + "/{id}",
             arguments = listOf(
                 navArgument("id") {
                     type = NavType.IntType

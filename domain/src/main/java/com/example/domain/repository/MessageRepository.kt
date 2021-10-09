@@ -86,12 +86,28 @@ class MessageRepository @Inject constructor(
         Log.d("ProjectRepository", "Started creating message  $message")
 
         return networkCaller(
-            call = { messageEndPoint.putMessageToProject(projectId, message.toMessagePost(participants)) },
+            call = { messageEndPoint.putMessageToProject(projectId, message.toMessagePost(participants = participants)) },
             onSuccess = { populateMessageWithProjectId(projectId) },
             onSuccessString = "Message added successfully",
             onFailureString = "Having problem while creating the message, please check the network connection"
         )
     }
+
+    suspend fun updateMessage(
+        projectId: Int,
+        message: MessageEntity,
+        participants: List<UserEntity>
+    ): Result<String, String> {
+        Log.d("ProjectRepository", "Started creating message  $message")
+
+        return networkCaller(
+            call = { messageEndPoint.updateMessage(message.id, message.toMessagePost(projectId, participants)) },
+            onSuccess = { populateMessageWithProjectId(projectId) },
+            onSuccessString = "Message added successfully",
+            onFailureString = "Having problem while creating the message, please check the network connection"
+        )
+    }
+
 
     suspend fun deleteMessage( messageId: Int): Result<String, String>{
 

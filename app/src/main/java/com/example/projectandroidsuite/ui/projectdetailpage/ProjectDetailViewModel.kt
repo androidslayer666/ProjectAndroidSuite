@@ -109,9 +109,9 @@ class ProjectDetailViewModel @Inject constructor(
 
     fun deleteComment(commentEntity: CommentEntity){
         CoroutineScope(IO).launch {
-            commentRepository.deleteComment(commentEntity.id)
+            val response = commentRepository.deleteComment(commentEntity.id)
             if(projectId.value != null) {
-                val response = messageRepository.populateMessageWithProjectId(projectId.value!!)
+                messageRepository.populateMessageWithProjectId(projectId.value!!)
                 withContext(Main){
                     _commentDeletionStatus.value = response
                 }
@@ -121,9 +121,9 @@ class ProjectDetailViewModel @Inject constructor(
 
     fun deleteMessage(message: MessageEntity) {
         CoroutineScope(IO).launch {
-            messageRepository.deleteMessage(message.id)
+            val response = messageRepository.deleteMessage(message.id)
             if(projectId.value != null) {
-                val response = messageRepository.populateMessageWithProjectId(projectId.value!!)
+                messageRepository.populateMessageWithProjectId(projectId.value!!)
                 withContext(Main){
                     _messageDeletionStatus.value = response
                 }

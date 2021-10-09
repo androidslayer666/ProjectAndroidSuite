@@ -19,11 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.ProjectEntity
 import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 
 @Composable
 fun ProjectPickerDialog(
     list: List<ProjectEntity>,
-    onSubmitList: () -> Unit,
+    onSubmit: () -> Unit,
     onClick: (user: ProjectEntity) -> Unit,
     closeDialog: () -> Unit,
     ifChooseResponsibleOrTeam: PickerType,
@@ -32,42 +33,20 @@ fun ProjectPickerDialog(
     problemWithFetchingProjects: String? = null
 ) {
 
-    AlertDialog(
-        onDismissRequest = {
-            closeDialog()
-        },
-        title = {
-            when (ifChooseResponsibleOrTeam) {
-                PickerType.SINGLE -> Text(text = "Choose responsible")
-                PickerType.MULTIPLE -> Text(text = "Choose team")
-            }
-        },
-        text = {
-            ProjectPickerBody(
-                list = list, { project -> onClick(project) }, ifChooseResponsibleOrTeam,
-                searchString, onSearchChanged, problemWithFetchingProjects
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onSubmitList()
-                    closeDialog()
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = {
-                    closeDialog()
-                }, modifier = Modifier.width(100.dp)
-            ) {
-                Text("Dismiss")
-            }
-        }
-    )
+    CustomDialog(
+        show = true,
+        hide = { closeDialog() },
+        text = "Project",
+        onSubmit = { onSubmit() },
+        showButtons = false,
+    ) {
+        ProjectPickerBody(
+            list = list, { project -> onClick(project)
+                closeDialog()
+                         }, ifChooseResponsibleOrTeam,
+            searchString, onSearchChanged, problemWithFetchingProjects
+        )
+    }
 }
 
 @Composable
@@ -80,7 +59,7 @@ fun ProjectPickerBody(
     problemWithFetchingProjects: String? = null
 ) {
     Column {
-        if(problemWithFetchingProjects != null ){
+        if (problemWithFetchingProjects != null) {
             Text(text = problemWithFetchingProjects!!)
         }
         TextField(value = searchString, onValueChange = onSearchChanged)

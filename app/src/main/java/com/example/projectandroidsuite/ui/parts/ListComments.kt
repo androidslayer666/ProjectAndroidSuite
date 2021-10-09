@@ -7,7 +7,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -78,7 +77,7 @@ fun CommentItem(
                             .weight(5F)
                     ) {
                         if (comment.inactive != true) {
-                            comment.createdBy?.let { TeamMemberCard(user = it) }
+                            comment.createdBy?.let { CardTeamMember(user = it) }
 
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

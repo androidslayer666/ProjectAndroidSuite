@@ -10,7 +10,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
-interface Auth {
+interface AuthEndPoint {
 
         //todo make one request
 

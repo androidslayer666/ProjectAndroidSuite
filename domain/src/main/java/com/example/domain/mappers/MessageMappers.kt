@@ -36,10 +36,11 @@ fun MessageDto.toEntity(projectId: Int): MessageEntity {
     )
 }
 
-fun MessageEntity.toMessagePost(participants: List<UserEntity>): MessagePost {
+fun MessageEntity.toMessagePost(projectId: Int? = 0,participants: List<UserEntity>): MessagePost {
     return MessagePost(
         title = this.title,
         content = this.description,
-    participants = participants.toStringIds()
+        projectId = projectId,
+        participants = participants.toStringIds()
     )
 }

@@ -22,6 +22,7 @@ fun CustomDialog(
     text: String,
     onSubmit: () -> Unit,
     onDeleteClick: (() -> Unit)? = null,
+    showButtons: Boolean = true,
     content: @Composable () -> Unit
 ) {
 
@@ -61,6 +62,7 @@ fun CustomDialog(
                         .padding(20.dp)
                 ) {
                     content()
+                    if(showButtons)
                     DialogButtonRow(
                         onSubmit = onSubmit,
                         closeDialog = hide,

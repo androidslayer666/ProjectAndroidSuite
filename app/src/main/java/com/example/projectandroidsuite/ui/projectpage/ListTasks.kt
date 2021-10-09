@@ -35,7 +35,7 @@ fun TaskList(
     LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
         list?.let {
             items(list!!) { task ->
-                TaskItem(task) { id -> navController.navigate("tasks/$id") }
+                TaskItem(task) { id -> navController.navigate("task/$id") }
             }
         }
     }
@@ -50,23 +50,24 @@ fun TaskItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = 12.dp, vertical = 12.dp)
+            .background(MaterialTheme.colors.background),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if(showStage == true)
-        Image(
-            painterResource(
-                when (task.status) {
-                    1 -> R.drawable.ic_project_status_active
-                    2 -> R.drawable.ic_project_status_done
-                    else -> R.drawable.ic_project_status_active
-                }
-            ),
-            contentDescription = "Status",
-            modifier = Modifier
-                .weight(0.3f)
-                .padding(end = 12.dp)
-        )
+        if (showStage == true)
+            Image(
+                painterResource(
+                    when (task.status) {
+                        1 -> R.drawable.ic_project_status_active
+                        2 -> R.drawable.ic_project_status_done
+                        else -> R.drawable.ic_project_status_active
+                    }
+                ),
+                contentDescription = "Status",
+                modifier = Modifier
+                    .weight(0.3f)
+                    .padding(end = 12.dp)
+            )
         Column(modifier = Modifier
             .weight(2f)
             .clickable { onClick(task.id) }) {
@@ -93,10 +94,7 @@ fun TaskItem(
             Row {
                 if (task.responsibles.isNotEmpty()) {
                     Text(
-                        text = task.responsibles[0].displayName
-//                            + " + "
-//                            + if (task.responsibles.size > 0) (task.responsibles.size - 1) else ""
-                        ,
+                        text = task.responsibles[0].displayName,
                         style = MaterialTheme.typography.overline,
                         modifier = Modifier.padding(end = 12.dp)
                     )

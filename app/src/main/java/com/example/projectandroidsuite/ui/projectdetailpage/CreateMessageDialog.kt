@@ -1,27 +1,19 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
-import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.MessageEntity
 import com.example.domain.repository.Success
-import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
-import com.example.projectandroidsuite.ui.parts.TeamMemberRow
+import com.example.projectandroidsuite.ui.parts.RowTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
-import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
 
 @Composable
 fun CreateMessageDialog(
@@ -34,8 +26,14 @@ fun CreateMessageDialog(
 ) {
     viewModel.setProjectId(projectId)
 
+    if(message != null) viewModel.setMessage(message)
+
     val messageUpdatingStatus by viewModel.updatingStatus.observeAsState()
     val messageCreationStatus by viewModel.creationStatus.observeAsState()
+    val listUsersFlow by viewModel.userListFlow.observeAsState()
+    var showTeamPicker by remember { mutableStateOf(false) }
+    val userSearch by viewModel.userSearchQuery.observeAsState("")
+
 
     if (messageCreationStatus is Success<String>) {
         onMessageDeletedOrEdited((messageCreationStatus as Success<String>).value)
@@ -51,7 +49,7 @@ fun CreateMessageDialog(
     CustomDialog(
         show = true,
         hide = { closeDialog() },
-        text = "Create task",
+        text = if (message == null) "Create message" else "Update message",
         onSubmit = {
             if (message == null) {
                 viewModel.createMessage()
@@ -62,18 +60,34 @@ fun CreateMessageDialog(
         onDeleteClick = onDeleteClick
 
     ) {
-        CreateMessageDialogInput(viewModel)
+        CreateMessageDialogInput(viewModel, {showTeamPicker = true})
+    }
+
+    listUsersFlow?.let {
+            if (showTeamPicker) {
+                TeamPickerDialog(
+                    list = it,
+                    onSubmit = {  showTeamPicker = false },
+                    onClick = { user ->
+                        viewModel.addOrRemoveUser(user)
+
+                    },
+                    closeDialog = { showTeamPicker = false },
+                    pickerType = PickerType.MULTIPLE,
+                    userSearch,
+                    { query -> viewModel.setUserSearch(query)}
+                )
+        }
     }
 }
 
 @Composable
-fun CreateMessageDialogInput(viewModel: MessageCreateEditViewModel) {
-    var showTeamPicker by remember { mutableStateOf(false) }
-
+fun CreateMessageDialogInput(
+    viewModel: MessageCreateEditViewModel,
+    showTeamPicker: () -> Unit
+) {
     val title by viewModel.title.observeAsState("")
-    val description by viewModel.description.observeAsState("")
-    val listUsersFlow by viewModel.userListFlow.observeAsState()
-    val userSearch by viewModel.userSearchQuery.observeAsState("")
+    val description by viewModel.content.observeAsState("")
     val chosenUserList by viewModel.chosenUserList.observeAsState()
 
     Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
@@ -86,38 +100,21 @@ fun CreateMessageDialogInput(viewModel: MessageCreateEditViewModel) {
 
         Row(Modifier.padding(vertical = 12.dp)) {
             CustomTextField(
-                label = "Description",
+                label = "Content",
                 numberOfLines = 3,
                 height = 100,
                 value = description,
                 onValueChange = { text ->
-                    viewModel.setDescription(text)
+                    viewModel.setContent(text)
                 })
         }
-
-        listUsersFlow?.let {
-            Row(Modifier.padding(vertical = 12.dp)) {
-
-                ButtonUsers(
-                    singleUser = false,
-                    onClicked = { showTeamPicker = true }
-                )
-
-                chosenUserList?.let { it -> TeamMemberRow(it, modifier = Modifier.weight(4F)) }
-                if (showTeamPicker) {
-                    TeamPickerDialog(
-                        list = it,
-                        onSubmitList = { },
-                        onClick = { user ->
-                            viewModel.addOrRemoveUser(user)
-                        },
-                        closeDialog = { showTeamPicker = false },
-                        pickerType = PickerType.MULTIPLE,
-                        userSearch,
-                        { query -> viewModel.setUserSearch(query) }
-                    )
-                }
-            }
+        Row(Modifier.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            ButtonUsers(
+                singleUser = false,
+                onClicked = { showTeamPicker() }
+            )
+            chosenUserList?.let { it -> RowTeamMember(it, modifier = Modifier.weight(4F)) }
         }
+
     }
 }

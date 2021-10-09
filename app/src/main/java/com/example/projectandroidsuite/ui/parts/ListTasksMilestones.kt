@@ -82,7 +82,7 @@ fun ListTasksMilestones(
                     for (task in listTasksAndMilestones[milestone]!!) {
                         TaskItem(
                             task = task,
-                            onClick = { navController.navigate("tasks/${task.id}") })
+                            onClick = { navController.navigate("task/${task.id}") })
                     }
 
                     if (showEditDialog) {

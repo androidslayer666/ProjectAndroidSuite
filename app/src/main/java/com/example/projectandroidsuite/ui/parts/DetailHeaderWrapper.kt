@@ -127,12 +127,12 @@ fun DetailHeaderWrapper(
         if (responsible != null)
             Row(Modifier.padding(top = 12.dp)) {
                 Text(text = "Responsible", Modifier.padding(end = 12.dp, start = 6.dp))
-                TeamMemberCard(responsible)
+                CardTeamMember(responsible)
             }
         Spacer(modifier = Modifier.size(6.dp))
         Row {
             Text(text = "Team", Modifier.padding(end = 12.dp, top = 12.dp, start = 6.dp))
-            team?.let { TeamMemberRow(it, Modifier.padding(bottom = 12.dp, top = 12.dp)) }
+            team?.let { RowTeamMember(it, Modifier.padding(bottom = 12.dp, top = 12.dp)) }
         }
         Spacer(modifier = Modifier.size(6.dp))
 
@@ -161,6 +161,6 @@ fun DetailHeaderWrapper(
                 Text(milestone)
             }
         }
-        Spacer(modifier = Modifier.size(6.dp))
+
     }
 }

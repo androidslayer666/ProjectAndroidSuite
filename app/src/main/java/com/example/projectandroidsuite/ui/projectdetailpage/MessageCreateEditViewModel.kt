@@ -3,13 +3,8 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.MessageEntity
-import com.example.database.entities.ProjectEntity
-import com.example.database.entities.SubtaskEntity
 import com.example.database.entities.UserEntity
 import com.example.domain.repository.*
-import com.example.network.dto.SubtaskPost
-import com.example.network.dto.TaskPost
-import com.example.projectandroidsuite.logic.Constants.FORMAT_API_DATE
 import com.example.projectandroidsuite.logic.*
 
 import com.example.projectandroidsuite.ui.*
@@ -19,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -33,11 +27,13 @@ class MessageCreateEditViewModel @Inject constructor(
 
     private var projectId: Int? = null
 
+    private var messageId: Int? = null
+
     private var _title = MutableLiveData("")
     val title: LiveData<String> = _title
 
-    private var _description = MutableLiveData("")
-    val description: LiveData<String> = _description
+    private var _content = MutableLiveData("")
+    val content: LiveData<String> = _content
 
     private var _chosenUserList = MutableLiveData<MutableList<UserEntity>>(mutableListOf())
     val chosenUserList: LiveData<MutableList<UserEntity>> = _chosenUserList
@@ -72,13 +68,20 @@ class MessageCreateEditViewModel @Inject constructor(
         }
     }
 
+    fun setMessage(message: MessageEntity) {
+        messageId = message.id
+        _title.value  = message.title
+        _content.value = message.text ?: ""
+        //_chosenUserList.value = message.
+    }
+
 
     fun setTitle(string: String) {
         _title.value = string
     }
 
-    fun setDescription(string: String) {
-        _description.value = string
+    fun setContent(string: String) {
+        _content.value = string
     }
 
     fun setProjectId(projectId: Int) {
@@ -104,7 +107,7 @@ class MessageCreateEditViewModel @Inject constructor(
     fun clearInput() {
         projectId = null
         _title.value = ""
-        _description.value = ""
+        _content.value = ""
         _chosenUserList.value = mutableListOf()
         _creationStatus.value = null
         _updatingStatus.value = null
@@ -125,7 +128,7 @@ class MessageCreateEditViewModel @Inject constructor(
                 MessageEntity(
                     title = title.value ?: "",
                     id = 0,
-                    description = description.value,
+                    description = content.value,
                 ),
                 chosenUserList.value?: listOf()
             )
@@ -138,16 +141,20 @@ class MessageCreateEditViewModel @Inject constructor(
 
     fun updateMessage() {
         viewModelScope.launch(IO) {
-//        val response = taskRepository.updateTask(
-//            //todo shouldNot be null
-//            taskId ?: 0,
-//            TaskPost(
-//                title = title.value,
-//            )
-//        )
-//        withContext(Dispatchers.Main) {
-//            _subtaskUpdatingStatus.value = response
-//        }
+        val response = messageRepository.updateMessage(
+                //todo shouldNot be null
+            projectId ?: 0,
+                MessageEntity(
+                    title = title.value ?: "",
+                    id = messageId ?: 0,
+                    description = content.value,
+                ),
+                chosenUserList.value?: listOf()
+            )
+            withContext(Dispatchers.Main) {
+                Log.d("", response.toString())
+                _creationStatus.value = response
+            }
         }
     }
 }

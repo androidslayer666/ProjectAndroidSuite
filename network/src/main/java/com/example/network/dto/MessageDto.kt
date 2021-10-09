@@ -32,6 +32,8 @@ data class MessageDto(
 )
 
 data class MessagePost(
+    @SerializedName("projectid")
+    val projectId: Int? = null,
     @SerializedName("title")
     val title: String? = null,
     @SerializedName("content")

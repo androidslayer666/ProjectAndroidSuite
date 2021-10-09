@@ -2,6 +2,9 @@ package com.example.projectandroidsuite.ui.loginpage
 
 import android.util.Log
 import android.view.KeyEvent
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
@@ -21,13 +24,16 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.ui.ProjectsScreens
 
-@OptIn(ExperimentalComposeUiApi::class)
+@ExperimentalComposeUiApi
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun LoginPage(
     viewModel: LoginViewModel,
@@ -39,72 +45,36 @@ fun LoginPage(
     val emailAddress by viewModel.emailInput.observeAsState("")
     val password by viewModel.passwordInput.observeAsState("")
     val addressIsValid by viewModel.canConnectToPortal.observeAsState(false)
+    val emailIsValid by viewModel.inputEmailValidated.observeAsState(true)
+    val passwordIsValid by viewModel.inputPasswordValidated.observeAsState(true)
 
     val portalIsInCloud by viewModel.portalIsInCloud.observeAsState()
 
     val (focusRequesterMail, focusRequesterPassword) = FocusRequester.createRefs()
-
-    val uriHandler = LocalUriHandler.current
-
     val titles = listOf("Cloud portal", "Local portal")
-    val annotatedLinkString: AnnotatedString = buildAnnotatedString {
 
-        val str = "If you don't have one - get one!"
-        val startIndex = str.indexOf("If")
-        val endIndex = str.length
-        append(str)
-        addStyle(
-            style = SpanStyle(
-                color = Color(0xff64B5F6),
-                fontSize = 14.sp,
-                textDecoration = TextDecoration.Underline,
-                fontStyle = MaterialTheme.typography.body1.fontStyle
-            ), start = startIndex, end = endIndex
-        )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.primary)
+    ) {
+        AnimatedVisibility(
+            !addressIsValid,
+            enter = slideInVertically(
 
-        addStringAnnotation(
-            tag = "URL",
-            annotation = "https://www.onlyoffice.com/cloud-office.aspx",
-            start = startIndex,
-            end = endIndex
-        )
-    }
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-        if (!addressIsValid) {
-
-            Text(
-                text = "Welcome!",
-                style = MaterialTheme.typography.h5,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .align(Alignment.CenterHorizontally)
+                initialOffsetY = { fullHeight -> -fullHeight  },
+                animationSpec = tween(durationMillis = 400)
+            ),
+            exit = slideOutVertically(
+                targetOffsetY = { fullHeight -> -fullHeight },
+                animationSpec = tween(durationMillis = 400)
             )
-
-            Text(
-                text = "This app works only with ONLYOFFICE Groups portal.",
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
-            ClickableText(
-                text = annotatedLinkString,
-                style = MaterialTheme.typography.caption,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .align(Alignment.CenterHorizontally),
-                onClick = {
-                    annotatedLinkString
-                        .getStringAnnotations("URL", it, it)
-                        .firstOrNull()?.let { stringAnnotation ->
-                            uriHandler.openUri(stringAnnotation.item)
-                        }
-                }
-            )
+        ) {
+            LoginTextGreeting()
         }
 
-
+        Spacer(modifier = Modifier.size(12.dp))
         Row {
             TabRow(
                 selectedTabIndex = portalIsInCloud ?: 0,
@@ -119,6 +89,7 @@ fun LoginPage(
                 }
             }
         }
+        Spacer(modifier = Modifier.size(12.dp))
 
         TextField(
             value = portalAddress,
@@ -129,13 +100,18 @@ fun LoginPage(
             modifier = Modifier
                 .defaultMinSize(minWidth = 300.dp)
                 .padding(bottom = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.background,
+                textColor = MaterialTheme.colors.onPrimary
+            ),
+            isError = !addressIsValid && portalAddress.isNotEmpty()
         )
         if (!addressIsValid) {
             if (portalIsInCloud == 0) {
                 Text(
                     text = "Input your portal address in a format : xxxxxx.onlyoffice.com/sg/eu",
                     style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.colors.onPrimary,
                     modifier = Modifier
                         .padding(start = 50.dp, end = 50.dp)
                         .align(Alignment.CenterHorizontally)
@@ -147,60 +123,82 @@ fun LoginPage(
             }
         }
 
-        if (addressIsValid) {
-            TextField(
-                value = emailAddress,
-                onValueChange = { input ->
-                    viewModel.onChangeEmail(input)
-                },
-                label = { Text("Email") },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = { focusRequesterPassword.requestFocus() }
-                ),
-                modifier = Modifier
-                    .defaultMinSize(minWidth = 300.dp)
-                    .padding(20.dp)
-                    .focusRequester(focusRequesterMail)
-                    .onKeyEvent {
-                        if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                            focusRequesterPassword.requestFocus()
-                            true
-                        }
-                        false
-                    })
-            TextField(
-                value = password,
-                onValueChange = { input ->
-                    viewModel.onChangePassword(input)
-                },
-                singleLine = true,
-                label = { Text("Password") },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = { focusRequesterPassword.requestFocus() }
-                ),
-                modifier = Modifier
-                    .defaultMinSize(minWidth = 300.dp)
-                    .padding(20.dp)
-                    .focusRequester(focusRequesterPassword)
-                    .onKeyEvent {
-                        if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                            viewModel.authenticate { navController.navigate(ProjectsScreens.Projects.name) }
-                            true
-                        } else false
-                    },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
-            )
+        AnimatedVisibility(
+            addressIsValid,
+            enter = slideInHorizontally(
 
-            Button(onClick = {
-                viewModel.authenticate { navController.navigate(ProjectsScreens.Projects.name) }
-                Log.d("authenticated", viewModel.authenticated.value.toString())
-            }) {
-                Text(text = "Log In")
+                initialOffsetX = { fullHeight -> -fullHeight  },
+                animationSpec = tween(durationMillis = 400)
+            ),
+            exit = slideOutHorizontally(
+                targetOffsetX = { fullHeight -> -fullHeight },
+                animationSpec = tween(durationMillis = 400)
+            )
+        ) {
+            Column (horizontalAlignment = Alignment.CenterHorizontally){
+                TextField(
+                    value = emailAddress,
+                    onValueChange = { input ->
+                        viewModel.onChangeEmail(input)
+                    },
+                    label = { Text("Email") },
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = MaterialTheme.colors.background
+                    ),
+                    isError = !emailIsValid ,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusRequesterPassword.requestFocus() }
+                    ),
+                    modifier = Modifier
+                        .defaultMinSize(minWidth = 300.dp)
+                        .padding(20.dp)
+                        .focusRequester(focusRequesterMail)
+                        .onKeyEvent {
+                            if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+                                focusRequesterPassword.requestFocus()
+                                true
+                            }
+                            false
+                        })
+                TextField(
+                    value = password,
+                    onValueChange = { input ->
+                        viewModel.onChangePassword(input)
+                    },
+                    visualTransformation = PasswordVisualTransformation(),
+                    singleLine = true,
+                    label = { Text("Password") },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusRequesterPassword.requestFocus() }
+                    ),
+                    modifier = Modifier
+                        .defaultMinSize(minWidth = 300.dp)
+                        .padding(20.dp)
+                        .focusRequester(focusRequesterPassword)
+                        .onKeyEvent {
+                            if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+                                viewModel.authenticate { navController.navigate(ProjectsScreens.Projects.name) }
+                                true
+                            } else false
+                        },
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = MaterialTheme.colors.background
+                    ),
+                    isError = !passwordIsValid
+                )
+
+                Button(onClick = {
+                    viewModel.authenticate { navController.navigate(ProjectsScreens.Projects.name) }
+                    //Log.d("authenticated", viewModel.authenticated.value.toString())
+                }) {
+                    Text(text = "Log In")
+                }
             }
         }
 
     }
 }
+
+

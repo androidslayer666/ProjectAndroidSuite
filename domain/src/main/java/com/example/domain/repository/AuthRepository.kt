@@ -1,4 +1,4 @@
-package com.example.domain
+package com.example.domain.repository
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -12,9 +12,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class SessionManager @Inject constructor(context: Context) {
 
+@Singleton
+class AuthRepository @Inject constructor(context: Context) {
 
     //todo remove lateinit
     private lateinit var apiService: AuthEndPoint
@@ -94,6 +94,5 @@ class SessionManager @Inject constructor(context: Context) {
         }
         return apiService
     }
-
 
 }

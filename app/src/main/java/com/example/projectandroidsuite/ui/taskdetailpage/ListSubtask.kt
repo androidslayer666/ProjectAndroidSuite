@@ -14,7 +14,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.SubtaskEntity
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.ui.parts.TeamMemberCard
 
 @Composable
 fun ListSubtask(listSubtask: List<SubtaskEntity>) {

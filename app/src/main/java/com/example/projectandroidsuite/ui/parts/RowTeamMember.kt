@@ -22,19 +22,19 @@ import com.example.database.entities.UserEntity
 import com.example.projectandroidsuite.logic.coilRequestBuilder
 
 @Composable
-fun TeamMemberRow(
+fun RowTeamMember(
     list: List<UserEntity>,
     modifier : Modifier = Modifier
 ) {
     LazyRow(modifier = modifier) {
         items(list) { user ->
-            TeamMemberCard(user)
+            CardTeamMember(user)
         }
     }
 }
 
 @Composable
-fun TeamMemberCard(
+fun CardTeamMember(
     user: UserEntity,
     showFullName : Boolean? = false
     ) {

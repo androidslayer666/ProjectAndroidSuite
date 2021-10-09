@@ -123,9 +123,11 @@ fun TaskDetailPage(
             when (taskDeletionStatus) {
                 is Success -> {
                     //Log.d("delete task", taskDeletionStatus.toString())
+                    showDeleteDialog = false
+                    showUpdateTaskDialog = false
                     makeToast((taskDeletionStatus as Success<String>).value, context)
                     viewModel.resetState()
-                    //navController.popBackStack()
+                    navController.popBackStack()
                 }
                 is Failure -> {
                     //Log.d("delete task", taskDeletionStatus.toString())
@@ -147,7 +149,6 @@ fun TaskDetailPage(
                 text = "Do you want to delete the task?",
                 onSubmit = {
                     viewModel.deleteTask()
-                    navController.popBackStack()
                 },
                 { showDeleteDialog = false })
         }
@@ -155,7 +156,8 @@ fun TaskDetailPage(
         if (showUpdateStatusDialog) {
             ConfirmationDialog(
                 text = "Do you want to change the task status?",
-                onSubmit = { viewModel.changeTaskStatus() },
+                onSubmit = { viewModel.changeTaskStatus()
+                    showDeleteDialog = false},
                 { showUpdateStatusDialog = false })
         }
     }

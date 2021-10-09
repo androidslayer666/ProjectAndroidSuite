@@ -44,28 +44,28 @@ fun ProjectsPage(
     var showFilters by remember { mutableStateOf(false) }
     var state by rememberSaveable { mutableStateOf(0) }
     var initialOffset by rememberSaveable { mutableStateOf(0F) }
-    val offset = remember { androidx.compose.animation.core.Animatable(0F) }
+    val offset = remember { androidx.compose.animation.core.Animatable(initialOffset) }
     val titles = listOf("Projects", "Tasks")
     var direction by remember { mutableStateOf(SwipeDirections.RIGHT) }
     var sizeMeasured by remember { mutableStateOf(0) }
-    val context = LocalContext.current
+    var animateTo by remember { mutableStateOf(0) }
 
     BackHandler(showFilters) { showFilters = !showFilters }
 
-    Log.d("ProjectsPage", sizeMeasured.toString())
+    Log.d("ProjectsPage", initialOffset.toString())
 
-    if (state == 0)
+    if (animateTo == 1)
         LaunchedEffect(offset) {
             offset.animateTo(0F)
             direction = SwipeDirections.RIGHT
+            animateTo = 0
         }
-    if (state == 1)
+    if (animateTo == 2)
         LaunchedEffect(offset) {
             offset.animateTo(-sizeMeasured.toFloat())
             direction = SwipeDirections.LEFT
+            animateTo = 0
         }
-
-
 
     CustomScaffold({ showFilters = !showFilters }, navController, viewModel = hiltViewModel()) {
         Box(Modifier.background(MaterialTheme.colors.background)) {
@@ -91,11 +91,16 @@ fun ProjectsPage(
                                 }
                             },
                             selected = state == index,
-                            onClick = { state = index }
+                            onClick = {
+                                state = index
+                                if (state == 0)
+                                    animateTo = 1
+                                if (state == 1)
+                                    animateTo = 2
+                            }
                         )
                     }
                 }
-
 
                 Row(
                     modifier = Modifier
@@ -103,7 +108,6 @@ fun ProjectsPage(
                         .expandScrollingViewportWidthBy(440.dp)
                         .fillMaxHeight()
                 ) {
-
                     Card(
                         Modifier
                             .width(LocalContext.current.resources.displayMetrics.xdpi.dp - 55.dp)
@@ -157,7 +161,6 @@ fun ProjectsPage(
                                     }
                                 }
                             }
-
                     ) {
                         Column {
                             ProjectList(hiltViewModel(), navController)
@@ -235,15 +238,10 @@ fun ProjectsPage(
                     animationSpec = tween(durationMillis = 400)
                 )
             ) {
-                Row {
-                    Row(Modifier.weight(3F)) {}
-                    Row(Modifier.weight(2F)) {
-                        if (state == 0)
-                            FilterProjects(viewModel = hiltViewModel())
-                        if (state == 1)
-                            FilterTasks(viewModel = hiltViewModel())
-                    }
-                }
+                if (state == 0)
+                    FilterProjects(viewModel = hiltViewModel())
+                if (state == 1)
+                    FilterTasks(viewModel = hiltViewModel())
             }
         }
     }

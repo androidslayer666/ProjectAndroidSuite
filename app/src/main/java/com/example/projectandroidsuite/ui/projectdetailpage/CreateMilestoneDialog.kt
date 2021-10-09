@@ -11,7 +11,7 @@ import com.example.database.entities.MilestoneEntity
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.DatePicker
-import com.example.projectandroidsuite.ui.parts.TeamMemberCard
+import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
@@ -31,8 +31,13 @@ fun CreateMilestoneDialog(
     viewModel.setProjectId(projectId)
     if (milestone != null) viewModel.setMilestone(milestone)
 
+    var showResponsiblePicker by remember { mutableStateOf(false) }
+
     val milestoneUpdatingStatus by viewModel.subtaskUpdatingStatus.observeAsState()
     val milestoneCreationStatus by viewModel.subtaskCreationStatus.observeAsState()
+
+    val listUsersFlow by viewModel.userListFlow.observeAsState()
+    val userSearch by viewModel.userSearchQuery.observeAsState("")
 
     if (milestoneCreationStatus is Success<String>) {
         onMilestoneDeletedOrEdited((milestoneCreationStatus as Success<String>).value)
@@ -46,39 +51,60 @@ fun CreateMilestoneDialog(
         closeDialog()
     }
 
-    CustomDialog(
-        show = true,
-        hide = { closeDialog() },
-        text = "Create task",
-        onSubmit = {
-            if (milestone == null) {
-                viewModel.createMilestone()
-            } else {
-                viewModel.updateMilestone()
+    Box {
+        CustomDialog(
+            show = true,
+            hide = { closeDialog() },
+            text = if (milestone == null) "Create milestone" else "Update milestone",
+            onSubmit = {
+                if (milestone == null) {
+                    viewModel.createMilestone()
+                } else {
+                    viewModel.updateMilestone()
+                }
+            },
+            onDeleteClick = onDeleteClick
+        ) {
+            CreateMilestoneDialogInput(viewModel, {showResponsiblePicker = true})
+        }
+
+
+        listUsersFlow?.let {
+            if (showResponsiblePicker) {
+                TeamPickerDialog(
+                    list = it,
+                    onSubmit = { },
+                    onClick = { user ->
+                        run {
+                            viewModel.setResponsible(user)
+                            showResponsiblePicker = false
+                        }
+                    },
+                    closeDialog = { showResponsiblePicker = false },
+                    pickerType = PickerType.SINGLE,
+                    userSearch,
+                    { query -> viewModel.setUserSearch(query) }
+                )
             }
-        },
-        onDeleteClick = onDeleteClick
-    ) {
-        CreateMilestoneDialogInput(viewModel)
+        }
     }
 }
 
 @Composable
-fun CreateMilestoneDialogInput(viewModel: MilestoneCreateEditViewModel) {
-    var showResponsiblePicker by remember { mutableStateOf(false) }
-    var showDatePicker by remember { mutableStateOf(false) }
+fun CreateMilestoneDialogInput(
+    viewModel: MilestoneCreateEditViewModel,
+    showResponsiblePicker: ()-> Unit
 
+) {
+
+    var showDatePicker by remember { mutableStateOf(false) }
     val title by viewModel.title.observeAsState("")
     val description by viewModel.description.observeAsState("")
-    val listUsersFlow by viewModel.userListFlow.observeAsState()
-    val userSearch by viewModel.userSearchQuery.observeAsState("")
     val responsible by viewModel.responsible.observeAsState()
     val endDate by viewModel.endDate.observeAsState(Date())
     val priority by viewModel.priority.observeAsState()
 
-    Column(
-//        Modifier.defaultMinSize(minHeight = 200.dp)
-    ) {
+    Column{
         Row {
             CustomTextField(
                 value = title,
@@ -112,38 +138,20 @@ fun CreateMilestoneDialogInput(viewModel: MilestoneCreateEditViewModel) {
         Row(
             Modifier
                 .padding(vertical = 12.dp)
-                .clickable { showResponsiblePicker = true }) {
+                .clickable { showResponsiblePicker() }) {
             ButtonUsers(
                 singleUser = true,
-                onClicked = {showResponsiblePicker = true }
+                onClicked = {showResponsiblePicker()}
             )
             responsible?.let { user ->
                 Row(
                     Modifier.weight(4F)
                 ) {
-                    TeamMemberCard(user = user)
+                    CardTeamMember(user = user)
                 }
             }
         }
 
-        listUsersFlow?.let {
-            if (showResponsiblePicker) {
-                TeamPickerDialog(
-                    list = it,
-                    onSubmitList = { },
-                    onClick = { user ->
-                        run {
-                            viewModel.setResponsible(user)
-                            showResponsiblePicker = false
-                        }
-                    },
-                    closeDialog = { showResponsiblePicker = false },
-                    pickerType = PickerType.SINGLE,
-                    userSearch,
-                    { query -> viewModel.setUserSearch(query) }
-                )
-            }
-        }
 
         Row(Modifier.padding(vertical = 12.dp)) {
             Text(

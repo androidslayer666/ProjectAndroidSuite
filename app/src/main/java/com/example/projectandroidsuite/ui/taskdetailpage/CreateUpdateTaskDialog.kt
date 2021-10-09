@@ -1,23 +1,20 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.TaskEntity
 import com.example.domain.repository.Success
-import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.TaskStatus
+import com.example.projectandroidsuite.logic.makeToast
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.*
 import java.text.SimpleDateFormat
@@ -35,6 +32,17 @@ fun CreateUpdateTaskDialog(
 
     val taskUpdatingStatus by viewModel.taskUpdatingStatus.observeAsState()
     val taskCreationStatus by viewModel.taskCreationStatus.observeAsState()
+
+    var showTeamPicker by remember { mutableStateOf(false) }
+    var showProjectPicker by remember { mutableStateOf(false) }
+    var showMilestonePicker by remember { mutableStateOf(false) }
+    val listMilestones by viewModel.milestonesList.observeAsState()
+    val listProjects by viewModel.projectList.observeAsState()
+    val listUsersFlow by viewModel.userList.observeAsState()
+    val project by viewModel.project.observeAsState()
+
+    val projectSearch by viewModel.projectSearchQuery.observeAsState("")
+    val userSearch by viewModel.userSearchQuery.observeAsState("")
 
     Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
 
@@ -55,7 +63,7 @@ fun CreateUpdateTaskDialog(
     CustomDialog(
         show = true,
         hide = { closeDialog() },
-        text = "Create task",
+        text = if (task == null) "Create task" else "Update task",
         onSubmit = {
             if (task == null) {
                 viewModel.createTask()
@@ -65,17 +73,82 @@ fun CreateUpdateTaskDialog(
         },
         onDeleteClick = onDeleteClick
     ) {
-        CreateTaskDialogInput(viewModel)
+        CreateTaskDialogInput(
+            viewModel,
+            { showProjectPicker = true },
+            { showTeamPicker = true },
+            { showMilestonePicker = true },
+            task == null
+        )
     }
+
+    if (showProjectPicker) {
+        ProjectPickerDialog(
+            list = listProjects!!,
+            onSubmit = { showProjectPicker = false },
+            onClick = { project ->
+                run {
+                    viewModel.setProject(project = project)
+                }
+            },
+            closeDialog = { showProjectPicker = false },
+            ifChooseResponsibleOrTeam = PickerType.SINGLE,
+            searchString = projectSearch,
+            onSearchChanged = { query -> viewModel.setProjectSearch(query) }
+        )
+    }
+
+    if (showTeamPicker) {
+        TeamPickerDialog(
+            list = listUsersFlow!!,
+            onSubmit = { showTeamPicker = false},
+            onClick = { user ->
+                run {
+                    viewModel.addOrRemoveUser(user)
+                }
+            },
+            closeDialog = { showTeamPicker = false },
+            pickerType = PickerType.MULTIPLE,
+            searchString = userSearch,
+            onSearchChanged = { query -> viewModel.setUserSearch(query)}
+        )
+    }
+
+    if (showMilestonePicker && project != null){
+        makeToast("the project doesn't have milestones", LocalContext.current)
+        showMilestonePicker = false
+    }
+
+    listMilestones?.let {
+        if (showMilestonePicker && listMilestones?.isNotEmpty() == true) {
+            DialogPickerMilestone(
+                list = listMilestones!!,
+                onClick = { milestone ->
+                    run {
+                        viewModel.setMilestone(milestone)
+                        showMilestonePicker = false
+                    }
+                },
+                closeDialog = { showMilestonePicker = false }
+            )
+        }
+    }
+
+
+
 
 }
 
 @Composable
-fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
-    var showTeamPicker by remember { mutableStateOf(false) }
-    var showProjectPicker by remember { mutableStateOf(false) }
+fun CreateTaskDialogInput(
+    viewModel: TaskCreateEditViewModel,
+    showProjectPicker: () -> Unit,
+    showTeamPicker: () -> Unit,
+    showMilestonePicker: () -> Unit,
+    modeCreate: Boolean
+) {
+
     var showDatePicker by remember { mutableStateOf(false) }
-    var showMilestonePicker by remember { mutableStateOf(false) }
 
     val title by viewModel.title.observeAsState("")
     val description by viewModel.description.observeAsState("")
@@ -84,8 +157,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
     val listUsersFlow by viewModel.userList.observeAsState()
     val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf())
     val endDate by viewModel.endDate.observeAsState(Date())
-    val projectSearch by viewModel.projectSearchQuery.observeAsState("")
-    val userSearch by viewModel.userSearchQuery.observeAsState("")
+
     val taskStatus by viewModel.taskStatus.observeAsState()
     val milestone by viewModel.milestone.observeAsState()
     val listMilestones by viewModel.milestonesList.observeAsState()
@@ -107,6 +179,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                 onValueChange = { text -> viewModel.setDescription(text) }
             )
         }
+
 
         Row(Modifier.padding(vertical = 12.dp)) {
             CustomButton(
@@ -136,7 +209,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                 Text(
                     text = "Project",
                     Modifier
-                        .clickable { showProjectPicker = true }
+                        .clickable { showProjectPicker() }
                         .padding(end = 12.dp)
                         .weight(2F)
                 )
@@ -146,22 +219,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                             .weight(4F)
                     )
                 }
-                if (showProjectPicker) {
-                    ProjectPickerDialog(
-                        list = listProjects!!,
-                        onSubmitList = { },
-                        onClick = { project ->
-                            run {
-                                viewModel.setProject(project = project)
-                                showProjectPicker = false
-                            }
-                        },
-                        closeDialog = { showProjectPicker = false },
-                        ifChooseResponsibleOrTeam = PickerType.SINGLE,
-                        projectSearch,
-                        { query -> viewModel.setProjectSearch(query) }
-                    )
-                }
+
             }
         } else {
             Row(Modifier.padding(vertical = 12.dp)) {
@@ -173,31 +231,19 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
 
         if (listUsersFlow != null) {
 
-            Row(Modifier.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                Modifier.padding(vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 ButtonUsers(
                     singleUser = false,
-                    onClicked = { showTeamPicker = true }
+                    onClicked = { showTeamPicker() }
                 )
 
-                TeamMemberRow(
+                RowTeamMember(
                     list = listChosenUsers,
                     Modifier
                         .weight(4F)
-                )
-            }
-            if (showTeamPicker) {
-                TeamPickerDialog(
-                    list = listUsersFlow!!,
-                    onSubmitList = { },
-                    onClick = { user ->
-                        run {
-                            viewModel.addOrRemoveUser(user)
-                        }
-                    },
-                    closeDialog = { showTeamPicker = false },
-                    pickerType = PickerType.MULTIPLE,
-                    userSearch,
-                    { query -> viewModel.setUserSearch(query) }
                 )
             }
 
@@ -217,7 +263,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                 Text(
                     text = "Milestone",
                     Modifier
-                        .clickable { showMilestonePicker = true }
+                        .clickable { showMilestonePicker() }
                         .padding(end = 12.dp)
                         .weight(2F)
                 )
@@ -227,18 +273,7 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                             .weight(4F)
                     )
                 }
-                if (showMilestonePicker) {
-                    PickerMilestoneDialog(
-                        list = listMilestones!!,
-                        onClick = { milestone ->
-                            run {
-                                viewModel.setMilestone(milestone)
-                                showMilestonePicker = false
-                            }
-                        },
-                        closeDialog = { showMilestonePicker = false }
-                    )
-                }
+
             }
         } else {
             Row(Modifier.padding(vertical = 12.dp)) {
@@ -267,6 +302,9 @@ fun CreateTaskDialogInput(viewModel: TaskCreateEditViewModel) {
                 DatePicker({ date -> viewModel.setDate(date) }, { showDatePicker = false })
             }
         }
+
+
+
 
     }
 }

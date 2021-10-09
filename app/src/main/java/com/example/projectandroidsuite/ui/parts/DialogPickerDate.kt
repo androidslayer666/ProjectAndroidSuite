@@ -37,14 +37,22 @@ fun DatePicker(onDateSelected: (Date) -> Unit, onDismissRequest: () -> Unit) {
             })
         },
         buttons = {
-            CustomDialogButton(
-                onClick = {
-                    onDateSelected(selDate)
-                    onDismissRequest()
-                },
-                text = "Confirm",
-                typeConfirm = true
-            )
+            Row {
+                Row(Modifier.weight(1F)) {}
+                Row(Modifier.weight(3F)) {
+                    CustomDialogButton(
+                        onClick = {
+                            onDateSelected(selDate)
+                            onDismissRequest()
+                        },
+                        text = "Confirm",
+                        typeConfirm = true
+                    )
+                }
+                Row(Modifier.weight(1F)) {}
+
+            }
+
 
         })
 
@@ -57,7 +65,7 @@ fun CustomCalendarView(onDateSelected: (Date) -> Unit) {
     AndroidView(
         modifier = Modifier.wrapContentSize(),
         factory = { context ->
-            CalendarView(ContextThemeWrapper(context, R.style.ThemeOverlay_AppCompat_Light))
+            CalendarView(ContextThemeWrapper(context, R.style.CalenderViewCustom))
         },
         update = { view ->
             view.setOnDateChangeListener { _, year, month, day ->

@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -16,9 +15,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.database.entities.MessageEntity
 import com.example.database.entities.MilestoneEntity
-import com.example.domain.repository.Failure
-import com.example.domain.repository.Success
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.makeToast
 import com.example.projectandroidsuite.logic.showResultToast
@@ -43,10 +41,14 @@ fun ProjectDetailPage(
 
     var showUpdateProjectDialog by remember { mutableStateOf(false) }
     var showCreateMessageDialog by remember { mutableStateOf(false) }
+    var showEditMessageDialog by remember { mutableStateOf(false) }
     var showCreateMilestoneDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var rememberMilestone by remember { mutableStateOf(MilestoneEntity(id = 0)) }
+    var rememberMessage by remember { mutableStateOf(MessageEntity(id = 0)) }
     var showEditMilestoneDialog by remember { mutableStateOf(false) }
+    var showDeleteMilestoneDialog by remember { mutableStateOf(false) }
+    var showDeleteMessageDialog by remember { mutableStateOf(false) }
 
 
     val project by viewModel.currentProject.observeAsState()
@@ -60,7 +62,10 @@ fun ProjectDetailPage(
 
     showResultToast(
         result = milestoneDeletionStatus,
-        onSuccess = { showEditMilestoneDialog = false },
+        onSuccess = {
+            showEditMilestoneDialog = false
+            showDeleteMilestoneDialog = false
+                    },
         context = context
     )
 
@@ -72,7 +77,9 @@ fun ProjectDetailPage(
 
     showResultToast(
         result = messageDeletionStatus,
-        onSuccess = {},
+        onSuccess = {showDeleteMessageDialog = false
+                    showEditMessageDialog = false
+                    },
         context = context
     )
 
@@ -147,10 +154,12 @@ fun ProjectDetailPage(
                         }
                     }
                     1 -> ListMessages(
-                        listMessages,
-                        { comment -> viewModel.addCommentToMessage(comment) },
-                        { message -> viewModel.deleteMessage(message) },
-                        { comment -> viewModel.deleteComment(comment) })
+                        listMessages = listMessages,
+                        onReplyClick = { comment -> viewModel.addCommentToMessage(comment) },
+                        onEditMessageClick = { message -> rememberMessage = message
+                            showEditMessageDialog = true
+                        },
+                        onDeleteCommentClick = { comment -> viewModel.deleteComment(comment) })
                     2 -> ListFiles(listFiles = listFiles)
                 }
             }
@@ -178,6 +187,19 @@ fun ProjectDetailPage(
             }
         }
 
+        if (showEditMessageDialog) {
+            if (projectId != null) {
+                CreateMessageDialog(
+                    message = rememberMessage,
+                    projectId = projectId,
+                    viewModel = hiltViewModel(),
+                    closeDialog = { showEditMessageDialog = false },
+                    onMessageDeletedOrEdited = { string -> makeToast(string, context) },
+                    onDeleteClick = {showDeleteMessageDialog = true}
+                )
+            }
+        }
+
         if (showCreateMilestoneDialog) {
             if (projectId != null) {
                 CreateMilestoneDialog(
@@ -197,7 +219,7 @@ fun ProjectDetailPage(
                     viewModel = hiltViewModel(),
                     closeDialog = { showEditMilestoneDialog = false },
                     onMilestoneDeletedOrEdited = { string -> makeToast(string, context) },
-                    onDeleteClick = { viewModel.deleteMilestone(rememberMilestone) }
+                    onDeleteClick = { showDeleteMilestoneDialog = true }
                 )
             }
         }
@@ -209,10 +231,28 @@ fun ProjectDetailPage(
                 text = "Do you want to delete the project?",
                 onSubmit = {
                     viewModel.deleteProject()
-                    //navController.popBackStack()
                 },
                 { showDeleteDialog = false })
         }
+
+        if (showDeleteMilestoneDialog) {
+            ConfirmationDialog(
+                text = "Do you want to delete the project?",
+                onSubmit = {
+                    viewModel.deleteMilestone(rememberMilestone)
+                },
+                { showDeleteMilestoneDialog = false })
+        }
+
+        if (showDeleteMessageDialog) {
+            ConfirmationDialog(
+                text = "Do you want to delete the message?",
+                onSubmit = {
+                    viewModel.deleteMessage(rememberMessage)
+                },
+                { showDeleteMessageDialog = false })
+        }
+
     }
 }
 

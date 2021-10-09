@@ -33,7 +33,7 @@ private val LightColors = lightColors(
     primary = Color(0xFF10446c),
     secondary = Color(0xFFeb7304),
     primaryVariant = Color(0xFF0F3D61),
-    error = Color(0xFFA43F6C),
+    error = Color(0xFFB9000E),
     background = Color(0xFFFFFCF9),
     onPrimary = Color(0xFFCECECE),
     onBackground = Color(0xFF383838)
@@ -45,6 +45,7 @@ private val DarkColors = darkColors(
     primaryVariant = Color(0xFF002B4D),
     secondary = Color(0xFF9B5312),
     surface = Color(0xFF000000),
+    error = Color(0xFFB9000E),
     //onBackground = Color(0xFFC2C2C2),
     onPrimary = Color(0xFFFFE1E1)
    )
