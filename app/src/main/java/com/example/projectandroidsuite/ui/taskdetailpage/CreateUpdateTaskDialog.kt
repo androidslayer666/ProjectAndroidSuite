@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.TaskEntity
+import com.example.domain.model.Task
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.TaskStatus
@@ -24,7 +25,7 @@ import java.util.*
 fun CreateUpdateTaskDialog(
     viewModel: TaskCreateEditViewModel,
     closeDialog: () -> Unit,
-    task: TaskEntity? = null,
+    task: Task? = null,
     onTaskDeletedOrEdited: (String) -> Unit = { },
     onDeleteClick: (() -> Unit)? = null
 ) {

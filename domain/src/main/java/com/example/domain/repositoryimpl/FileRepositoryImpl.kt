@@ -1,13 +1,16 @@
-package com.example.domain.repository
+package com.example.domain.repositoryimpl
 
-import android.util.Log
 import com.example.database.dao.FileDao
-import com.example.database.entities.CommentEntity
 import com.example.database.entities.FileEntity
-import com.example.domain.mappers.toCommentPost
+import com.example.domain.mappers.fromListFileEntitiesToListFiles
 import com.example.domain.mappers.toListEntities
+import com.example.domain.model.File
+import com.example.domain.repository.FileRepository
+import com.example.domain.repository.Result
+import com.example.domain.repository.networkCaller
 import com.example.network.endpoints.FileEndPoint
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,7 +18,7 @@ import javax.inject.Singleton
 class FileRepositoryImpl @Inject constructor(
     private val fileDao: FileDao,
     private val fileEndPoint: FileEndPoint
-) : FileRepository{
+) : FileRepository {
 
     override suspend fun populateTaskFiles(taskId: Int): Result<String, String> {
         return networkCaller(
@@ -40,16 +43,16 @@ class FileRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun getFilesWithTaskId(taskId: Int): Flow<List<FileEntity>> {
-        return fileDao.getFilesByTaskId(taskId)
+    override fun getFilesWithTaskId(taskId: Int): Flow<List<File>> {
+        return fileDao.getFilesByTaskId(taskId).transform { emit(it.fromListFileEntitiesToListFiles()) }
     }
 
-    override fun getFilesWithProjectId(projectId: Int): Flow<List<FileEntity>> {
-        return fileDao.getFilesByProjectId(projectId)
+    override fun getFilesWithProjectId(projectId: Int): Flow<List<File>> {
+        return fileDao.getFilesByProjectId(projectId).transform { emit(it.fromListFileEntitiesToListFiles()) }
     }
 
-    override fun getAllFiles(): Flow<List<FileEntity>> {
-        return fileDao.getAllFiles()
+    override fun getAllFiles(): Flow<List<File>> {
+        return fileDao.getAllFiles().transform { emit(it.fromListFileEntitiesToListFiles()) }
     }
 
 }

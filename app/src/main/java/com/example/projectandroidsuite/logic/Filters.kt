@@ -1,6 +1,7 @@
 package com.example.projectandroidsuite.logic
 
 import com.example.database.entities.*
+import com.example.domain.model.*
 
 data class ProjectFilter(
     var searchQuery: String? = null,
@@ -12,7 +13,7 @@ enum class ProjectStatus(val index: Int) {
     ACTIVE(0), PAUSED(2), STOPPED(1)
 }
 
-fun List<ProjectEntity>.filterProjectsByFilter(filter: ProjectFilter): List<ProjectEntity> {
+fun List<Project>.filterProjectsByFilter(filter: ProjectFilter): List<Project> {
     val newList = this.toMutableList()
     //Log.d("filterProjectsBySearch", filter.toString())
     this.forEach { project ->
@@ -41,8 +42,8 @@ data class UserFilter(
     var searchQuery: String?
 )
 
-fun List<UserEntity>.filterUsersByFilter(filter: UserFilter): MutableList<UserEntity> {
-    val newList = mutableListOf<UserEntity>()
+fun List<User>.filterUsersByFilter(filter: UserFilter): MutableList<User> {
+    val newList = mutableListOf<User>()
     this.forEach { user ->
         //Log.d("filterProjectsBySearch", filter.toString())
         if (filter.searchQuery != null)
@@ -63,7 +64,7 @@ enum class TaskStatus (val index : Int){
     ACTIVE(1), COMPLETE(2)
 }
 
-fun List<TaskEntity>.filterTaskByFilter(filter: TaskFilter): List<TaskEntity> {
+fun List<Task>.filterTaskByFilter(filter: TaskFilter): List<Task> {
     val newList = this.toMutableList()
     //Log.d("filterProjectsBySearch", filter.toString())
     this.forEach { task ->
@@ -89,8 +90,8 @@ data class MilestoneFilter(
     var searchQuery: String?
 )
 
-fun List<MilestoneEntity>.filterMilestoneByFilter(filter: MilestoneFilter) : List<MilestoneEntity>{
-    val newList = mutableListOf<MilestoneEntity>()
+fun List<Milestone>.filterMilestoneByFilter(filter: MilestoneFilter) : List<Milestone>{
+    val newList = mutableListOf<Milestone>()
     this.forEach { milestone ->
         //Log.d("filterProjectsBySearch", filter.toString())
         if (filter.searchQuery != null)
@@ -105,8 +106,8 @@ data class FileFilter(
     var searchQuery: String?
 )
 
-fun List<FileEntity>.filterFileByFilter(filter: FileFilter) : List<FileEntity>{
-    val newList = mutableListOf<FileEntity>()
+fun List<File>.filterFileByFilter(filter: FileFilter) : List<File>{
+    val newList = mutableListOf<File>()
     this.forEach { file ->
         //Log.d("filterProjectsBySearch", filter.toString())
         if (filter.searchQuery != null)

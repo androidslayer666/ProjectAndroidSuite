@@ -1,11 +1,14 @@
-package com.example.domain.repository
+package com.example.domain.repositoryimpl
 
 import android.util.Log
 import com.example.database.dao.ProjectDao
 import com.example.database.entities.ProjectEntity
-import com.example.domain.mappers.toListEntities
-import com.example.domain.mappers.toListUserEntity
-import com.example.domain.mappers.toProjectEntity
+import com.example.domain.mappers.*
+import com.example.domain.model.Project
+import com.example.domain.repository.ProjectRepository
+import com.example.domain.repository.Result
+import com.example.domain.repository.networkCaller
+import com.example.domain.repository.toListProjectIds
 import com.example.network.dto.ProjectDto
 import com.example.network.dto.ProjectPost
 import com.example.network.dto.ProjectStatusPost
@@ -15,8 +18,8 @@ import com.example.network.endpoints.TeamEndPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,7 +28,7 @@ class ProjectRepositoryImpl @Inject constructor(
     private val projectDao: ProjectDao,
     private val projectEndPoint: ProjectEndPoint,
     private val teamEndPoint: TeamEndPoint,
-) : ProjectRepository{
+) : ProjectRepository {
 
     override suspend fun getProjects(): Result<String, String> {
         return networkCaller(
@@ -52,37 +55,35 @@ class ProjectRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getProjectFromDbById(projectId: Int): Flow<ProjectEntity?> {
-        return projectDao.getProjectFromDbById(projectId)
+    override fun getProjectFromDbById(projectId: Int): Flow<Project?> {
+        return projectDao.getProjectFromDbById(projectId).transform { emit(it?.fromProjectEntityToProject()) }
     }
 
-    override fun getAllStoredProjects(): Flow<List<ProjectEntity>> {
-        return projectDao.getAllFlow()
+    override fun getAllStoredProjects(): Flow<List<Project>> {
+        return projectDao.getAllFlow().transform { emit(it.fromListProjectEntitiesToListProjects()) }
     }
-
-    override fun projectsFromDb() = projectDao.getAllFlow()
 
     override suspend fun updateProject(
         projectId: Int,
-        project: ProjectPost,
+        project: Project,
         projectStatus: String
     ): Result<String, String> {
-        Log.d("ProjectRepository", "list users  " + project.participants?.toString())
+        Log.d("ProjectRepository", "list users  " + project.fromEntityToPost().participants?.toString())
         return networkCaller(
             call = {
-                projectEndPoint.updateProject(projectId, project)
+                projectEndPoint.updateProject(projectId, project.fromEntityToPost())
                 updateProjectStatus(projectId, projectStatus)
-                if(project.participants != null)
-                    Log.d("ProjectRepository", project.participants.toString())
-                projectEndPoint.updateProjectTeam(projectId, ProjectTeamPost(project.participants!!, true) )
+                if(project.fromEntityToPost().participants != null)
+                    Log.d("ProjectRepository", project.fromEntityToPost().toString())
+                projectEndPoint.updateProjectTeam(projectId, ProjectTeamPost(project.fromEntityToPost().participants!!, true) )
             },
             onSuccess = { getTeamAndInsertProjectToDb(projectId) }
         )
     }
 
-    override suspend fun createProject(project: ProjectPost): Result<String, String> {
+    override suspend fun createProject(project: Project): Result<String, String> {
         return networkCaller(
-            call = { projectEndPoint.createProject(project) },
+            call = { projectEndPoint.createProject(project.fromEntityToPost()) },
             onSuccess = { getProjects() },
             onSuccessString = "Project created successfully",
             onFailureString = "Having problem while creating the project, please check the network connection"

@@ -3,6 +3,7 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.*
+import com.example.domain.model.*
 import com.example.domain.repository.*
 import com.example.projectandroidsuite.logic.arrangeMilestonesAndTasks
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +34,7 @@ class ProjectDetailViewModel @Inject constructor(
         messageRepository.getMessagesByProjectId(projectId).asLiveData()
     }
 
-    val listFiles: LiveData<List<FileEntity>> = _projectId.switchMap { projectId ->
+    val listFiles: LiveData<List<File>> = _projectId.switchMap { projectId ->
         fileRepository.getFilesWithProjectId(projectId).asLiveData()
     }
 
@@ -49,7 +50,7 @@ class ProjectDetailViewModel @Inject constructor(
     private var _milestoneDeletionStatus = MutableLiveData<Result<String, String>?>()
     val milestoneDeletionStatus: LiveData<Result<String, String>?> = _milestoneDeletionStatus
 
-    val taskAndMilestones: LiveData<Map<MilestoneEntity?, List<TaskEntity>>> =
+    val taskAndMilestones: LiveData<Map<Milestone?, List<Task>>> =
         _projectId.switchMap { projectId ->
             taskRepository.getTasksByProject(projectId)
                 .combine(milestoneRepository.getMilestonesByProjectFlow(projectId))
@@ -81,7 +82,8 @@ class ProjectDetailViewModel @Inject constructor(
         }
     }
 
-    fun addCommentToMessage(comment: CommentEntity){
+    //todo
+    fun addCommentToMessage(comment: Comment){
         Log.d("ProjectDetailViewModel", comment.toString())
         CoroutineScope(IO).launch {
             val result = commentRepository.putCommentToMessage(comment.messageId ?:0, comment)
@@ -92,7 +94,7 @@ class ProjectDetailViewModel @Inject constructor(
         }
     }
 
-    fun deleteMilestone(milestoneEntity: MilestoneEntity?) {
+    fun deleteMilestone(milestoneEntity: Milestone?) {
         CoroutineScope(IO).launch {
             if(milestoneEntity != null){
                 val response = milestoneRepository.deleteMilestone(milestoneEntity.id, projectId.value)
@@ -107,7 +109,7 @@ class ProjectDetailViewModel @Inject constructor(
         _projectDeletionStatus.value = null
     }
 
-    fun deleteComment(commentEntity: CommentEntity){
+    fun deleteComment(commentEntity: Comment){
         CoroutineScope(IO).launch {
             val response = commentRepository.deleteComment(commentEntity.id)
             if(projectId.value != null) {
@@ -119,7 +121,7 @@ class ProjectDetailViewModel @Inject constructor(
         }
     }
 
-    fun deleteMessage(message: MessageEntity) {
+    fun deleteMessage(message: Message) {
         CoroutineScope(IO).launch {
             val response = messageRepository.deleteMessage(message.id)
             if(projectId.value != null) {

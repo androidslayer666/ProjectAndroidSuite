@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.MessageEntity
 import com.example.database.entities.UserEntity
+import com.example.domain.model.Message
+import com.example.domain.model.User
 import com.example.domain.repository.*
 import com.example.projectandroidsuite.logic.*
 
@@ -20,7 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MessageCreateEditViewModel @Inject constructor(
     private val teamRepository: TeamRepository,
-    private val taskRepository: TaskRepository,
     private val projectRepository: ProjectRepository,
     private val messageRepository: MessageRepository
 ) : ViewModel() {
@@ -35,8 +36,8 @@ class MessageCreateEditViewModel @Inject constructor(
     private var _content = MutableLiveData("")
     val content: LiveData<String> = _content
 
-    private var _chosenUserList = MutableLiveData<MutableList<UserEntity>>(mutableListOf())
-    val chosenUserList: LiveData<MutableList<UserEntity>> = _chosenUserList
+    private var _chosenUserList = MutableLiveData<MutableList<User>>(mutableListOf())
+    val chosenUserList: LiveData<MutableList<User>> = _chosenUserList
 
     private var userSearch = MutableLiveData<UserFilter>()
 
@@ -68,7 +69,7 @@ class MessageCreateEditViewModel @Inject constructor(
         }
     }
 
-    fun setMessage(message: MessageEntity) {
+    fun setMessage(message: Message) {
         messageId = message.id
         _title.value  = message.title
         _content.value = message.text ?: ""
@@ -88,7 +89,7 @@ class MessageCreateEditViewModel @Inject constructor(
         this.projectId = projectId
     }
 
-    fun addOrRemoveUser(user: UserEntity) {
+    fun addOrRemoveUser(user: User) {
         //Log.d("addOrRemoveUser", user.toString())
         val listIds = _chosenUserList.value!!.getListIds()
         if (listIds.contains(user.id)) {
@@ -125,7 +126,7 @@ class MessageCreateEditViewModel @Inject constructor(
             val response = messageRepository.putMessageToProject(
                 //todo shouldNot be null
                 projectId ?: 0,
-                MessageEntity(
+                Message(
                     title = title.value ?: "",
                     id = 0,
                     description = content.value,
@@ -144,12 +145,12 @@ class MessageCreateEditViewModel @Inject constructor(
         val response = messageRepository.updateMessage(
                 //todo shouldNot be null
             projectId ?: 0,
-                MessageEntity(
+                Message(
                     title = title.value ?: "",
                     id = messageId ?: 0,
                     description = content.value,
                 ),
-                chosenUserList.value?: listOf()
+            chosenUserList.value?: listOf()
             )
             withContext(Dispatchers.Main) {
                 Log.d("", response.toString())

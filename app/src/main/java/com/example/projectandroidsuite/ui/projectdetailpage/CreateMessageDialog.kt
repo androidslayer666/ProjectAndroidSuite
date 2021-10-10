@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.MessageEntity
+import com.example.domain.model.Message
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.RowTeamMember
@@ -20,7 +21,7 @@ fun CreateMessageDialog(
     projectId: Int,
     viewModel: MessageCreateEditViewModel,
     closeDialog: () -> Unit,
-    message: MessageEntity? = null,
+    message: Message? = null,
     onMessageDeletedOrEdited: (String) -> Unit = { },
     onDeleteClick: (() -> Unit)? = null
 ) {

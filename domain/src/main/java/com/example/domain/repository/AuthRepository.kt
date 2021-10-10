@@ -7,7 +7,7 @@ import com.example.network.dto.auth.Token
 
 interface AuthRepository {
 
-    suspend fun authenticate(loginRequest: LoginRequest)
+    suspend fun authenticate(email: String, password: String)
 
     fun rememberPortalAddress(portalAddress: String)
 

@@ -1,8 +1,11 @@
 package com.example.domain.mappers
 
 import android.util.Log
+import com.example.database.entities.MessageEntity
 import com.example.database.entities.MilestoneEntity
 import com.example.database.entities.TaskEntity
+import com.example.domain.model.Message
+import com.example.domain.model.Milestone
 import com.example.domain.repository.dateToString
 import com.example.network.dto.MilestoneDto
 import com.example.network.dto.MilestonePost
@@ -39,7 +42,7 @@ fun MilestoneDto.toEntity(projectId: Int): MilestoneEntity {
 }
 
 
-fun MilestoneEntity.toMilestonePost(): MilestonePost {
+fun Milestone.toMilestonePost(): MilestonePost {
     return MilestonePost(
         title = this.title,
         description = this.description,
@@ -49,4 +52,30 @@ fun MilestoneEntity.toMilestonePost(): MilestonePost {
         isNotify = true,
         isKey = true
         )
+}
+
+fun List<MilestoneEntity>.fromListMilestoneEntitiesToListMilestone(): MutableList<Milestone> {
+    val listFiles = mutableListOf<Milestone>()
+    listFiles.addAll(this.map { it.fromMilestoneEntityToMilestone() })
+    return listFiles
+}
+
+
+fun MilestoneEntity.fromMilestoneEntityToMilestone(): Milestone {
+    return Milestone(
+        canEdit = this.canEdit,
+        canDelete = this.canDelete,
+        deadline = this.deadline,
+        id = this.id,
+        isKey = this.isKey,
+        title = this.title,
+        description = this.description,
+        status = this.status,
+        responsible = this.responsible?.fromUserEntityToUser(),
+        updatedBy = this.updatedBy?.fromUserEntityToUser(),
+        created = this.created,
+        createdBy = this.createdBy?.fromUserEntityToUser(),
+        updated = this.updated,
+        projectId = projectId
+    )
 }

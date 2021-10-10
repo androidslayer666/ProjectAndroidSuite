@@ -1,11 +1,15 @@
-package com.example.domain.repository
+package com.example.domain.repositoryimpl
 
 import android.util.Log
 import com.example.database.dao.TaskDao
 import com.example.database.entities.ProjectEntity
+import com.example.database.entities.SubtaskEntity
 import com.example.database.entities.TaskEntity
-import com.example.domain.mappers.toEntity
-import com.example.domain.mappers.toListEntities
+import com.example.database.entities.UserEntity
+import com.example.domain.mappers.*
+import com.example.domain.model.Subtask
+import com.example.domain.model.Task
+import com.example.domain.repository.*
 import com.example.network.dto.SubtaskPost
 import com.example.network.dto.TaskDto
 import com.example.network.dto.TaskPost
@@ -13,9 +17,9 @@ import com.example.network.dto.TaskStatusPost
 import com.example.network.endpoints.ProjectEndPoint
 import com.example.network.endpoints.TaskEndPoint
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +29,7 @@ class TaskRepositoryImpl @Inject constructor(
     private val taskDao: TaskDao,
     private val taskEndPoint: TaskEndPoint,
     private val projectEndPoint: ProjectEndPoint,
-) : TaskRepository{
+) : TaskRepository {
 
     override suspend fun populateTasksByProject(projectId: Int): Result<String, String> {
         try {
@@ -46,14 +50,16 @@ class TaskRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getTasksByProject(projectId: Int): Flow<List<TaskEntity>> {
-        return taskDao.getTasksWithProject(projectId)
+    override fun getTasksByProject(projectId: Int): Flow<List<Task>> {
+        return taskDao.getTasksWithProject(projectId).transform {
+            Log.d("getTasksByProject",it.toString())
+            emit(it.fromListTaskEntitiesToListTasks()) }
     }
 
-    override fun getTaskById(taskId: Int): Flow<TaskEntity?> {
+    override fun getTaskById(taskId: Int): Flow<Task?> {
         //todo only download one task
         //Log.d("TaskRepository", "getTaskById" + taskId.toString())
-        return taskDao.getTaskFromById(taskId)
+        return taskDao.getTaskFromById(taskId).transform { emit(it.fromTaskEntityToTask()) }
     }
 
     override suspend fun populateTasks(): Result<String, String> {
@@ -96,22 +102,32 @@ class TaskRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getAllUserTasks(): Flow<List<TaskEntity>> {
-        return taskDao.getAllFlow()
+    override fun getAllUserTasks(): Flow<List<Task>> {
+        return taskDao.getAllFlow().transform { emit( it.fromListTaskEntitiesToListTasks()) }
     }
 
-    override suspend fun createTask(chosenProject: Int, task: TaskPost): Result<String, String> {
+    override suspend fun createTask(milestoneId: Int, task: Task): Result<String, String> {
         return networkCaller(
-            call = { taskEndPoint.addTaskToProject(chosenProject, task) },
+            call = { taskEndPoint.addTaskToProject(task.id, task.fromTaskEntityToPost(milestoneId)) },
             onSuccess = { populateTasks() },
             onSuccessString = "Task created successfully",
             onFailureString = "Having problem while creating the task, please check the network connection"
         )
     }
 
-    override suspend fun createSubtask(taskId: Int, subtask: SubtaskPost): Result<String, String> {
+    override suspend fun createSubtask(
+        subtask: Subtask
+    ): Result<String, String> {
         return networkCaller(
-            call = { taskEndPoint.createSubtask(taskId, subtask) },
+            call = {
+                taskEndPoint.createSubtask(
+                    subtask.taskId,
+                    SubtaskPost(
+                        title = subtask.title ?: "",
+                        responsible = subtask.responsible?.id ?: ""
+                    )
+                )
+            },
             onSuccess = { populateTasks() },
             onSuccessString = "Subtask created successfully",
             onFailureString = "Having problem while creating the subtask, please check the network connection"
@@ -121,11 +137,11 @@ class TaskRepositoryImpl @Inject constructor(
 
     override suspend fun updateTask(
         taskId: Int,
-        task: TaskPost,
+        task: Task,
         taskStatus: String
     ): Result<String, String> {
         return networkCaller(
-            call = { taskEndPoint.updateTask(taskId, task) },
+            call = { taskEndPoint.updateTask(taskId, task.fromTaskEntityToPost()) },
             onSuccess = {
                 populateTasks()
                 taskEndPoint.updateTaskStatus(taskId, TaskStatusPost(taskStatus, 1))

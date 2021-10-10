@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.database.entities.UserEntity
+import com.example.domain.model.User
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.TitleOverflowedText
 import java.text.SimpleDateFormat
@@ -21,8 +22,8 @@ import java.util.*
 fun DetailHeaderWrapper(
     title: String?,
     description: String?,
-    responsible: UserEntity? = null,
-    team: List<UserEntity>?,
+    responsible: User? = null,
+    team: List<User>?,
     endDate: Date? = null,
     taskStatus: Int? = null,
     projectStatus: Int? = null,

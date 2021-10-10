@@ -1,10 +1,13 @@
-package com.example.domain.repository
+package com.example.domain.repositoryimpl
 
 import android.util.Log
 import com.example.database.dao.CommentDao
 import com.example.database.entities.CommentEntity
+import com.example.domain.mappers.fromListCommentEntitiesToListComments
 import com.example.domain.mappers.toCommentPost
 import com.example.domain.mappers.toListEntities
+import com.example.domain.model.Comment
+import com.example.domain.repository.*
 import com.example.network.endpoints.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -17,7 +20,7 @@ import javax.inject.Singleton
 class CommentRepositoryImpl @Inject constructor(
     private val commentEndPoint: CommentEndPoint,
     private val commentDao: CommentDao
-) : CommentRepository{
+) : CommentRepository {
 
     override suspend fun populateCommentsWithTaskId(taskId: Int): Result<String, String> {
         try {
@@ -47,16 +50,16 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getCommentByTaskId(taskId: Int?): Flow<List<CommentEntity>?> {
+    override fun getCommentByTaskId(taskId: Int?): Flow<List<Comment>?> {
         if(taskId != null)
         return commentDao.getCommentsByTaskIdFlow(taskId).transform { listComments ->
             //Log.d("CommentRepository", "arranging comments" + listComments.toString())
-            emit(arrangingComments(listComments))
+            emit(arrangingComments(listComments).fromListCommentEntitiesToListComments())
         }
         return flow{}
     }
 
-    override suspend fun putCommentToMessage(messageId: Int, comment: CommentEntity): Result<String, String> {
+    override suspend fun putCommentToMessage(messageId: Int, comment: Comment): Result<String, String> {
         //Log.d("ProjectRepository", "Started creating pproject" + comment.toCommentPost().toString())
 
         return networkCaller(
@@ -67,7 +70,7 @@ class CommentRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun putCommentToTask(taskId: Int, comment: CommentEntity) : Result<String, String> {
+    override suspend fun putCommentToTask(taskId: Int, comment: Comment) : Result<String, String> {
         Log.d("CommentRepository", "Started creating comment" + taskId.toString())
 
         return networkCaller(

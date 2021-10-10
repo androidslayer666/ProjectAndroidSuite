@@ -18,15 +18,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.CommentEntity
 import com.example.database.entities.MessageEntity
+import com.example.domain.mappers.fromListCommentEntitiesToListComments
+import com.example.domain.model.Comment
+import com.example.domain.model.Message
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.DrawSideLine
 
 @Composable
 fun ListMessages(
-    listMessages: List<MessageEntity>? = listOf(),
-    onReplyClick: (CommentEntity) -> Unit,
-    onEditMessageClick: (MessageEntity) -> Unit,
-    onDeleteCommentClick: (CommentEntity) -> Unit
+    listMessages: List<Message>? = listOf(),
+    onReplyClick: (Comment) -> Unit,
+    onEditMessageClick: (Message) -> Unit,
+    onDeleteCommentClick: (Comment) -> Unit
 ) {
     var activeMessage by remember { mutableStateOf(0) }
 
@@ -117,7 +120,7 @@ fun ListMessages(
                                     modifier = Modifier
                                         .clickable {
                                             onReplyClick(
-                                                CommentEntity(
+                                                Comment(
                                                     id = "",
                                                     text = replyText,
                                                     messageId = message.id

@@ -15,14 +15,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.CommentEntity
+import com.example.database.entities.UserEntity
+import com.example.domain.model.Comment
+import com.example.domain.model.User
 import com.example.projectandroidsuite.R
 
 @Composable
 fun ListComments(
-    listComments: List<CommentEntity>? = listOf(),
-    onReplyClick: (CommentEntity) -> Unit,
+    listComments: List<Comment>? = listOf(),
+    onReplyClick: (Comment) -> Unit,
     messageId: Int? = null,
-    onDeleteClick: (CommentEntity) -> Unit
+    onDeleteClick: (Comment) -> Unit
 ) {
     var activeComment by remember { mutableStateOf("")}
 
@@ -43,10 +46,10 @@ fun ListComments(
 
 @Composable
 fun CommentItem(
-    comment: CommentEntity,
-    onReplyClick: (CommentEntity) -> Unit,
+    comment: Comment,
+    onReplyClick: (Comment) -> Unit,
     messageId: Int? = null,
-    onDeleteClick: (CommentEntity) -> Unit,
+    onDeleteClick: (Comment) -> Unit,
     isFocused: Boolean,
     setActive: (String) -> Unit
 ) {
@@ -77,7 +80,8 @@ fun CommentItem(
                             .weight(5F)
                     ) {
                         if (comment.inactive != true) {
-                            comment.createdBy?.let { CardTeamMember(user = it) }
+                            //todo change to real User
+                            comment.createdBy?.let { CardTeamMember(user = User(id="",email= "",firstName = "",lastName = "")) }
 
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -88,7 +92,6 @@ fun CommentItem(
                             } else {
                                 Text(text = Html.fromHtml(comment.text).toString())
                             }
-
                         } else {
                             Text(text = "Comment has been deleted")
                         }
@@ -129,7 +132,7 @@ fun CommentItem(
                             modifier = Modifier
                                 .clickable {
                                     onReplyClick(
-                                        CommentEntity(
+                                        Comment(
                                             id = "",
                                             text = replyText,
                                             parentId = comment.id,

@@ -2,9 +2,12 @@ package com.example.domain.repository
 
 import android.util.Log
 import com.example.database.entities.ProjectEntity
+import com.example.database.entities.SubtaskEntity
 import com.example.database.entities.TaskEntity
 import com.example.domain.mappers.toEntity
 import com.example.domain.mappers.toListEntities
+import com.example.domain.model.Subtask
+import com.example.domain.model.Task
 import com.example.network.dto.SubtaskPost
 import com.example.network.dto.TaskDto
 import com.example.network.dto.TaskPost
@@ -18,21 +21,21 @@ interface TaskRepository {
 
     suspend fun populateTasksByProject(projectId: Int): Result<String, String>
 
-    fun getTasksByProject(projectId: Int): Flow<List<TaskEntity>>
+    fun getTasksByProject(projectId: Int): Flow<List<Task>>
 
-    fun getTaskById(taskId: Int): Flow<TaskEntity?>
+    fun getTaskById(taskId: Int): Flow<Task?>
 
     suspend fun populateTasks(): Result<String, String>
 
-    fun getAllUserTasks(): Flow<List<TaskEntity>>
+    fun getAllUserTasks(): Flow<List<Task>>
 
-    suspend fun createTask(chosenProject: Int, task: TaskPost): Result<String, String>
+    suspend fun createTask(chosenProject: Int, task: Task): Result<String, String>
 
-    suspend fun createSubtask(taskId: Int, subtask: SubtaskPost): Result<String, String>
+    suspend fun createSubtask(subtask: Subtask): Result<String, String>
 
     suspend fun updateTask(
         taskId: Int,
-        task: TaskPost,
+        task: Task,
         taskStatus: String
     ): Result<String, String>
 

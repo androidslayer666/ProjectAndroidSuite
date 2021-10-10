@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.database.entities.ProjectEntity
+import com.example.domain.model.Project
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.swipeToRefresh
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDivider
@@ -49,7 +50,7 @@ fun ProjectList(
 }
 
 @Composable
-fun ProjectItem(project: ProjectEntity, onClick: (projectId: Int) -> Unit) {
+fun ProjectItem(project: Project, onClick: (projectId: Int) -> Unit) {
 
     var responsibleString = project.responsible?.displayName
     val participantsNumber = project.participantCount

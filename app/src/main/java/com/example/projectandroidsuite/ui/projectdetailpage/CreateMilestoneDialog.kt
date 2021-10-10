@@ -8,6 +8,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.MilestoneEntity
+import com.example.domain.model.Milestone
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.DatePicker
@@ -21,7 +22,7 @@ import java.util.*
 
 @Composable
 fun CreateMilestoneDialog(
-    milestone: MilestoneEntity? = null,
+    milestone: Milestone? = null,
     projectId: Int,
     viewModel: MilestoneCreateEditViewModel,
     closeDialog: () -> Unit,

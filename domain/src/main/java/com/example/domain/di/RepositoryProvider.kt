@@ -3,13 +3,13 @@ package com.example.domain.di
 import android.content.Context
 import com.example.database.dao.*
 import com.example.domain.repository.*
+import com.example.domain.repositoryimpl.*
 import com.example.network.endpoints.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

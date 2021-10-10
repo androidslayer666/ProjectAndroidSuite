@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.database.entities.TaskEntity
+import com.example.domain.model.Task
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDivider
 import java.text.SimpleDateFormat
@@ -43,7 +44,7 @@ fun TaskList(
 
 @Composable
 fun TaskItem(
-    task: TaskEntity,
+    task: Task,
     showStage: Boolean? = true,
     onClick: (taskId: Int) -> Unit,
 ) {

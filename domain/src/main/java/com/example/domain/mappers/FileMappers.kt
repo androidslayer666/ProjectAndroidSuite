@@ -1,6 +1,7 @@
 package com.example.domain.mappers
 
 import com.example.database.entities.FileEntity
+import com.example.domain.model.File
 import com.example.network.dto.FileDto
 
 fun List<FileDto>.toListEntities(taskId: Int? = null, projectId: Int? = null): List<FileEntity> {
@@ -22,6 +23,28 @@ fun FileDto.toEntity(taskId: Int?, projectId: Int?) : FileEntity{
         created = this.created?.stringToDate(),
         createdBy = this.createdBy?.toUserEntity(),
         updated = this.updated?.stringToDate(),
+        fileExst = this.fileExst,
+        taskId = taskId,
+        projectId = projectId
+    )
+}
+
+
+fun List<FileEntity>.fromListFileEntitiesToListFiles() : List<File>{
+    val listFiles = mutableListOf<File>()
+    listFiles.addAll(this.map { it.fromFileEntityToFile() })
+    return listFiles
+}
+
+
+fun FileEntity.fromFileEntityToFile(): File {
+    return File(
+        id = this.id,
+        title = this.title,
+        updatedBy = this.updatedBy?.fromUserEntityToUser(),
+        created = this.created,
+        createdBy = this.createdBy?.fromUserEntityToUser(),
+        updated = this.updated,
         fileExst = this.fileExst,
         taskId = taskId,
         projectId = projectId

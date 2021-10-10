@@ -1,9 +1,10 @@
-package com.example.domain.repository
+package com.example.domain.repositoryimpl
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.repository.AuthRepository
 import com.example.network.Constants.AUTHENTICATED
 import com.example.network.Constants.EXPIRATION_DATE
 import com.example.network.Constants.PORTAL_ADDRESS
@@ -11,8 +12,6 @@ import com.example.network.Constants.USER_TOKEN
 import com.example.network.dto.auth.LoginRequest
 import com.example.network.dto.auth.Token
 import com.example.network.endpoints.AuthEndPoint
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,9 +30,9 @@ class AuthRepositoryImpl @Inject constructor(
         _authenticated.value = isAuthenticated()
     }
 
-    override suspend fun authenticate(loginRequest: LoginRequest) {
+    override suspend fun authenticate(email: String, password: String) {
         try {
-            val loginResponse = apiService.login(loginRequest)
+            val loginResponse = apiService.login( LoginRequest(email = email, password = password))
             Log.d("authenticate", loginResponse.toString())
             if (loginResponse.token.authToken.isNotEmpty())
                 saveAuthToken(loginResponse.token)

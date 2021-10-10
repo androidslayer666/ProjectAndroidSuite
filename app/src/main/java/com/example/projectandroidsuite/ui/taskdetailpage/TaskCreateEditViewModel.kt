@@ -6,13 +6,13 @@ import com.example.database.entities.MilestoneEntity
 import com.example.database.entities.ProjectEntity
 import com.example.database.entities.TaskEntity
 import com.example.database.entities.UserEntity
+import com.example.domain.model.Milestone
+import com.example.domain.model.Project
+import com.example.domain.model.Task
+import com.example.domain.model.User
 import com.example.domain.repository.*
-import com.example.network.dto.TaskPost
-import com.example.projectandroidsuite.logic.Constants.FORMAT_API_DATE
 import com.example.projectandroidsuite.logic.*
-
 import com.example.projectandroidsuite.ui.*
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -43,14 +42,14 @@ class TaskCreateEditViewModel @Inject constructor(
     private var _priority = MutableLiveData(0)
     val priority: LiveData<Int> = _priority
 
-    private var _chosenUserList = MutableLiveData<MutableList<UserEntity>>(mutableListOf())
-    val chosenUserList: LiveData<MutableList<UserEntity>> = _chosenUserList
+    private var _chosenUserList = MutableLiveData<MutableList<User>>(mutableListOf())
+    val chosenUserList: LiveData<MutableList<User>> = _chosenUserList
 
-    private var _project = MutableLiveData<ProjectEntity?>()
-    val project: LiveData<ProjectEntity?> = _project
+    private var _project = MutableLiveData<Project?>()
+    val project: LiveData<Project?> = _project
 
-    private var _milestone = MutableLiveData<MilestoneEntity?>()
-    val milestone: LiveData<MilestoneEntity?> = _milestone
+    private var _milestone = MutableLiveData<Milestone?>()
+    val milestone: LiveData<Milestone?> = _milestone
 
     private var projectSearch = MutableLiveData<ProjectFilter>()
     private var userSearch = MutableLiveData<UserFilter>()
@@ -110,7 +109,7 @@ class TaskCreateEditViewModel @Inject constructor(
         }
     }
 
-    fun setTask(task: TaskEntity) {
+    fun setTask(task: Task) {
         //Log.d("setTask", task.toString())
         taskId = task.id
         _title.value = task.title
@@ -148,12 +147,12 @@ class TaskCreateEditViewModel @Inject constructor(
         _priority.value = value
     }
 
-    fun setProject(project: ProjectEntity) {
+    fun setProject(project: Project) {
         _project.value = project
         Log.d("setProject", _project.value.toString())
     }
 
-    fun setMilestone(milestone: MilestoneEntity) {
+    fun setMilestone(milestone: Milestone) {
         _milestone.value = milestone
         Log.d("setProject", _milestone.value.toString())
     }
@@ -178,7 +177,7 @@ class TaskCreateEditViewModel @Inject constructor(
         _taskUpdatingStatus.value = null
     }
 
-    fun addOrRemoveUser(user: UserEntity) {
+    fun addOrRemoveUser(user: User) {
         //Log.d("addOrRemoveUser", user.toString())
         val listIds = _chosenUserList.value!!.getListIds()
         if (listIds.contains(user.id)) {
@@ -211,15 +210,15 @@ class TaskCreateEditViewModel @Inject constructor(
             if (project.value?.id != null) {
                 val response = taskRepository.createTask(
                     //todo shouldNot be null
-                    project.value?.id!!,
-                    TaskPost(
-                        description = description.value,
-                        deadline = SimpleDateFormat(FORMAT_API_DATE).format(endDate.value),
-                        title = title.value,
-                        responsibles = chosenUserList.value?.fromListUsersToStrings(),
-                        startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date()),
-                        milestoneid = milestone.value?.id ?: 0,
-                        priority = priorityToString(priority.value ?: 0)
+                    milestone.value?.id ?: 0,
+                    Task(
+                        id = 0,
+                        description = description.value?:"",
+                        deadline = endDate.value?: Date(),
+                        title = title.value?:"",
+                        projectOwner= project.value,
+                        responsibles = chosenUserList.value?: mutableListOf(),
+                        priority = priority.value
                     )
                 )
                 withContext(Dispatchers.Main) {
@@ -237,14 +236,14 @@ class TaskCreateEditViewModel @Inject constructor(
             val response = taskRepository.updateTask(
                 //todo shouldNot be null
                 taskId ?: 0,
-                TaskPost(
-                    description = description.value,
-                    deadline = SimpleDateFormat(FORMAT_API_DATE).format(endDate.value),
-                    title = title.value,
-                    responsibles = chosenUserList.value?.fromListUsersToStrings(),
-                    startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date()),
-                    milestoneid = milestone.value?.id ?: 0,
-                    priority = priorityToString(priority.value ?: 0)
+                Task(
+                    id = 0,
+                    description = description.value?:"",
+                    deadline = endDate.value?: Date(),
+                    title = title.value?:"",
+                    projectOwner= project.value,
+                    responsibles = chosenUserList.value?: mutableListOf(),
+                    priority = priority.value
                 ),
                 when (taskStatus.value) {
                     TaskStatus.ACTIVE -> "Open"

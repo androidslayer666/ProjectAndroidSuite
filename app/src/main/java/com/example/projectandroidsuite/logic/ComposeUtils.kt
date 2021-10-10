@@ -1,7 +1,6 @@
 package com.example.projectandroidsuite.logic
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -16,12 +15,9 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainWidth
 import coil.request.ImageRequest
-import com.example.domain.AuthCredentialsProvider
 import com.example.domain.repository.Failure
 import com.example.domain.repository.Result
 import com.example.domain.repository.Success
-import com.example.network.Constants.PORTAL_ADDRESS
-import com.example.network.Constants.USER_TOKEN
 
 
 enum class PickerType {

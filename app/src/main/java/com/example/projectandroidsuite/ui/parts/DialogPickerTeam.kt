@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.UserEntity
+import com.example.domain.model.User
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
@@ -20,9 +21,9 @@ import com.example.projectandroidsuite.ui.parts.customitems.DialogButtonRow
 
 @Composable
 fun TeamPickerDialog(
-    list: List<UserEntity>,
+    list: List<User>,
     onSubmit: () -> Unit,
-    onClick: (user: UserEntity) -> Unit,
+    onClick: (user: User) -> Unit,
     closeDialog: () -> Unit,
     pickerType: PickerType,
     searchString: String,
@@ -46,8 +47,8 @@ fun TeamPickerDialog(
 
 @Composable
 fun TeamPickerBody(
-    list: List<UserEntity>,
-    onClick: (name: UserEntity) -> Unit,
+    list: List<User>,
+    onClick: (name: User) -> Unit,
     pickerType: PickerType,
     searchString: String,
     onSearchChanged: (String) -> Unit,

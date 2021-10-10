@@ -5,6 +5,7 @@ import com.example.database.entities.ProjectEntity
 import com.example.domain.mappers.toListEntities
 import com.example.domain.mappers.toListUserEntity
 import com.example.domain.mappers.toProjectEntity
+import com.example.domain.model.Project
 import com.example.network.dto.ProjectDto
 import com.example.network.dto.ProjectPost
 import com.example.network.dto.ProjectStatusPost
@@ -17,21 +18,17 @@ import kotlinx.coroutines.launch
 interface ProjectRepository {
     suspend fun getProjects(): Result<String, String>
 
+    fun getProjectFromDbById(projectId: Int): Flow<Project?>
 
-
-    fun getProjectFromDbById(projectId: Int): Flow<ProjectEntity?>
-
-    fun getAllStoredProjects(): Flow<List<ProjectEntity>>
-
-    fun projectsFromDb(): Flow<List<ProjectEntity>>
+    fun getAllStoredProjects(): Flow<List<Project>>
 
     suspend fun updateProject(
         projectId: Int,
-        project: ProjectPost,
+        project: Project,
         projectStatus: String
     ): Result<String, String>
 
-    suspend fun createProject(project: ProjectPost): Result<String, String>
+    suspend fun createProject(project: Project): Result<String, String>
 
     suspend fun deleteProject(projectId: Int): Result<String, String>
 

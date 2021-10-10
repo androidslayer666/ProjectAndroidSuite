@@ -4,21 +4,15 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.CommentEntity
 import com.example.database.entities.MilestoneEntity
-import com.example.database.entities.TaskEntity
+import com.example.domain.model.Comment
+import com.example.domain.model.Milestone
 import com.example.domain.repository.*
-import com.example.network.dto.SubtaskPost
-import com.example.network.dto.TaskPost
-import com.example.projectandroidsuite.logic.Constants
-import com.example.projectandroidsuite.logic.TaskStatus
-import com.example.projectandroidsuite.logic.priorityToString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,7 +32,7 @@ class TaskDetailViewModel @Inject constructor(
 
     val taskMilestone = currentTask.switchMap { task ->
         if (task?.milestoneId != null) {
-            liveData<MilestoneEntity> { emit(milestoneRepository.getMilestoneById(task.milestoneId!!)) }
+            liveData<Milestone> { emit(milestoneRepository.getMilestoneById(task.milestoneId!!)) }
         } else liveData {}
     }
 
@@ -76,20 +70,10 @@ class TaskDetailViewModel @Inject constructor(
         }
     }
 
-    fun addCommentToTask(comment: CommentEntity) {
+    fun addCommentToTask(comment: Comment) {
         //Log.d("ProjectDetailViewModel", comment.toString())
         CoroutineScope(IO).launch {
             val result = commentRepository.putCommentToTask(taskId.value ?: 0, comment)
-            if (result is Success) {
-                //Log.d("ProjectDetailViewModel", projectId.value.toString())
-                taskId.value?.let { commentRepository.populateCommentsWithTaskId(it) }
-            }
-        }
-    }
-
-    fun addSubtaskToTask(subtask: SubtaskPost) {
-        CoroutineScope(IO).launch {
-            val result = taskRepository.createSubtask(taskId.value ?: 0, subtask)
             if (result is Success) {
                 //Log.d("ProjectDetailViewModel", projectId.value.toString())
                 taskId.value?.let { commentRepository.populateCommentsWithTaskId(it) }
@@ -101,7 +85,7 @@ class TaskDetailViewModel @Inject constructor(
         _taskDeletionStatus.value = null
     }
 
-    fun deleteComment(commentEntity: CommentEntity) {
+    fun deleteComment(commentEntity: Comment) {
         CoroutineScope(IO).launch {
             commentRepository.deleteComment(commentEntity.id, taskId.value ?: 0)
         }

@@ -2,7 +2,7 @@ package com.example.domain.di
 
 import android.content.Context
 import com.example.domain.AuthCredentialsProvider
-import com.example.domain.repository.AuthRepositoryImpl
+import com.example.domain.repositoryimpl.AuthRepositoryImpl
 import com.example.network.buildEndPoint
 import com.example.network.endpoints.*
 import dagger.Module

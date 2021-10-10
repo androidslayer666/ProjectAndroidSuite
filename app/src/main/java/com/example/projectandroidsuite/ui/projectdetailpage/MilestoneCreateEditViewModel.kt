@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.MilestoneEntity
 import com.example.database.entities.UserEntity
+import com.example.domain.model.Milestone
+import com.example.domain.model.User
 import com.example.domain.repository.*
-import com.example.network.dto.MilestonePost
-import com.example.projectandroidsuite.logic.*
-
+import com.example.projectandroidsuite.logic.UserFilter
+import com.example.projectandroidsuite.logic.combineWith
+import com.example.projectandroidsuite.logic.filterUsersByFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
@@ -19,15 +21,14 @@ import javax.inject.Inject
 @HiltViewModel
 class MilestoneCreateEditViewModel @Inject constructor(
     private val teamRepository: TeamRepository,
-    private val taskRepository: TaskRepository,
     private val projectRepository: ProjectRepository,
     private val milestoneRepository: MilestoneRepository
 ) : ViewModel() {
 
     private var projectId: Int? = null
 
-    private var _milestone = MutableLiveData<MilestoneEntity>()
-    val milestone: LiveData<MilestoneEntity> = _milestone
+    private var _milestone = MutableLiveData<Milestone>()
+    val milestone: LiveData<Milestone> = _milestone
 
     private var _title = MutableLiveData("")
     val title: LiveData<String> = _title
@@ -38,15 +39,15 @@ class MilestoneCreateEditViewModel @Inject constructor(
     private var _priority = MutableLiveData(false)
     val priority: LiveData<Boolean?> = _priority
 
-    private var _responsible = MutableLiveData<UserEntity?>()
-    val responsible: LiveData<UserEntity?> = _responsible
+    private var _responsible = MutableLiveData<User?>()
+    val responsible: LiveData<User?> = _responsible
 
     private var userSearch = MutableLiveData<UserFilter>()
 
     private var _userSearchQuery = MutableLiveData<String>()
     val userSearchQuery: LiveData<String> = _userSearchQuery
 
-    private var _endDate = MutableLiveData<Date>(Date())
+    private var _endDate = MutableLiveData(Date())
     val endDate: LiveData<Date> = _endDate
 
     private var _milestoneCreationStatus = MutableLiveData<Result<String, String>?>()
@@ -69,7 +70,7 @@ class MilestoneCreateEditViewModel @Inject constructor(
         }
     }
 
-    fun setMilestone(milestone: MilestoneEntity) {
+    fun setMilestone(milestone: Milestone) {
         _milestone.value = milestone
         _title.value = milestone.title
         _priority.value = milestone.isKey
@@ -95,7 +96,7 @@ class MilestoneCreateEditViewModel @Inject constructor(
         _endDate.value = date
     }
 
-    fun setResponsible(user: UserEntity) {
+    fun setResponsible(user: User) {
         //Log.d("ProjectCreateEditodel", "setting the manager" + user.toString())
         _responsible.value = user
     }
@@ -127,12 +128,13 @@ class MilestoneCreateEditViewModel @Inject constructor(
             val response = milestoneRepository.putMilestoneToProject(
                 //todo shouldNot be null
                 projectId ?: 0,
-                MilestonePost(
+                Milestone(
+                    id =0,
                     title = title.value ?: "",
-                    responsible = responsible.value?.id,
+                    responsible = responsible.value,
                     description = description.value,
                     isKey = priority.value,
-                    deadline = endDate.value?.dateToString(),
+                    deadline = endDate.value,
                 )
             )
             withContext(Dispatchers.Main) {
@@ -147,7 +149,7 @@ class MilestoneCreateEditViewModel @Inject constructor(
             val response = milestoneRepository.updateMilestoneToProject(
                 //todo shouldNot be null
                 projectId ?: 0,
-                MilestoneEntity(
+                Milestone(
                     title = title.value ?: "",
                     responsible = responsible.value,
                     description = description.value,

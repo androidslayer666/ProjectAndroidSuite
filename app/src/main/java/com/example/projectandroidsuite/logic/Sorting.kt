@@ -2,12 +2,14 @@ package com.example.projectandroidsuite.logic
 
 import com.example.database.entities.ProjectEntity
 import com.example.database.entities.TaskEntity
+import com.example.domain.model.Project
+import com.example.domain.model.Task
 
 enum class ProjectSorting {
     STAGE_ASC, STAGE_DESC, CREATED_ASC, CREATED_DESC
 }
 
-fun List<ProjectEntity>.sortProjects(sorting: ProjectSorting?): List<ProjectEntity> {
+fun List<Project>.sortProjects(sorting: ProjectSorting?): List<Project> {
     return if (sorting != null)
         when (sorting) {
             ProjectSorting.STAGE_ASC -> this.sortedBy { it.status }
@@ -26,7 +28,7 @@ enum class TaskSorting {
 }
 
 
-fun List<TaskEntity>.sortTasks(sorting: TaskSorting?): List<TaskEntity> {
+fun List<Task>.sortTasks(sorting: TaskSorting?): List<Task> {
     return if (sorting != null)
         when (sorting) {
             TaskSorting.STAGE_ASC -> this.sortedBy { it.status }

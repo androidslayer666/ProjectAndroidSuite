@@ -3,6 +3,7 @@ package com.example.projectandroidsuite.ui.projectpage
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.UserEntity
+import com.example.domain.model.User
 import com.example.domain.repository.Failure
 import com.example.domain.repository.ProjectRepository
 import com.example.domain.repository.TaskRepository
@@ -28,11 +29,11 @@ class ProjectViewModel @Inject constructor(
     private var _stageFroFilteringTask = MutableLiveData<TaskStatus?>()
     val stageForFilteringTask: LiveData<TaskStatus?> = _stageFroFilteringTask
 
-    private var _userForFilteringProject = MutableLiveData<UserEntity?>()
-    val userForFilteringProject: LiveData<UserEntity?> = _userForFilteringProject
+    private var _userForFilteringProject = MutableLiveData<User?>()
+    val userForFilteringProject: LiveData<User?> = _userForFilteringProject
 
-    private var _userForFilteringTask = MutableLiveData<UserEntity?>()
-    val userForFilteringTask: LiveData<UserEntity?> = _userForFilteringTask
+    private var _userForFilteringTask = MutableLiveData<User?>()
+    val userForFilteringTask: LiveData<User?> = _userForFilteringTask
 
     private var userSearch = MutableLiveData<UserFilter>()
 
@@ -54,7 +55,7 @@ class ProjectViewModel @Inject constructor(
 
 
     val projects =
-        repository.projectsFromDb().asLiveData().combineWith(projectFilter) { listProjects, filter ->
+        repository.getAllStoredProjects().asLiveData().combineWith(projectFilter) { listProjects, filter ->
                 if (filter != null) {
                     listProjects?.filterProjectsByFilter(filter)
                 } else {
@@ -107,7 +108,7 @@ class ProjectViewModel @Inject constructor(
         userSearch.value = UserFilter(query)
     }
 
-    fun setUserForFilteringProject(user: UserEntity) {
+    fun setUserForFilteringProject(user: User) {
         _userForFilteringProject.value = user
         if(projectFilter.value != null){
             projectFilter.value!!.responsible = user.id
@@ -117,7 +118,7 @@ class ProjectViewModel @Inject constructor(
         }
     }
 
-    fun setUserForFilteringTask(user: UserEntity) {
+    fun setUserForFilteringTask(user: User) {
         _userForFilteringTask.value = user
         if(taskFilter.value != null){
             taskFilter.value!!.responsible = user.id

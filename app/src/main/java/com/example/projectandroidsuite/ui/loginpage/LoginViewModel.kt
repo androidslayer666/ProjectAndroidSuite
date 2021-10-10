@@ -7,18 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.AuthCredentialsProvider
 import com.example.domain.repository.AuthRepository
-import com.example.domain.repository.AuthRepositoryImpl
-import com.example.network.dto.auth.LoginRequest
-import com.example.network.dto.auth.LoginResponse
-import com.example.network.services.ApiClientAuth
 import com.example.projectandroidsuite.logic.validateEmail
 import com.example.projectandroidsuite.logic.validatePassword
 import com.example.projectandroidsuite.logic.validatePortalNameInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -90,30 +83,7 @@ class LoginViewModel @Inject constructor(
     }
 
     fun tryIfPortalExists() {
-        val apiClient = ApiClientAuth()
-        Log.d("LoginViewModel", "try portal")
-        portalAddress.value?.toString()?.let { Log.d("LoginViewModel", it) }
-        apiClient.getApiService(portalAddress.value?.trim() ?: "")
-            .tryLogin()
-            .enqueue(
-                (object : Callback<LoginResponse> {
-                    override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                        Log.d("LoginViewModel", t.toString())
-                        if (inputPortalValidated.value == true)
-                            _canConnectToPortal.value = false
-                    }
-
-                    override fun onResponse(
-                        call: Call<LoginResponse>,
-                        response: Response<LoginResponse>
-                    ) {
-                        Log.d("LoginViewModel", response.toString())
-                        if (response.code() == 401) {
-                            _canConnectToPortal.value = true
-                        }
-                    }
-                })
-            )
+        //todo implement based on capabilities
     }
 
     fun authenticate(
@@ -133,10 +103,10 @@ class LoginViewModel @Inject constructor(
                 authRepository.rememberPortalAddress(portalAddress.value!!)
                 Log.d("LoginFragment", "all is well")
                 authRepository.authenticate(
-                    LoginRequest(
+
                         emailInput.value!!,
                         passwordInput.value!!
-                    )
+
                 )
 
                 onCompleteLogin()

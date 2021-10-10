@@ -3,6 +3,7 @@ package com.example.projectandroidsuite.ui.search
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.database.entities.MilestoneEntity
+import com.example.domain.model.Milestone
 import com.example.domain.repository.FileRepository
 import com.example.domain.repository.MilestoneRepository
 import com.example.domain.repository.ProjectRepository
@@ -45,7 +46,7 @@ class SearchViewModel @Inject constructor(
         //todo implement population on the repository side
 
     val milestones = projectRepository.getAllStoredProjects().asLiveData().switchMap { projects ->
-        val listMilestones = mutableListOf<MilestoneEntity>()
+        val listMilestones = mutableListOf<Milestone>()
         viewModelScope.launch {
             projects.forEach { project ->
                 milestoneRepository.getMilestonesByProjectFlow(project.id).collectLatest { milestones ->

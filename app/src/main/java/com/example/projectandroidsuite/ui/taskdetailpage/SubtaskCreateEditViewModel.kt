@@ -2,24 +2,22 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.database.entities.ProjectEntity
 import com.example.database.entities.SubtaskEntity
 import com.example.database.entities.UserEntity
-import com.example.domain.repository.*
-import com.example.network.dto.SubtaskPost
-import com.example.network.dto.TaskPost
-import com.example.projectandroidsuite.logic.Constants.FORMAT_API_DATE
-import com.example.projectandroidsuite.logic.*
-
-import com.example.projectandroidsuite.ui.*
-
+import com.example.domain.model.Subtask
+import com.example.domain.model.User
+import com.example.domain.repository.ProjectRepository
+import com.example.domain.repository.Result
+import com.example.domain.repository.TaskRepository
+import com.example.domain.repository.TeamRepository
+import com.example.projectandroidsuite.logic.UserFilter
+import com.example.projectandroidsuite.logic.combineWith
+import com.example.projectandroidsuite.logic.filterUsersByFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,8 +32,8 @@ class SubtaskCreateEditViewModel @Inject constructor(
     private var _title = MutableLiveData("")
     val title: LiveData<String> = _title
 
-    private var _responsible = MutableLiveData<UserEntity?>()
-    val responsible: LiveData<UserEntity?> = _responsible
+    private var _responsible = MutableLiveData<User?>()
+    val responsible: LiveData<User?> = _responsible
 
     private var userSearch = MutableLiveData<UserFilter>()
 
@@ -59,11 +57,10 @@ class SubtaskCreateEditViewModel @Inject constructor(
         viewModelScope.launch(IO) {
             teamRepository.populateAllPortalUsers()
             projectRepository.getProjects()
-            //if(projectResponse is Failure<String>) _problemWithFetchingProjects.value = projectResponse.reason!!
         }
     }
 
-    fun setSubtask(subtask: SubtaskEntity) {
+    fun setSubtask(subtask: Subtask) {
         //Log.d("setTask", task.toString())
         taskId = subtask.id
         _title.value = subtask.title
@@ -75,13 +72,12 @@ class SubtaskCreateEditViewModel @Inject constructor(
         _title.value = string
     }
 
-    fun setTaskId(taskId: Int){
+    fun setTaskId(taskId: Int) {
         this.taskId = taskId
     }
 
 
-    fun setResponsible(user: UserEntity) {
-        //Log.d("ProjectCreateEditodel", "setting the manager" + user.toString())
+    fun setResponsible(user: User) {
         _responsible.value = user
     }
 
@@ -99,37 +95,20 @@ class SubtaskCreateEditViewModel @Inject constructor(
             UserFilter(query)
     }
 
-
     fun createSubtask() {
         viewModelScope.launch(IO) {
             val response = taskRepository.createSubtask(
-                //todo shouldNot be null
-                taskId ?: 0,
-                SubtaskPost(
+                Subtask(
+                    id = 0,
                     title = title.value ?: "",
-                    responsible = responsible.value?.id ?: ""
+                    responsible = responsible.value,
+                    taskId = taskId ?: 0
                 )
             )
             withContext(Dispatchers.Main) {
                 Log.d("", response.toString())
                 _subtaskCreationStatus.value = response
             }
+        }
     }
 }
-
-fun updateSubtask() {
-    viewModelScope.launch(IO) {
-//        val response = taskRepository.updateTask(
-//            //todo shouldNot be null
-//            taskId ?: 0,
-//            TaskPost(
-//                title = title.value,
-//            )
-//        )
-//        withContext(Dispatchers.Main) {
-//            _subtaskUpdatingStatus.value = response
-//        }
-    }
-}
-}
-

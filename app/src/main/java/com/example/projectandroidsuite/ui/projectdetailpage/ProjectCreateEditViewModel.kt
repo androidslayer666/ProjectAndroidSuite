@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.ProjectEntity
 import com.example.database.entities.UserEntity
+import com.example.domain.model.Project
+import com.example.domain.model.User
 import com.example.domain.repository.*
-import com.example.network.dto.ProjectPost
+
 import com.example.projectandroidsuite.logic.*
 
 import com.example.projectandroidsuite.ui.*
@@ -32,11 +34,11 @@ class ProjectCreateEditViewModel @Inject constructor(
     private var _description = MutableLiveData("")
     val description: LiveData<String> = _description
 
-    private var _chosenUserList = MutableLiveData<MutableList<UserEntity>>(mutableListOf())
-    val chosenUserList: LiveData<MutableList<UserEntity>> = _chosenUserList
+    private var _chosenUserList = MutableLiveData<MutableList<User>>(mutableListOf())
+    val chosenUserList: LiveData<MutableList<User>> = _chosenUserList
 
-    private var _responsible = MutableLiveData<UserEntity?>()
-    val responsible: LiveData<UserEntity?> = _responsible
+    private var _responsible = MutableLiveData<User?>()
+    val responsible: LiveData<User?> = _responsible
 
     private var userSearch = MutableLiveData<UserFilter>()
 
@@ -71,7 +73,7 @@ class ProjectCreateEditViewModel @Inject constructor(
         }
     }
 
-    fun setProject(project: ProjectEntity) {
+    fun setProject(project: Project) {
         //Log.d("setTask", project.toString())
         projectId = project.id
         _title.value = project.title
@@ -95,7 +97,7 @@ class ProjectCreateEditViewModel @Inject constructor(
         _description.value = string
     }
 
-    fun setResponsible(user: UserEntity) {
+    fun setResponsible(user: User) {
         //Log.d("ProjectCreateEditodel", "setting the manager" + user.toString())
         _responsible.value = user
     }
@@ -114,7 +116,7 @@ class ProjectCreateEditViewModel @Inject constructor(
         _projectUpdatingStatus.value = null
     }
 
-    fun addOrRemoveUser(user: UserEntity) {
+    fun addOrRemoveUser(user: User) {
         //Log.d("addOrRemoveUser", user.toString())
         val listIds = _chosenUserList.value!!.getListIds()
         if (listIds.contains(user.id)) {
@@ -137,11 +139,12 @@ class ProjectCreateEditViewModel @Inject constructor(
     fun createProject() {
         CoroutineScope(IO).launch {
             val response = projectRepository.createProject(
-                ProjectPost(
-                    title = title.value,
-                    description = description.value,
-                    participants = chosenUserList.value?.fromListUsersToStrings(),
-                    responsibleId = responsible.value?.id
+                Project(
+                    id =0,
+                    title = title.value?:"",
+                    description = description.value?:"",
+                    team = chosenUserList.value,
+                    responsible = responsible.value
                 )
             )
             withContext(Main) {
@@ -157,11 +160,12 @@ class ProjectCreateEditViewModel @Inject constructor(
             val response = projectRepository.updateProject(
                 //todo should not be null
                 projectId ?: 0,
-                ProjectPost(
-                    title = title.value,
-                    description = description.value,
-                    participants = chosenUserList.value?.fromListUsersToStrings(),
-                    responsibleId = responsible.value?.id
+                Project(
+                    id =0,
+                    title = title.value?:"",
+                    description = description.value?:"",
+                    team = chosenUserList.value,
+                    responsible = responsible.value
                 ),
                 when (projectStatus.value) {
                     ProjectStatus.ACTIVE -> "open"

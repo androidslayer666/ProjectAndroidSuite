@@ -5,7 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.database.entities.UserEntity
-import com.example.domain.repository.AuthRepositoryImpl
+import com.example.domain.model.User
+import com.example.domain.repositoryimpl.AuthRepositoryImpl
 import com.example.domain.repository.TeamRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.Main
@@ -19,8 +20,8 @@ class ScaffoldViewModel @Inject constructor(
     private val authRepository: AuthRepositoryImpl
 ) :ViewModel(){
 
-    private var _self = MutableLiveData<UserEntity>()
-    val self: LiveData<UserEntity> = _self
+    private var _self = MutableLiveData<User>()
+    val self: LiveData<User> = _self
 
     init{
         getSelf()

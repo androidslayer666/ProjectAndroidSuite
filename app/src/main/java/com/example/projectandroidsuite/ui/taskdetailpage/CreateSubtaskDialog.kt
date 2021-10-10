@@ -6,6 +6,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.SubtaskEntity
+import com.example.domain.model.Subtask
 import com.example.domain.repository.Success
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
@@ -19,7 +20,7 @@ fun CreateSubtaskDialog(
     taskId: Int,
     viewModel: SubtaskCreateEditViewModel,
     closeDialog: () -> Unit,
-    subtask: SubtaskEntity? = null,
+    subtask: Subtask? = null,
     onSubtaskDeletedOrEdited: (String) -> Unit = { },
     onDeleteClick: (() -> Unit)? = null
 ) {
@@ -48,13 +49,7 @@ fun CreateSubtaskDialog(
         show = true,
         hide = { closeDialog() },
         text = "Create Subtask",
-        onSubmit = {
-            if (subtask == null) {
-                viewModel.createSubtask()
-            } else {
-                viewModel.updateSubtask()
-            }
-        },
+        onSubmit = {viewModel.createSubtask()},
         onDeleteClick = onDeleteClick
 
     ) {

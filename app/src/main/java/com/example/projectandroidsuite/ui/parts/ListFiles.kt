@@ -17,10 +17,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.FileEntity
+import com.example.domain.model.File
 import com.example.projectandroidsuite.R
 
 @Composable
-fun ListFiles(listFiles: List<FileEntity>) {
+fun ListFiles(listFiles: List<File>) {
     LazyColumn {
         items(listFiles) { file ->
             Row(Modifier.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {

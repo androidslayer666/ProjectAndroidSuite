@@ -5,6 +5,7 @@ import com.example.database.entities.CommentEntity
 import com.example.database.entities.ProjectEntity
 import com.example.database.entities.TaskEntity
 import com.example.database.entities.UserEntity
+import com.example.domain.model.User
 import com.example.network.dto.CommentDto
 import com.example.network.dto.MessageDto
 import com.example.network.dto.MilestoneDto
@@ -90,7 +91,7 @@ data class Success<out Success>(val value: Success) : Result<Success, Nothing>()
 data class Failure<out Failure>(val reason: Failure) : Result<Nothing, Failure>()
 
 
-fun List<UserEntity>.fromListUsersToStrings(): List<String> {
+fun List<User>.fromListUsersToStrings(): List<String> {
     val listString = mutableListOf<String>()
     for (user in this) {
         listString.add(user.id)
@@ -119,7 +120,7 @@ fun Date.dateToString(): String {
     return SimpleDateFormat(FORMAT_API_DATE).format(this)
 }
 
-fun List<UserEntity>.toStringIds(): String {
+fun List<User>.toStringIds(): String {
     var string = ""
     this.map {
         string += it.id + ","

@@ -7,7 +7,9 @@ import androidx.lifecycle.MutableLiveData
 import com.example.database.entities.MilestoneEntity
 import com.example.database.entities.TaskEntity
 import com.example.database.entities.UserEntity
-
+import com.example.domain.model.Milestone
+import com.example.domain.model.Task
+import com.example.domain.model.User
 
 
 fun validatePortalNameInput(input: String): Boolean {
@@ -35,7 +37,7 @@ fun validatePassword(input: String): Boolean {
 }
 
 
-fun List<UserEntity>.getListIds(): List<String> {
+fun List<User>.getListIds(): List<String> {
     val listIds = mutableListOf<String>()
     for (user in this) {
         listIds.add(user.id)
@@ -43,7 +45,7 @@ fun List<UserEntity>.getListIds(): List<String> {
     return listIds
 }
 
-fun List<UserEntity>.getUserById(id: String): UserEntity? {
+fun List<User>.getUserById(id: String): User? {
     for (user in this) {
         if (user.id == id) return user
     }
@@ -73,13 +75,13 @@ fun <T, K, R> LiveData<T>.combineWith(
 
 
 fun arrangeMilestonesAndTasks(
-    listMilestones: List<MilestoneEntity>,
-    listTasks: List<TaskEntity>
-): Map<MilestoneEntity?, List<TaskEntity>> {
-    val map = mutableMapOf<MilestoneEntity?, List<TaskEntity>>()
-    val listTasksWithoutMilestone = mutableListOf<TaskEntity>()
+    listMilestones: List<Milestone>,
+    listTasks: List<Task>
+): Map<Milestone?, List<Task>> {
+    val map = mutableMapOf<Milestone?, List<Task>>()
+    val listTasksWithoutMilestone = mutableListOf<Task>()
     for (milestone in listMilestones) {
-        val listTasksWithMilestone = mutableListOf<TaskEntity>()
+        val listTasksWithMilestone = mutableListOf<Task>()
         for (task in listTasks) {
             if (task.milestoneId == milestone.id) {
                 listTasksWithMilestone.add(task)
@@ -95,10 +97,3 @@ fun arrangeMilestonesAndTasks(
     return map
 }
 
-fun priorityToString(value : Int) : String {
-    return when(value) {
-        0 -> "normal"
-        1 -> "high"
-        else -> "normal"
-    }
-}

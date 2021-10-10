@@ -18,14 +18,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.ProjectEntity
+import com.example.domain.model.Project
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 
 @Composable
 fun ProjectPickerDialog(
-    list: List<ProjectEntity>,
+    list: List<Project>,
     onSubmit: () -> Unit,
-    onClick: (user: ProjectEntity) -> Unit,
+    onClick: (user: Project) -> Unit,
     closeDialog: () -> Unit,
     ifChooseResponsibleOrTeam: PickerType,
     searchString: String,
@@ -51,8 +52,8 @@ fun ProjectPickerDialog(
 
 @Composable
 fun ProjectPickerBody(
-    list: List<ProjectEntity>,
-    onClick: (project: ProjectEntity) -> Unit,
+    list: List<Project>,
+    onClick: (project: Project) -> Unit,
     ifChooseResponsibleOrTeam: PickerType,
     searchString: String,
     onSearchChanged: (String) -> Unit,

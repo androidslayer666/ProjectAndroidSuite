@@ -1,17 +1,20 @@
-package com.example.domain.repository
+package com.example.domain.repositoryimpl
 
 import android.util.Log
 import com.example.database.dao.CommentDao
 import com.example.database.dao.MessageDao
 import com.example.database.entities.MessageEntity
 import com.example.database.entities.UserEntity
+import com.example.domain.mappers.fromListMessageEntitiesToListMessages
 import com.example.domain.mappers.toEntity
 import com.example.domain.mappers.toListEntities
 import com.example.domain.mappers.toMessagePost
-import com.example.network.dto.MessageDto
+import com.example.domain.model.Message
+import com.example.domain.model.User
+import com.example.domain.repository.*
 import com.example.network.endpoints.*
 import kotlinx.coroutines.flow.Flow
-import retrofit2.http.Path
+import kotlinx.coroutines.flow.transform
 import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,7 +26,7 @@ class MessageRepositoryImpl @Inject constructor(
     private val commentEndPoint: CommentEndPoint,
     private val commentDao: CommentDao,
     private val commentRepository: CommentRepository
-) : MessageRepository{
+) : MessageRepository {
 
     override suspend fun populateMessageWithProjectId(projectId: Int): Result<String, String> {
         try {
@@ -73,15 +76,15 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getMessagesByProjectId(projectId: Int): Flow<List<MessageEntity>> {
-        return messageDao.getMessageByProjectIdFlow(projectId)
+    override fun getMessagesByProjectId(projectId: Int): Flow<List<Message>> {
+        return messageDao.getMessageByProjectIdFlow(projectId).transform { emit(it.fromListMessageEntitiesToListMessages()) }
     }
 
 
     override suspend fun putMessageToProject(
         projectId: Int,
-        message: MessageEntity,
-        participants: List<UserEntity>
+        message: Message,
+        participants: List<User>
     ): Result<String, String> {
         Log.d("ProjectRepository", "Started creating message  $message")
 
@@ -95,8 +98,8 @@ class MessageRepositoryImpl @Inject constructor(
 
     override suspend fun updateMessage(
         projectId: Int,
-        message: MessageEntity,
-        participants: List<UserEntity>
+        message: Message,
+        participants: List<User>
     ): Result<String, String> {
         Log.d("ProjectRepository", "Started creating message  $message")
 
@@ -109,7 +112,7 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun deleteMessage( messageId: Int): Result<String, String>{
+    override suspend fun deleteMessage( messageId: Int): Result<String, String> {
 
         return networkCaller(
             call = { messageEndPoint.deleteMessage(messageId) },

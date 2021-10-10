@@ -1,23 +1,21 @@
-package com.example.domain.repository
+package com.example.domain.repositoryimpl
 
 import android.util.Log
-import com.example.database.dao.TaskDao
-import com.example.database.dao.TeamDao
 import com.example.database.dao.UserDao
-import com.example.database.entities.TaskOrMilestoneEntity
 import com.example.database.entities.UserEntity
-import com.example.domain.mappers.toListEntities
+import com.example.domain.mappers.fromListUserEntitiesToListUsers
+import com.example.domain.mappers.fromUserEntityToUser
 import com.example.domain.mappers.toListUserEntity
 import com.example.domain.mappers.toUserEntity
-import com.example.network.dto.Team
+import com.example.domain.model.User
+import com.example.domain.repository.Failure
+import com.example.domain.repository.Result
+import com.example.domain.repository.Success
+import com.example.domain.repository.TeamRepository
 import com.example.network.dto.UserDto
-import com.example.network.dto.UserTransporter
-import com.example.network.endpoints.MilestoneEndPoint
-import com.example.network.endpoints.TaskEndPoint
 import com.example.network.endpoints.TeamEndPoint
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,7 +23,7 @@ import javax.inject.Singleton
 class TeamRepositoryImpl @Inject constructor(
     private val teamEndPoint: TeamEndPoint,
     private val userDao: UserDao
-) : TeamRepository{
+) : TeamRepository {
 
     override suspend fun populateAllPortalUsers() : Result<String, String> {
         try {
@@ -48,9 +46,11 @@ class TeamRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAllPortalUsers() = userDao.getAll()
+    override fun getAllPortalUsers(): Flow<List<User>> {
+        return userDao.getAll().transform { emit(it.fromListUserEntitiesToListUsers()) }
+        }
 
-    override suspend fun getSelfProfile(): UserEntity? {
-        return teamEndPoint.getSelfProfile().user?.toUserEntity()
+    override suspend fun getSelfProfile(): User? {
+        return teamEndPoint.getSelfProfile().user?.toUserEntity()?.fromUserEntityToUser()
     }
 }

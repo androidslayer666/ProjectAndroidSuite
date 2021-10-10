@@ -18,6 +18,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.database.entities.MilestoneEntity
 import com.example.database.entities.TaskEntity
+import com.example.domain.model.Milestone
+import com.example.domain.model.Task
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.DrawSideLine
 import com.example.projectandroidsuite.ui.projectdetailpage.CreateMilestoneDialog
@@ -26,9 +28,9 @@ import com.example.projectandroidsuite.ui.projectpage.TaskItem
 
 @Composable
 fun ListTasksMilestones(
-    listTasksAndMilestones: Map<MilestoneEntity?, List<TaskEntity>>?,
+    listTasksAndMilestones: Map<Milestone?, List<Task>>?,
     navController: NavHostController,
-    onEditMilestone: (milestone: MilestoneEntity?) -> Unit = {},
+    onEditMilestone: (milestone: Milestone?) -> Unit = {},
 ) {
     listTasksAndMilestones?.let {
         LazyColumn() {

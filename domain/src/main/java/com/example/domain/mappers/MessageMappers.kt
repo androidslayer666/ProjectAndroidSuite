@@ -2,6 +2,9 @@ package com.example.domain.mappers
 
 import com.example.database.entities.MessageEntity
 import com.example.database.entities.UserEntity
+import com.example.domain.model.File
+import com.example.domain.model.Message
+import com.example.domain.model.User
 import com.example.domain.repository.toStringIds
 import com.example.network.dto.MessageDto
 import com.example.network.dto.MessagePost
@@ -36,11 +39,38 @@ fun MessageDto.toEntity(projectId: Int): MessageEntity {
     )
 }
 
-fun MessageEntity.toMessagePost(projectId: Int? = 0,participants: List<UserEntity>): MessagePost {
+fun Message.toMessagePost(projectId: Int? = 0,participants: List<User>): MessagePost {
     return MessagePost(
         title = this.title,
         content = this.description,
         projectId = projectId,
         participants = participants.toStringIds()
+    )
+}
+
+
+fun List<MessageEntity>.fromListMessageEntitiesToListMessages(): MutableList<Message> {
+    val listFiles = mutableListOf<Message>()
+    listFiles.addAll(this.map { it.fromMessageEntityToMessage() })
+    return listFiles
+}
+
+
+fun MessageEntity.fromMessageEntityToMessage() : Message {
+    return Message(
+        id = this.id,
+        canEdit = this.canEdit,
+        created = this.created,
+        createdBy = this.createdBy?.fromUserEntityToUser(),
+        text = this.text ?: "",
+        updated = this.updated,
+        canCreateComment = this.canCreateComment,
+        commentsCount = this.commentsCount,
+        projectId = projectId,
+        description = this.description,
+        projectOwner = this.projectOwner?.fromUserEntityToUser(),
+        status = this.status,
+        title = this.title ?: "",
+        updatedBy = this.updatedBy?.fromUserEntityToUser()
     )
 }

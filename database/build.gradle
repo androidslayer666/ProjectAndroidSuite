@@ -34,8 +34,6 @@ android {
 }
 
 dependencies {
-    implementation( project(":network"))
-
     sharedGroupLifecycle dependencies
     sharedGroupHilt dependencies
     sharedGroupRoom dependencies

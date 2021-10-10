@@ -13,12 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.database.entities.MilestoneEntity
+import com.example.domain.model.Milestone
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 
 @Composable
 fun DialogPickerMilestone(
-    list: List<MilestoneEntity>,
-    onClick: (user: MilestoneEntity) -> Unit,
+    list: List<Milestone>,
+    onClick: (user: Milestone) -> Unit,
     closeDialog: () -> Unit
 ) {
     CustomDialog(
@@ -36,8 +37,8 @@ fun DialogPickerMilestone(
 
 @Composable
 fun PickerMilestoneBody(
-    list: List<MilestoneEntity>,
-    onClick: (project: MilestoneEntity) -> Unit
+    list: List<Milestone>,
+    onClick: (project: Milestone) -> Unit
 ) {
 if(list.isNotEmpty())
         LazyColumn {

@@ -1,13 +1,21 @@
-package com.example.domain.repository
+package com.example.domain.repositoryimpl
 
 import android.util.Log
 import com.example.database.dao.MilestoneDao
 import com.example.database.entities.MilestoneEntity
+import com.example.domain.mappers.fromListMilestoneEntitiesToListMilestone
+import com.example.domain.mappers.fromMilestoneEntityToMilestone
 import com.example.domain.mappers.toListEntities
 import com.example.domain.mappers.toMilestonePost
+import com.example.domain.model.Milestone
+import com.example.domain.repository.MilestoneRepository
+import com.example.domain.repository.Result
+import com.example.domain.repository.networkCaller
+import com.example.domain.repository.toListMilestoneIds
 import com.example.network.dto.MilestonePost
 import com.example.network.endpoints.MilestoneEndPoint
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
 import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,7 +24,7 @@ import javax.inject.Singleton
 class MilestoneRepositoryImpl @Inject constructor(
     private val milestoneEndPoint: MilestoneEndPoint,
     private val milestoneDao: MilestoneDao
-) : MilestoneRepository{
+) : MilestoneRepository {
 
     override suspend fun populateMilestonesByProject(projectId: Int) {
         try {
@@ -36,23 +44,22 @@ class MilestoneRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getMilestonesByProjectFlow(projectId: Int): Flow<List<MilestoneEntity>> {
-        return milestoneDao.getMilestonesByProjectIdFlow(projectId)
+    override fun getMilestonesByProjectFlow(projectId: Int): Flow<List<Milestone>> {
+        return milestoneDao.getMilestonesByProjectIdFlow(projectId).transform { emit(it.fromListMilestoneEntitiesToListMilestone()) }
     }
 
-    override suspend fun getMilestoneById(milestoneId: Int): MilestoneEntity {
-        return milestoneDao.getMilestoneById(milestoneId)
+    override suspend fun getMilestoneById(milestoneId: Int): Milestone {
+        return milestoneDao.getMilestoneById(milestoneId).fromMilestoneEntityToMilestone()
     }
-
 
     override suspend fun putMilestoneToProject(
         projectId: Int,
-        milestone: MilestonePost
+        milestone: Milestone
     ): Result<String, String> {
-        Log.d("MilestoneRepository", "Started creating milestone  ${milestone}")
+        Log.d("MilestoneRepository", "Started creating milestone  ${milestone.toMilestonePost()}")
 
         return networkCaller(
-            call = { milestoneEndPoint.putMilestoneToProject(projectId, milestone) },
+            call = { milestoneEndPoint.putMilestoneToProject(projectId, milestone.toMilestonePost()) },
             onSuccess = { populateMilestonesByProject(projectId) },
             onSuccessString = "Milestone added successfully",
             onFailureString = "Having problem while creating the milestone, please check the network connection"
@@ -75,7 +82,7 @@ class MilestoneRepositoryImpl @Inject constructor(
 
     override suspend fun updateMilestoneToProject(
         projectId: Int,
-        milestone: MilestoneEntity
+        milestone: Milestone
     ): Result<String, String> {
         Log.d("MilestoneRepository", "Started creating with ${milestone.id}  milestone  ${milestone.toMilestonePost()}")
         return networkCaller(
