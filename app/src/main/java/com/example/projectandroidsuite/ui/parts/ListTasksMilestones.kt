@@ -16,8 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.database.entities.MilestoneEntity
-import com.example.database.entities.TaskEntity
 import com.example.domain.model.Milestone
 import com.example.domain.model.Task
 import com.example.projectandroidsuite.R
@@ -33,10 +31,10 @@ fun ListTasksMilestones(
     onEditMilestone: (milestone: Milestone?) -> Unit = {},
 ) {
     listTasksAndMilestones?.let {
-        LazyColumn() {
-            items(listTasksAndMilestones.keys.toList()) { milestone ->
+        LazyColumn {
+            items(it.keys.toList()) { milestone ->
                 var showButtons by remember { mutableStateOf(false) }
-                var showDeleteDialog by remember { mutableStateOf(false) }
+//                var showDeleteDialog by remember { mutableStateOf(false) }
                 var showEditDialog by remember { mutableStateOf(false) }
 
                 DrawSideLine(
@@ -94,9 +92,9 @@ fun ListTasksMilestones(
                             viewModel = hiltViewModel(),
                             closeDialog = { showEditDialog = false },
                             onDeleteClick = {
-                                if (milestone?.canDelete == true) {
-                                    showDeleteDialog = true
-                                }
+//                                if (milestone?.canDelete == true) {
+//                                    showDeleteDialog = true
+//                                }
                             }
                         )
                     }

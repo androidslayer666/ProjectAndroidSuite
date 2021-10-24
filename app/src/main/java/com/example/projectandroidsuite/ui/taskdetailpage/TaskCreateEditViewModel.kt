@@ -2,10 +2,7 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.database.entities.MilestoneEntity
-import com.example.database.entities.ProjectEntity
-import com.example.database.entities.TaskEntity
-import com.example.database.entities.UserEntity
+import com.example.domain.Result
 import com.example.domain.model.Milestone
 import com.example.domain.model.Project
 import com.example.domain.model.Task
@@ -182,11 +179,11 @@ class TaskCreateEditViewModel @Inject constructor(
         val listIds = _chosenUserList.value!!.getListIds()
         if (listIds.contains(user.id)) {
             _chosenUserList.value!!.remove(_chosenUserList.value!!.getUserById(user.id))
-            Log.d("addOrRemoveUser", "remove user " + user.toString())
+            Log.d("addOrRemoveUser", "remove user $user")
             _chosenUserList.forceRefresh()
         } else {
             _chosenUserList.value!!.add(user)
-            Log.d("addOrRemoveUser", "add user " + user.toString())
+            Log.d("addOrRemoveUser", "add user $user")
             _chosenUserList.forceRefresh()
         }
     }
@@ -209,7 +206,6 @@ class TaskCreateEditViewModel @Inject constructor(
 
             if (project.value?.id != null) {
                 val response = taskRepository.createTask(
-                    //todo shouldNot be null
                     milestone.value?.id ?: 0,
                     Task(
                         id = 0,
@@ -221,7 +217,7 @@ class TaskCreateEditViewModel @Inject constructor(
                         priority = priority.value
                     )
                 )
-                withContext(Dispatchers.Main) {
+                withContext(Main) {
                     Log.d("TaskCreateEditViewModel", response.toString())
                     _taskCreationStatus.value = response
                 }
@@ -234,7 +230,6 @@ class TaskCreateEditViewModel @Inject constructor(
     fun updateTask() {
         viewModelScope.launch(IO) {
             val response = taskRepository.updateTask(
-                //todo shouldNot be null
                 taskId ?: 0,
                 Task(
                     id = 0,

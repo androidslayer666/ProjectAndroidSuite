@@ -3,7 +3,6 @@ package com.example.database.entities
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.network.dto.MilestonePost
 import java.util.*
 
 @Entity(tableName = "milestones")
@@ -11,8 +10,8 @@ data class MilestoneEntity(
     val canEdit: Boolean? = null,
     val canDelete: Boolean? = null,
     @PrimaryKey
-    override val id: Int,
-    override val title: String? = null,
+    val id: Int,
+    val title: String? = null,
     val description: String? = null,
     @Embedded(prefix = "projectOwner")
     val projectOwner: UserEntity? = null,
@@ -31,8 +30,4 @@ data class MilestoneEntity(
     val createdBy: UserEntity? = null,
     val updated: Date? = null,
     val projectId: Int? = null
-) : UniversalEntity(id, title) {
-
-
-
-}
+)

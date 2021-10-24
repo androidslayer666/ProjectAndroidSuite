@@ -2,9 +2,10 @@ package com.example.domain.repositoryimpl
 
 import android.util.Log
 import com.example.database.dao.CommentDao
-import com.example.database.entities.CommentEntity
+import com.example.domain.*
 import com.example.domain.mappers.fromListCommentEntitiesToListComments
 import com.example.domain.mappers.toCommentPost
+import com.example.domain.mappers.toListCommentIds
 import com.example.domain.mappers.toListEntities
 import com.example.domain.model.Comment
 import com.example.domain.repository.*
@@ -36,7 +37,7 @@ class CommentRepositoryImpl @Inject constructor(
                 }
                 commentDao.getCommentsByTaskId(taskId).forEach {
                     //Log.d("CommentRepository", "id " + it.id)
-                    if(comments?.toListCommentIds()?.contains(it.id) != true){
+                    if(!comments.toListCommentIds().contains(it.id)){
                         //Log.d("CommentRepository", "DeleteMessage with id " + it.id)
                         commentDao.deleteComment(it.id)
                     }
@@ -44,7 +45,7 @@ class CommentRepositoryImpl @Inject constructor(
                 Success("Comments are populated")
             }
         } catch (e: Exception) {
-            Log.e("CommentRepository", "caught an exception" + e.toString())
+            Log.e("CommentRepository", "caught an exception $e")
             return Failure("Network/server problem")
         }
     }
@@ -71,7 +72,7 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     override suspend fun putCommentToTask(taskId: Int, comment: Comment) : Result<String, String> {
-        Log.d("CommentRepository", "Started creating comment" + taskId.toString())
+        Log.d("CommentRepository", "Started creating comment $taskId")
 
         return networkCaller(
             call = { commentEndPoint.putCommentToTask(taskId, comment.toCommentPost()) },
@@ -83,7 +84,6 @@ class CommentRepositoryImpl @Inject constructor(
 
     override suspend fun deleteComment(commentId: String, taskId: Int?): Result<String, String> {
 
-        //todo is it necessary to be nullable?
         return networkCaller(
             call = { commentEndPoint.deleteComment(commentId) },
             onSuccess = {

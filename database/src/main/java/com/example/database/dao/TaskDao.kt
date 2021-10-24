@@ -1,10 +1,11 @@
 package com.example.database.dao
 
-import androidx.room.*
-import com.example.database.entities.ProjectEntity
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.example.database.entities.TaskEntity
 import kotlinx.coroutines.flow.Flow
-import retrofit2.http.DELETE
 
 @Dao
 interface TaskDao {
@@ -14,6 +15,9 @@ interface TaskDao {
 
     @Query("SELECT * FROM task")
     fun getAllFlow(): Flow<List<TaskEntity>>
+
+    @Query("SELECT * FROM task WHERE responsibles LIKE :userId")
+    fun getUserTasks(userId: Int) : Flow<List<TaskEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTasks(taskList: List<TaskEntity>)

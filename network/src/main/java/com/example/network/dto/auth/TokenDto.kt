@@ -2,9 +2,11 @@ package com.example.network.dto.auth
 
 import com.google.gson.annotations.SerializedName
 
-data class Token(
+data class TokenDto(
     @SerializedName("expires")
     var tokenExpirationDate: String,
     @SerializedName("token")
     var authToken: String,
+    @SerializedName("tfa")
+    var tfa: Boolean,
 )

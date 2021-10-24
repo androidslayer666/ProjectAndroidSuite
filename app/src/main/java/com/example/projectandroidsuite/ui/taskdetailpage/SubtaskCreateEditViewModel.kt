@@ -2,12 +2,10 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.database.entities.SubtaskEntity
-import com.example.database.entities.UserEntity
 import com.example.domain.model.Subtask
 import com.example.domain.model.User
 import com.example.domain.repository.ProjectRepository
-import com.example.domain.repository.Result
+import com.example.domain.Result
 import com.example.domain.repository.TaskRepository
 import com.example.domain.repository.TeamRepository
 import com.example.projectandroidsuite.logic.UserFilter
@@ -81,7 +79,6 @@ class SubtaskCreateEditViewModel @Inject constructor(
         _responsible.value = user
     }
 
-    //todo only users
     fun clearInput() {
         _title.value = ""
         _responsible.value = null

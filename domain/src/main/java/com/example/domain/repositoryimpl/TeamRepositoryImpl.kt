@@ -2,15 +2,14 @@ package com.example.domain.repositoryimpl
 
 import android.util.Log
 import com.example.database.dao.UserDao
-import com.example.database.entities.UserEntity
+import com.example.domain.Failure
+import com.example.domain.Result
+import com.example.domain.Success
 import com.example.domain.mappers.fromListUserEntitiesToListUsers
 import com.example.domain.mappers.fromUserEntityToUser
 import com.example.domain.mappers.toListUserEntity
 import com.example.domain.mappers.toUserEntity
 import com.example.domain.model.User
-import com.example.domain.repository.Failure
-import com.example.domain.repository.Result
-import com.example.domain.repository.Success
 import com.example.domain.repository.TeamRepository
 import com.example.network.dto.UserDto
 import com.example.network.endpoints.TeamEndPoint
@@ -25,10 +24,10 @@ class TeamRepositoryImpl @Inject constructor(
     private val userDao: UserDao
 ) : TeamRepository {
 
-    override suspend fun populateAllPortalUsers() : Result<String, String> {
+    override suspend fun populateAllPortalUsers(): Result<String, String> {
         try {
             val users = teamEndPoint.getAllPortalUsers().ids
-            if(users != null ){
+            return if (users != null) {
                 val newList = mutableListOf<UserDto>()
                 for (user in users) {
                     if (user.isVisitor != true) {
@@ -36,19 +35,19 @@ class TeamRepositoryImpl @Inject constructor(
                     }
                 }
                 userDao.insertUsers(newList.toListUserEntity())
-                return Success("Users are populated")
-            }else {
-                return Failure("Network/server problem")
+                Success("Users are populated")
+            } else {
+                Failure("Network/server problem")
             }
-        }catch (e: Exception){
-            Log.e("TeamRepository", "caught an exception" + e.toString())
+        } catch (e: Exception) {
+            Log.e("TeamRepository", "caught an exception$e")
             return Failure("Network/server problem")
         }
     }
 
     override fun getAllPortalUsers(): Flow<List<User>> {
         return userDao.getAll().transform { emit(it.fromListUserEntitiesToListUsers()) }
-        }
+    }
 
     override suspend fun getSelfProfile(): User? {
         return teamEndPoint.getSelfProfile().user?.toUserEntity()?.fromUserEntityToUser()

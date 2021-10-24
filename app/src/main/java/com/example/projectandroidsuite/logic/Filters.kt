@@ -2,6 +2,7 @@ package com.example.projectandroidsuite.logic
 
 import com.example.database.entities.*
 import com.example.domain.model.*
+import java.util.*
 
 data class ProjectFilter(
     var searchQuery: String? = null,
@@ -57,7 +58,8 @@ fun List<User>.filterUsersByFilter(filter: UserFilter): MutableList<User> {
 data class TaskFilter(
     var searchQuery: String? = null,
     var responsible: String? = null,
-    var status: TaskStatus? = null
+    var status: TaskStatus? = null,
+    var interval: Pair<Date?, Date?>? = null
 )
 
 enum class TaskStatus (val index : Int){
@@ -80,6 +82,12 @@ fun List<Task>.filterTaskByFilter(filter: TaskFilter): List<Task> {
         if(filter.status != null){
             if(filter.status!!.index != task.status) {
                 newList.remove(task)
+            }
+        }
+        filter.interval?.let {
+            filter.interval!!.first?.let{
+            }
+            filter.interval!!.second?.let{
             }
         }
     }

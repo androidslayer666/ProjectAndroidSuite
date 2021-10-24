@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.projectpage
 
-import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.core.tween
@@ -9,11 +8,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -27,7 +26,6 @@ import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.BackHandler
 import com.example.projectandroidsuite.logic.SwipeDirections
 import com.example.projectandroidsuite.logic.expandScrollingViewportWidthBy
-import com.example.projectandroidsuite.logic.swipeToChangeScreen
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -52,7 +50,7 @@ fun ProjectsPage(
 
     BackHandler(showFilters) { showFilters = !showFilters }
 
-    Log.d("ProjectsPage", initialOffset.toString())
+    //Log.d("ProjectsPage", initialOffset.toString())
 
     if (animateTo == 1)
         LaunchedEffect(offset) {
@@ -120,7 +118,6 @@ fun ProjectsPage(
                                 sizeMeasured = size.width
                                 val decay = splineBasedDecay<Float>(this)
                                 while (true) {
-
                                     coroutineScope {
                                         val pointerId =
                                             awaitPointerEventScope { awaitFirstDown().id }
@@ -134,6 +131,7 @@ fun ProjectsPage(
                                                         offset.snapTo(horizontalDragOffset)
                                                     }
                                                 }
+                                                change.consumePositionChange()
                                             }
                                         }
                                         val velocityTracker = VelocityTracker()

@@ -1,11 +1,8 @@
 package com.example.domain.mappers
 
 import com.example.database.entities.MessageEntity
-import com.example.database.entities.UserEntity
-import com.example.domain.model.File
 import com.example.domain.model.Message
 import com.example.domain.model.User
-import com.example.domain.repository.toStringIds
 import com.example.network.dto.MessageDto
 import com.example.network.dto.MessagePost
 import java.util.*
@@ -62,7 +59,7 @@ fun MessageEntity.fromMessageEntityToMessage() : Message {
         canEdit = this.canEdit,
         created = this.created,
         createdBy = this.createdBy?.fromUserEntityToUser(),
-        text = this.text ?: "",
+        text = this.text,
         updated = this.updated,
         canCreateComment = this.canCreateComment,
         commentsCount = this.commentsCount,
@@ -70,7 +67,15 @@ fun MessageEntity.fromMessageEntityToMessage() : Message {
         description = this.description,
         projectOwner = this.projectOwner?.fromUserEntityToUser(),
         status = this.status,
-        title = this.title ?: "",
+        title = this.title,
         updatedBy = this.updatedBy?.fromUserEntityToUser()
     )
+}
+
+fun List<MessageDto>.toListMessageIds() : List<Int> {
+    val listString = mutableListOf<Int>()
+    for (message in this) {
+        listString.add(message.id)
+    }
+    return listString
 }

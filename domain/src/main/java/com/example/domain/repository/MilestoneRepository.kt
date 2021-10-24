@@ -1,13 +1,8 @@
 package com.example.domain.repository
 
-import android.util.Log
-import com.example.database.entities.MilestoneEntity
-import com.example.domain.mappers.toListEntities
-import com.example.domain.mappers.toMilestonePost
+import com.example.domain.Result
 import com.example.domain.model.Milestone
-import com.example.network.dto.MilestonePost
 import kotlinx.coroutines.flow.Flow
-import java.lang.Exception
 
 interface MilestoneRepository {
 

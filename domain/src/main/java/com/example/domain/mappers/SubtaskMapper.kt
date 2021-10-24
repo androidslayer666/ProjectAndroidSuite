@@ -3,8 +3,6 @@ package com.example.domain.mappers
 import com.example.database.entities.SubtaskEntity
 import com.example.domain.model.Subtask
 import com.example.network.dto.SubtaskDto
-import com.example.network.dto.UserDto
-import com.google.gson.annotations.SerializedName
 
 fun List<SubtaskDto>.toSubtaskEntity() : List<SubtaskEntity>{
     val list = mutableListOf<SubtaskEntity>()

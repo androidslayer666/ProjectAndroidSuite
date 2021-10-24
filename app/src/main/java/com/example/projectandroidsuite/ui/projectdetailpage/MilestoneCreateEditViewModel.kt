@@ -2,8 +2,7 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.database.entities.MilestoneEntity
-import com.example.database.entities.UserEntity
+import com.example.domain.Result
 import com.example.domain.model.Milestone
 import com.example.domain.model.User
 import com.example.domain.repository.*
@@ -97,7 +96,6 @@ class MilestoneCreateEditViewModel @Inject constructor(
     }
 
     fun setResponsible(user: User) {
-        //Log.d("ProjectCreateEditodel", "setting the manager" + user.toString())
         _responsible.value = user
     }
 
@@ -126,7 +124,6 @@ class MilestoneCreateEditViewModel @Inject constructor(
     fun createMilestone() {
         viewModelScope.launch(IO) {
             val response = milestoneRepository.putMilestoneToProject(
-                //todo shouldNot be null
                 projectId ?: 0,
                 Milestone(
                     id =0,
@@ -147,7 +144,6 @@ class MilestoneCreateEditViewModel @Inject constructor(
     fun updateMilestone() {
         viewModelScope.launch(IO) {
             val response = milestoneRepository.updateMilestoneToProject(
-                //todo shouldNot be null
                 projectId ?: 0,
                 Milestone(
                     title = title.value ?: "",

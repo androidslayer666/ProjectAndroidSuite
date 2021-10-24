@@ -16,7 +16,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-class NetworkApiProvider {
+class NetworkProvider {
 
     @Provides
     @Singleton
@@ -115,9 +115,9 @@ class NetworkApiProvider {
 
     @Provides
     @Singleton
-    fun provideAuthEndPoint(provider: AuthCredentialsProvider): AuthEndPoint {
+    fun provideAuthEndPoint(): AuthEndPoint {
         val retrofit = Retrofit.Builder()
-            .baseUrl(provider.fetchPortalAddress() ?: "")
+            .baseUrl("https://localhost/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         return retrofit.create(AuthEndPoint::class.java)

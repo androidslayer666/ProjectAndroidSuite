@@ -1,23 +1,19 @@
 package com.example.network.endpoints
 
-import com.example.network.Constants.LOGIN_URL
-import com.example.network.Constants.TRY_PORTAL_URL
-import com.example.network.dto.auth.LoginRequest
-import com.example.network.dto.auth.LoginResponse
-import retrofit2.Call
+import com.example.network.dto.auth.LoginRequestDto
+import com.example.network.dto.auth.LoginResponseDto
+import com.example.network.dto.auth.ResponseCapabilities
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Url
 
 interface AuthEndPoint {
 
-        //todo make one request
+        @POST
+        suspend fun login(@Url url: String, @Body request: LoginRequestDto): LoginResponseDto
 
-        @GET(TRY_PORTAL_URL)
-        fun tryLogin(): Call<LoginResponse>
-
-        @POST(LOGIN_URL)
-        suspend fun login(@Body request: LoginRequest): LoginResponse
+        @GET
+        suspend fun checkPortalPossibilities(@Url url: String) : ResponseCapabilities
 
 }

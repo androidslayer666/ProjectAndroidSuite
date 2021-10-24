@@ -6,9 +6,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.database.entities.MessageEntity
 import com.example.domain.model.Message
-import com.example.domain.repository.Success
+import com.example.domain.Success
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.RowTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog

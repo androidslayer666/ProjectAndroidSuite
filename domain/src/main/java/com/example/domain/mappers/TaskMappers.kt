@@ -1,12 +1,8 @@
 package com.example.domain.mappers
 
-import android.util.Log
 import com.example.database.entities.TaskEntity
-import com.example.database.entities.UserEntity
-import com.example.domain.model.Milestone
+import com.example.domain.Constants.FORMAT_API_DATE
 import com.example.domain.model.Task
-import com.example.domain.repository.FORMAT_API_DATE
-import com.example.domain.repository.fromListUsersToStrings
 import com.example.network.dto.TaskDto
 import com.example.network.dto.TaskPost
 import java.text.SimpleDateFormat
@@ -14,18 +10,18 @@ import java.util.*
 
 fun List<TaskDto>.toListEntities(): List<TaskEntity> {
 
-        val listProjectEntity = mutableListOf<TaskEntity>()
-        for (taskDto in this) {
+    val listProjectEntity = mutableListOf<TaskEntity>()
+    for (taskDto in this) {
 
-            listProjectEntity.add(
-                taskDto.toEntity( )
-            )
-        }
-        return listProjectEntity
+        listProjectEntity.add(
+            taskDto.toEntity()
+        )
     }
+    return listProjectEntity
+}
 
 fun TaskDto.toEntity(): TaskEntity {
-    return  TaskEntity(
+    return TaskEntity(
         canEdit = this.canEdit,
         canDelete = this.canDelete,
         id = this.id,
@@ -49,39 +45,38 @@ fun TaskDto.toEntity(): TaskEntity {
 fun Task.fromTaskEntityToPost(milestoneId: Int? = 0): TaskPost {
     return TaskPost(
         description = description,
-        deadline = SimpleDateFormat(FORMAT_API_DATE).format(deadline),
+        deadline = SimpleDateFormat(FORMAT_API_DATE, Locale.getDefault()).format(deadline),
         title = title,
         responsibles = responsibles.fromListUsersToStrings(),
-        startDate = SimpleDateFormat(FORMAT_API_DATE).format(Date()),
-        milestoneid = milestoneId?:0,
-        priority = priority?.priorityToString()
-    ,
+        startDate = SimpleDateFormat(FORMAT_API_DATE, Locale.getDefault()).format(Date()),
+        milestoneid = milestoneId ?: 0,
+        priority = priority?.priorityToString(),
     )
 }
 
 
-fun Int.priorityToString() : String {
-    return when(this) {
+fun Int.priorityToString(): String {
+    return when (this) {
         0 -> "normal"
         1 -> "high"
         else -> "normal"
     }
 }
 
-fun List<TaskEntity>.fromListTaskEntitiesToListTasks () : List<Task> {
+fun List<TaskEntity>.fromListTaskEntitiesToListTasks(): List<Task> {
     val listFiles = mutableListOf<Task>()
     listFiles.addAll(this.map { it.fromTaskEntityToTask() })
     return listFiles
 }
 
 
-fun TaskEntity.fromTaskEntityToTask(): Task{
-    return  Task(
+fun TaskEntity.fromTaskEntityToTask(): Task {
+    return Task(
         canEdit = this.canEdit,
         canDelete = this.canDelete,
         id = this.id,
-        title = this.title ?: "",
-        description = this.description ?: "",
+        title = this.title,
+        description = this.description,
         priority = this.priority,
         status = this.status,
         responsible = this.responsible?.fromUserEntityToUser(),
@@ -91,8 +86,8 @@ fun TaskEntity.fromTaskEntityToTask(): Task{
         updated = this.updated,
         milestoneId = this.milestoneId,
         deadline = this.deadline,
-        subtasks = this.subtasks?.map{it.fromSubtaskEntityToSubtask()},
-        responsibles = this.responsibles.map{it.fromUserEntityToUser()}.toMutableList(),
+        subtasks = this.subtasks?.map { it.fromSubtaskEntityToSubtask() },
+        responsibles = this.responsibles.map { it.fromUserEntityToUser() }.toMutableList(),
         projectOwner = this.projectOwner?.fromProjectEntityToProject(),
     )
 }

@@ -2,21 +2,14 @@ package com.example.domain.repositoryimpl
 
 import android.util.Log
 import com.example.database.dao.MilestoneDao
-import com.example.database.entities.MilestoneEntity
-import com.example.domain.mappers.fromListMilestoneEntitiesToListMilestone
-import com.example.domain.mappers.fromMilestoneEntityToMilestone
-import com.example.domain.mappers.toListEntities
-import com.example.domain.mappers.toMilestonePost
+import com.example.domain.Result
+import com.example.domain.mappers.*
 import com.example.domain.model.Milestone
+import com.example.domain.networkCaller
 import com.example.domain.repository.MilestoneRepository
-import com.example.domain.repository.Result
-import com.example.domain.repository.networkCaller
-import com.example.domain.repository.toListMilestoneIds
-import com.example.network.dto.MilestonePost
 import com.example.network.endpoints.MilestoneEndPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
-import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
 

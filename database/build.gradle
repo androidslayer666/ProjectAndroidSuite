@@ -37,5 +37,6 @@ dependencies {
     sharedGroupLifecycle dependencies
     sharedGroupHilt dependencies
     sharedGroupRoom dependencies
+    sharedGroupNetwork dependencies
 
 }

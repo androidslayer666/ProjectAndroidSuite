@@ -2,9 +2,8 @@ package com.example.projectandroidsuite.ui.projectpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.database.entities.UserEntity
 import com.example.domain.model.User
-import com.example.domain.repository.Failure
+import com.example.domain.Failure
 import com.example.domain.repository.ProjectRepository
 import com.example.domain.repository.TaskRepository
 import com.example.domain.repository.TeamRepository
@@ -65,7 +64,7 @@ class ProjectViewModel @Inject constructor(
             listProjects?.sortProjects(sorting)
         }
 
-    val tasks = taskRepository.getAllUserTasks().asLiveData().combineWith(taskFilter){
+    val tasks = taskRepository.getAllTasks().asLiveData().combineWith(taskFilter){
         listTasks, filter ->
         if(filter != null) {
             listTasks?.filterTaskByFilter(filter)

@@ -19,8 +19,8 @@ data class FileEntity (
     val fileExst: String? = null,
     val comment: String? = null,
     @PrimaryKey
-    override val id: Int,
-    override val title: String? = null,
+    val id: Int,
+    val title: String? = null,
     val access: Int? = null,
     val shared: Boolean? = null,
     val rootFolderType: Int? = null,
@@ -32,4 +32,4 @@ data class FileEntity (
     val updated: Date? = null,
     val taskId: Int? = null,
     val projectId: Int? = null
-): UniversalEntity(id, title)
+)

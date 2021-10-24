@@ -1,34 +1,26 @@
 package com.example.projectandroidsuite.ui.loginpage
 
-import android.util.Log
 import android.view.KeyEvent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.ui.ProjectsScreens
 
@@ -41,12 +33,14 @@ fun LoginPage(
 ) {
 
     val portalAddress by viewModel.portalAddress.observeAsState("")
-    val portalAddressForLocal by viewModel.portalAddressForLocal.observeAsState("")
     val emailAddress by viewModel.emailInput.observeAsState("")
     val password by viewModel.passwordInput.observeAsState("")
     val addressIsValid by viewModel.canConnectToPortal.observeAsState(false)
     val emailIsValid by viewModel.inputEmailValidated.observeAsState(true)
     val passwordIsValid by viewModel.inputPasswordValidated.observeAsState(true)
+    val twoFactorAuth by viewModel.twoFactorAuth.observeAsState(false)
+    val tfaGoogleInput by viewModel.tfaGoogleInput.observeAsState("")
+
 
     val portalIsInCloud by viewModel.portalIsInCloud.observeAsState()
 
@@ -63,7 +57,7 @@ fun LoginPage(
             !addressIsValid,
             enter = slideInVertically(
 
-                initialOffsetY = { fullHeight -> -fullHeight  },
+                initialOffsetY = { fullHeight -> -fullHeight },
                 animationSpec = tween(durationMillis = 400)
             ),
             exit = slideOutVertically(
@@ -117,7 +111,7 @@ fun LoginPage(
                         .align(Alignment.CenterHorizontally)
                 )
             } else {
-                Button(onClick = { viewModel.tryIfPortalExists() }) {
+                Button(onClick = { viewModel.tryIfPortalExists(portalAddress) }) {
                     Text("Connect")
                 }
             }
@@ -127,7 +121,7 @@ fun LoginPage(
             addressIsValid,
             enter = slideInHorizontally(
 
-                initialOffsetX = { fullHeight -> -fullHeight  },
+                initialOffsetX = { fullHeight -> -fullHeight },
                 animationSpec = tween(durationMillis = 400)
             ),
             exit = slideOutHorizontally(
@@ -135,7 +129,7 @@ fun LoginPage(
                 animationSpec = tween(durationMillis = 400)
             )
         ) {
-            Column (horizontalAlignment = Alignment.CenterHorizontally){
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 TextField(
                     value = emailAddress,
                     onValueChange = { input ->
@@ -146,7 +140,7 @@ fun LoginPage(
                         backgroundColor = MaterialTheme.colors.background,
                         textColor = MaterialTheme.colors.onBackground
                     ),
-                    isError = !emailIsValid ,
+                    isError = !emailIsValid,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
                         onDone = { focusRequesterPassword.requestFocus() }
@@ -158,7 +152,6 @@ fun LoginPage(
                         .onKeyEvent {
                             if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
                                 focusRequesterPassword.requestFocus()
-                                true
                             }
                             false
                         })
@@ -170,7 +163,10 @@ fun LoginPage(
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
                     label = { Text("Password") },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Password
+                    ),
                     keyboardActions = KeyboardActions(
                         onDone = { focusRequesterPassword.requestFocus() }
                     ),
@@ -180,7 +176,11 @@ fun LoginPage(
                         .focusRequester(focusRequesterPassword)
                         .onKeyEvent {
                             if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                                viewModel.authenticate { navController.navigate(ProjectsScreens.Projects.name) }
+                                viewModel.authenticate(onCompleteLogin = {
+                                    navController.navigate(
+                                        ProjectsScreens.Projects.name
+                                    )
+                                })
                                 true
                             } else false
                         },
@@ -191,8 +191,21 @@ fun LoginPage(
                     isError = !passwordIsValid
                 )
 
+
+                if(twoFactorAuth) {
+                    Text("please input code from Google Authenticator for your Onlyoffice login")
+                    TextField(
+                        value = tfaGoogleInput ?:"",
+                        onValueChange = viewModel::setTfaGoogleInput
+                    )
+                }
+
                 Button(onClick = {
-                    viewModel.authenticate { navController.navigate(ProjectsScreens.Projects.name) }
+                    viewModel.authenticate(onCompleteLogin = {
+                        navController.navigate(
+                            ProjectsScreens.Projects.name
+                        )
+                    })
                     //Log.d("authenticated", viewModel.authenticated.value.toString())
                 }) {
                     Text(text = "Log In")

@@ -2,8 +2,8 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.database.entities.CommentEntity
-import com.example.database.entities.MilestoneEntity
+import com.example.domain.Result
+import com.example.domain.Success
 import com.example.domain.model.Comment
 import com.example.domain.model.Milestone
 import com.example.domain.repository.*

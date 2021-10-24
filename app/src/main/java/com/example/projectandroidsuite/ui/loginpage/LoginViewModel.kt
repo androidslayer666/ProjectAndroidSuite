@@ -7,11 +7,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.AuthCredentialsProvider
 import com.example.domain.repository.AuthRepository
+import com.example.domain.Failure
+import com.example.domain.Success
+import com.example.projectandroidsuite.logic.validateCode
 import com.example.projectandroidsuite.logic.validateEmail
 import com.example.projectandroidsuite.logic.validatePassword
 import com.example.projectandroidsuite.logic.validatePortalNameInput
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +26,7 @@ class LoginViewModel @Inject constructor(
     private val authCredentialsProvider: AuthCredentialsProvider
 ) : ViewModel() {
 
-    private var _inputPortalValidated = MutableLiveData<Boolean>(null)
+    private var _inputPortalValidated = MutableLiveData<Boolean>(false)
     val inputPortalValidated: LiveData<Boolean> = _inputPortalValidated
 
     private var _inputEmailValidated = MutableLiveData<Boolean>()
@@ -31,6 +37,9 @@ class LoginViewModel @Inject constructor(
 
     private var _canConnectToPortal = MutableLiveData<Boolean>(false)
     val canConnectToPortal: LiveData<Boolean> = _canConnectToPortal
+
+    private var _inputCodeValidated = MutableLiveData<Boolean>(false)
+    val inputCodeValidated: LiveData<Boolean> = _inputCodeValidated
 
     private var _portalAddress = MutableLiveData<String>()
     val portalAddress: LiveData<String> = _portalAddress
@@ -47,6 +56,12 @@ class LoginViewModel @Inject constructor(
     private var _portalIsInCloud = MutableLiveData<Int>(0)
     val portalIsInCloud: LiveData<Int> = _portalIsInCloud
 
+    private var _twoFactorAuth = MutableLiveData<Boolean>(false)
+    val twoFactorAuth: LiveData<Boolean> = _twoFactorAuth
+
+    private var _tfaGoogleInput = MutableLiveData<String?>(null)
+    val tfaGoogleInput: LiveData<String?> = _tfaGoogleInput
+
     fun checkIfAuthenticated(): Boolean {
         Log.d("checkIfAuthenticated",authRepository.isAuthenticated().toString())
         return authRepository.isAuthenticated()
@@ -60,7 +75,7 @@ class LoginViewModel @Inject constructor(
             _canConnectToPortal.value = false
         }
         if (isValidated) {
-            tryIfPortalExists()
+            tryIfPortalExists(portalAddress.value!!)
         }
         //Log.d("LoginViewModel", "portal address is valid" + inputPortalValidated.value.toString())
     }
@@ -82,8 +97,19 @@ class LoginViewModel @Inject constructor(
         //Log.d("LoginViewModel", passwordInput.value.toString())
     }
 
-    fun tryIfPortalExists() {
-        //todo implement based on capabilities
+    fun setTfaGoogleInput(value: String) {
+        _tfaGoogleInput.value = value
+        _inputCodeValidated.value = validateCode(value)
+    }
+
+    fun tryIfPortalExists(address: String) {
+        authRepository.rememberPortalAddress(portalAddress.value!!)
+        viewModelScope.launch(IO) {
+            when (authRepository.tryPortal(address)) {
+                is Success -> withContext(Main) {_canConnectToPortal.value = true}
+                is Failure -> {}
+            }
+        }
     }
 
     fun authenticate(
@@ -100,16 +126,46 @@ class LoginViewModel @Inject constructor(
             inputPasswordValidated.value == true
         ) {
             viewModelScope.launch{
-                authRepository.rememberPortalAddress(portalAddress.value!!)
-                Log.d("LoginFragment", "all is well")
-                authRepository.authenticate(
-
+                if(tfaGoogleInput.value == null) {
+                    authRepository.rememberPortalAddress(portalAddress.value!!)
+                    Log.d("LoginViewModel", "all is well")
+                    val response = authRepository.login(
+                        portalAddress.value?:"",
                         emailInput.value!!,
                         passwordInput.value!!
-
-                )
-
-                onCompleteLogin()
+                    )
+                    Log.d("LoginViewModel", response.toString())
+                    when (response) {
+                        is Success -> {
+                            if (response.value.token?.authToken != null) {
+                                onCompleteLogin()
+                            } else if (response.value.tfa == true) {
+                                Log.d("LoginFragment", "tfa == true")
+                                _twoFactorAuth.value = true
+                            }
+                        }
+                        is Failure -> {
+                        }
+                    }
+                }else {
+                    authRepository.rememberPortalAddress(portalAddress.value!!)
+                    Log.d("LoginFragment", "all is well")
+                    val response = authRepository.login(
+                        portalAddress.value?:"",
+                        emailInput.value!!,
+                        passwordInput.value!!,
+                        tfaGoogleInput.value!!.toInt()
+                    )
+                    when (response) {
+                        is Success -> {
+                            if (response.value.token != null) {
+                                onCompleteLogin()
+                            }
+                        }
+                        is Failure -> {
+                        }
+                    }
+                }
             }
         }
     }

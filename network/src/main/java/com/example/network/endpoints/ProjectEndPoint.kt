@@ -1,18 +1,9 @@
 package com.example.network.endpoints
 
-import com.example.network.Constants
-import com.example.network.Constants.GET_PROJECTS_URL
-import com.example.network.authTokenInterceptor
 import com.example.network.dto.*
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
 interface ProjectEndPoint {
-
-    @GET(GET_PROJECTS_URL)
-    fun getParticipatedProjects(): Call<ProjectsTransporter>
 
     @GET("api/2.0/project/{projectId}/files")
     suspend fun getProjectFiles(@Path("projectId")projectId: Int): FilesTransporter
@@ -23,8 +14,8 @@ interface ProjectEndPoint {
     @GET("api/2.0/project")
     suspend fun getAllProjects(): ProjectsTransporter
 
-    @GET("api/2.0/project/@follow")
-    suspend fun getFollowedProjects(): ProjectsTransporter
+    @GET("api/2.0/project/@self")
+    suspend fun getUserProjects(): ProjectsTransporter
 
     @POST("api/2.0/project")
     suspend fun createProject(@Body projectPostDto: ProjectPost): ProjectDto

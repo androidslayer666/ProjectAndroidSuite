@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.database.entities.CommentEntity
-import com.example.database.entities.ProjectEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

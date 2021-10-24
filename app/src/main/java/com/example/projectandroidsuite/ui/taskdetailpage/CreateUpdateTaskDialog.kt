@@ -3,21 +3,25 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Checkbox
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.database.entities.TaskEntity
+import com.example.domain.Success
 import com.example.domain.model.Task
-import com.example.domain.repository.Success
+import com.example.projectandroidsuite.logic.Constants.FORMAT_SHOW_DATE
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.TaskStatus
 import com.example.projectandroidsuite.logic.makeToast
 import com.example.projectandroidsuite.ui.parts.*
-import com.example.projectandroidsuite.ui.parts.customitems.*
+import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
+import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
+import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -78,8 +82,7 @@ fun CreateUpdateTaskDialog(
             viewModel,
             { showProjectPicker = true },
             { showTeamPicker = true },
-            { showMilestonePicker = true },
-            task == null
+            { showMilestonePicker = true }
         )
     }
 
@@ -87,9 +90,9 @@ fun CreateUpdateTaskDialog(
         ProjectPickerDialog(
             list = listProjects!!,
             onSubmit = { showProjectPicker = false },
-            onClick = { project ->
+            onClick = { projectClicked ->
                 run {
-                    viewModel.setProject(project = project)
+                    viewModel.setProject(project = projectClicked)
                 }
             },
             closeDialog = { showProjectPicker = false },
@@ -145,8 +148,7 @@ fun CreateTaskDialogInput(
     viewModel: TaskCreateEditViewModel,
     showProjectPicker: () -> Unit,
     showTeamPicker: () -> Unit,
-    showMilestonePicker: () -> Unit,
-    modeCreate: Boolean
+    showMilestonePicker: () -> Unit
 ) {
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -165,7 +167,7 @@ fun CreateTaskDialogInput(
     val priority by viewModel.priority.observeAsState()
 
     Column(Modifier.defaultMinSize(minHeight = 350.dp)) {
-        Row() {
+        Row {
             CustomTextField(
                 label = "Title",
                 value = title,
@@ -293,7 +295,7 @@ fun CreateTaskDialogInput(
                     .weight(2F)
             )
             Text(
-                text = SimpleDateFormat("dd/MM/yyyy").format(endDate),
+                text = SimpleDateFormat(FORMAT_SHOW_DATE, Locale.getDefault()).format(endDate),
                 Modifier
                     .clickable { showDatePicker = true }
                     .padding(12.dp, 12.dp)

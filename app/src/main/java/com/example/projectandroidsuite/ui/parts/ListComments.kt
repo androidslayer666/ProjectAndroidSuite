@@ -9,16 +9,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.database.entities.CommentEntity
-import com.example.database.entities.UserEntity
 import com.example.domain.model.Comment
-import com.example.domain.model.User
 import com.example.projectandroidsuite.R
+import com.example.projectandroidsuite.logic.fromHtml
 
 @Composable
 fun ListComments(
@@ -30,7 +31,7 @@ fun ListComments(
     var activeComment by remember { mutableStateOf("")}
 
     if (listComments != null) {
-        Column() {
+        Column {
             listComments.forEach { comment ->
                 CommentItem(
                     comment = comment,
@@ -38,7 +39,7 @@ fun ListComments(
                     messageId = messageId,
                     onDeleteClick = onDeleteClick,
                     isFocused = activeComment == comment.id,
-                    setActive = { comment -> activeComment = comment })
+                    setActive = { commentActive -> activeComment = commentActive })
             }
         }
     }
@@ -68,7 +69,7 @@ fun CommentItem(
             modifier = Modifier.padding(4.dp),
             backgroundColor = MaterialTheme.colors.background
         ) {
-            Column() {
+            Column {
                 Row(modifier = Modifier.padding(4.dp)) {
                     Column(
                         modifier = Modifier
@@ -80,9 +81,7 @@ fun CommentItem(
                             .weight(5F)
                     ) {
                         if (comment.inactive != true) {
-                            //todo change to real User
-                            comment.createdBy?.let { CardTeamMember(user = User(id="",email= "",firstName = "",lastName = "")) }
-
+                            comment.createdBy?.let { CardTeamMember(user = comment.createdBy!!) }
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 Text(
@@ -90,7 +89,7 @@ fun CommentItem(
                                         .toString()
                                 )
                             } else {
-                                Text(text = Html.fromHtml(comment.text).toString())
+                                Text(text = fromHtml(comment.text).toString())
                             }
                         } else {
                             Text(text = "Comment has been deleted")

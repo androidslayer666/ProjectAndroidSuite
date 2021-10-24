@@ -1,18 +1,22 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Checkbox
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.database.entities.MilestoneEntity
+import com.example.domain.Success
 import com.example.domain.model.Milestone
-import com.example.domain.repository.Success
+import com.example.projectandroidsuite.logic.Constants.FORMAT_SHOW_DATE
 import com.example.projectandroidsuite.logic.PickerType
-import com.example.projectandroidsuite.ui.parts.DatePicker
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
+import com.example.projectandroidsuite.ui.parts.DatePicker
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
@@ -66,7 +70,7 @@ fun CreateMilestoneDialog(
             },
             onDeleteClick = onDeleteClick
         ) {
-            CreateMilestoneDialogInput(viewModel, {showResponsiblePicker = true})
+            CreateMilestoneDialogInput(viewModel) { showResponsiblePicker = true }
         }
 
 
@@ -163,7 +167,7 @@ fun CreateMilestoneDialogInput(
                     .weight(2F)
             )
             Text(
-                text = SimpleDateFormat("dd/MM/yyyy").format(endDate),
+                text = SimpleDateFormat(FORMAT_SHOW_DATE, Locale.getDefault()).format(endDate),
                 Modifier
                     .clickable { showDatePicker = true }
                     .padding(12.dp, 12.dp)

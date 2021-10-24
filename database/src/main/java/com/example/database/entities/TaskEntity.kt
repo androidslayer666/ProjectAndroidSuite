@@ -3,7 +3,6 @@ package com.example.database.entities
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.network.dto.UserDto
 import java.util.*
 
 @Entity(tableName = "task")
@@ -14,8 +13,8 @@ data class TaskEntity(
     val canDelete: Boolean? = null,
     val canReadFiles: Boolean? = null,
     @PrimaryKey
-    override val id: Int,
-    override var title: String = "",
+    val id: Int,
+    var title: String = "",
     var description: String = "",
     var deadline: Date = Date(),
     val priority: Int? = null,
@@ -34,7 +33,6 @@ data class TaskEntity(
     var responsibles: MutableList<UserEntity> = mutableListOf(),
     val projectId: Int? = null,
     val subtasks: List<SubtaskEntity>? = listOf()
-
-) : UniversalEntity(id, title)
+)
 
 

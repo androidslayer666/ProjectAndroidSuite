@@ -47,16 +47,9 @@ data class FilesSubTransporter(
     val listFiles: List<FileDto>? = null
 )
 
-
-
 data class CommentsTransporter(
     @SerializedName("response")
     val listCommentDtos: List<CommentDto>? = null
-)
-
-data class SubtaskTransporter(
-    @SerializedName("response")
-    val listSubtaskDto: List<SubtaskDto>? = null
 )
 
 data class UserTransporter(

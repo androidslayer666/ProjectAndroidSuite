@@ -1,18 +1,21 @@
 package com.example.domain.repository
 
-import android.util.Log
-import com.example.network.Constants
-import com.example.network.dto.auth.LoginRequest
-import com.example.network.dto.auth.Token
+import com.example.domain.Result
+import com.example.domain.model.LoginResponse
 
 interface AuthRepository {
 
-    suspend fun authenticate(email: String, password: String)
+    suspend fun login(address: String,
+                      email: String,
+                      password: String,
+                      code: Int? = null) : Result<LoginResponse, String>
 
-    fun rememberPortalAddress(portalAddress: String)
+    fun rememberPortalAddress(address: String)
 
     fun logOut()
 
     fun isAuthenticated(): Boolean
+
+    suspend fun tryPortal(address: String) : Result<String, String>
 
 }

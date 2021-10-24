@@ -45,9 +45,6 @@ fun SearchBody(
     val milestones by viewModel.milestones.observeAsState(listOf())
     val files by viewModel.files.observeAsState(listOf())
 
-
-    //todo animation and scroll the entire screen
-
     Column(Modifier.defaultMinSize(minHeight = 600.dp)) {
         TextField(
             value = searchString,
@@ -103,7 +100,7 @@ fun SearchBody(
                 items(tasks!!) {
                     Text(text = it.title, Modifier
                         .fillMaxWidth()
-                        .clickable { navController.navigate("tasks/${it.id}") }
+                        .clickable { navController.navigate("task/${it.id}") }
                         .padding(12.dp))
                     CustomDivider()
                 }

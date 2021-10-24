@@ -8,11 +8,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.database.entities.ProjectEntity
-import com.example.database.entities.UserEntity
 import com.example.domain.model.Project
 import com.example.domain.model.User
-import com.example.domain.repository.Success
+import com.example.domain.Success
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.logic.ProjectStatus
 import com.example.projectandroidsuite.ui.parts.customitems.*
@@ -116,9 +114,8 @@ fun CreateProjectDialogInput(
     val title by viewModel.title.observeAsState("")
     val description by viewModel.description.observeAsState("\n")
     val listUsersFlow by viewModel.userListFlow.observeAsState()
-    val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf<User>())
+    val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf())
     val responsible by viewModel.responsible.observeAsState()
-    val userSearch by viewModel.userSearchQuery.observeAsState("")
     val projectStatus by viewModel.projectStatus.observeAsState()
 
 

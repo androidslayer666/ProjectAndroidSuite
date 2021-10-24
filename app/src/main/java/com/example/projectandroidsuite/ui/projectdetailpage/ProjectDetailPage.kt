@@ -15,8 +15,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.database.entities.MessageEntity
-import com.example.database.entities.MilestoneEntity
 import com.example.domain.model.Message
 import com.example.domain.model.Milestone
 import com.example.projectandroidsuite.R

@@ -1,15 +1,13 @@
 package com.example.domain.mappers
 
-import android.util.Log
-import com.example.database.entities.MessageEntity
+
 import com.example.database.entities.MilestoneEntity
-import com.example.database.entities.TaskEntity
-import com.example.domain.model.Message
+import com.example.domain.Constants.FORMAT_API_DATE
 import com.example.domain.model.Milestone
-import com.example.domain.repository.dateToString
 import com.example.network.dto.MilestoneDto
 import com.example.network.dto.MilestonePost
-import com.example.network.dto.TaskDto
+import java.text.SimpleDateFormat
+import java.util.*
 
 fun List<MilestoneDto>.toListEntities(projectId: Int): List<MilestoneEntity> {
 
@@ -46,7 +44,7 @@ fun Milestone.toMilestonePost(): MilestonePost {
     return MilestonePost(
         title = this.title,
         description = this.description,
-        deadline = this.deadline?.dateToString(),
+        deadline = SimpleDateFormat(FORMAT_API_DATE, Locale.getDefault()).format(this.deadline ?: Date()),
         responsible = this.responsible?.id,
         notifyResponsible = true,
         isNotify = true,
@@ -78,4 +76,13 @@ fun MilestoneEntity.fromMilestoneEntityToMilestone(): Milestone {
         updated = this.updated,
         projectId = projectId
     )
+}
+
+
+fun List<MilestoneDto>.toListMilestoneIds(): MutableList<Int> {
+    val listString = mutableListOf<Int>()
+    for (milestone in this) {
+        listString.add(milestone.id)
+    }
+    return listString
 }

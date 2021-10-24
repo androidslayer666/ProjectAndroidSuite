@@ -2,15 +2,12 @@ package com.example.domain.repositoryimpl
 
 import android.util.Log
 import com.example.database.dao.ProjectDao
-import com.example.database.entities.ProjectEntity
+import com.example.domain.Result
 import com.example.domain.mappers.*
 import com.example.domain.model.Project
+import com.example.domain.networkCaller
 import com.example.domain.repository.ProjectRepository
-import com.example.domain.repository.Result
-import com.example.domain.repository.networkCaller
-import com.example.domain.repository.toListProjectIds
 import com.example.network.dto.ProjectDto
-import com.example.network.dto.ProjectPost
 import com.example.network.dto.ProjectStatusPost
 import com.example.network.dto.ProjectTeamPost
 import com.example.network.endpoints.ProjectEndPoint
@@ -32,7 +29,7 @@ class ProjectRepositoryImpl @Inject constructor(
 
     override suspend fun getProjects(): Result<String, String> {
         return networkCaller(
-            call = { projectEndPoint.getAllProjects().listProjectDtos },
+            call = { projectEndPoint.getUserProjects().listProjectDtos },
             onSuccess = { projects ->
                 projects?.forEach { project ->
                     //gathering full info about each project

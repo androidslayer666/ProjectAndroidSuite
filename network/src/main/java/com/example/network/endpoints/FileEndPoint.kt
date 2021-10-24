@@ -1,10 +1,8 @@
 package com.example.network.endpoints
 
-import com.example.network.dto.FilesSubTransporter
 import com.example.network.dto.FilesTransporter
 import com.example.network.dto.FilesTransporterResponse
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.Path
 
 interface FileEndPoint {

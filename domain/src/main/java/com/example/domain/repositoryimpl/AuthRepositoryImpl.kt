@@ -4,13 +4,19 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.mappers.fromLoginResponseDtoToLoginResponse
+import com.example.domain.model.LoginResponse
 import com.example.domain.repository.AuthRepository
+import com.example.domain.Failure
+import com.example.domain.Result
+import com.example.domain.Success
 import com.example.network.Constants.AUTHENTICATED
+import com.example.network.Constants.AUTH_TOKEN
 import com.example.network.Constants.EXPIRATION_DATE
 import com.example.network.Constants.PORTAL_ADDRESS
 import com.example.network.Constants.USER_TOKEN
-import com.example.network.dto.auth.LoginRequest
-import com.example.network.dto.auth.Token
+import com.example.network.dto.auth.LoginRequestDto
+import com.example.network.dto.auth.TokenDto
 import com.example.network.endpoints.AuthEndPoint
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,25 +29,14 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
     private var prefs: SharedPreferences =
-        context.getSharedPreferences("AuthToken", Context.MODE_PRIVATE)
+        context.getSharedPreferences(AUTH_TOKEN, Context.MODE_PRIVATE)
     private var _authenticated = MutableLiveData<Boolean>()
 
     init {
         _authenticated.value = isAuthenticated()
     }
 
-    override suspend fun authenticate(email: String, password: String) {
-        try {
-            val loginResponse = apiService.login( LoginRequest(email = email, password = password))
-            Log.d("authenticate", loginResponse.toString())
-            if (loginResponse.token.authToken.isNotEmpty())
-                saveAuthToken(loginResponse.token)
-        } catch (e:Exception) {
-            Log.d("SessionManager", e.toString())
-        }
-    }
-
-    private fun saveAuthToken(token: Token) {
+    private fun saveAuthToken(token: TokenDto) {
         Log.d("SessionManager", token.authToken)
         val editor = prefs.edit()
         _authenticated.value = true
@@ -51,14 +46,13 @@ class AuthRepositoryImpl @Inject constructor(
         editor.apply()
     }
 
-    override fun rememberPortalAddress(portalAddress: String) {
+    override fun rememberPortalAddress(address: String) {
         val editor = prefs.edit()
-        editor.putString(PORTAL_ADDRESS, "https://" + portalAddress + "/")
+        editor.putString(PORTAL_ADDRESS, "https://" + address + "/")
         editor.apply()
     }
 
     override fun logOut() {
-        Log.d("SessionManager", "logging out")
         val editor = prefs.edit()
         _authenticated.value = false
         editor.putString(USER_TOKEN, null)
@@ -69,6 +63,40 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun isAuthenticated(): Boolean {
         return prefs.getBoolean(AUTHENTICATED, false)
+    }
+
+    override suspend fun login(
+        address: String,
+        email: String,
+        password: String,
+        code: Int?
+    ): Result<LoginResponse, String> {
+        try {
+            val portalAddress =
+                if (code != null) "https://$address/api/2.0/authentication/$code"
+                else "https://$address/api/2.0/authentication"
+            Log.d("login", portalAddress)
+            val loginResponse =
+                apiService.login(portalAddress, LoginRequestDto(email = email, password = password))
+            Log.d("authenticate", loginResponse.toString())
+            loginResponse.token?.authToken?.let { saveAuthToken(loginResponse.token!!) }
+            return Success(loginResponse.fromLoginResponseDtoToLoginResponse())
+        } catch (e: Exception) {
+            Log.d("SessionManager", e.toString())
+            return Failure(e.toString())
+        }
+    }
+
+    override suspend fun tryPortal(address: String): Result<String, String> {
+        try {
+            val response =
+                apiService.checkPortalPossibilities("https://$address/api/2.0/capabilities")
+            Log.d("AuthRepositoryImpl", response.toString())
+            return Success("portal exists")
+        } catch (e: Exception) {
+            Log.d("SessionManager", e.toString())
+            return Failure(e.toString())
+        }
     }
 
 }

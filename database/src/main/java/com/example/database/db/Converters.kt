@@ -4,7 +4,6 @@ import androidx.room.TypeConverter
 import com.example.database.entities.CommentEntity
 import com.example.database.entities.SubtaskEntity
 import com.example.database.entities.UserEntity
-import com.example.network.dto.UserDto
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
@@ -16,13 +15,13 @@ class Converters {
 
     @TypeConverter
     fun fromTimestamp(value: String?): Date? {
-        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault() )
         return value?.let { format.parse(it) }
     }
 
     @TypeConverter
     fun dateToTimestamp(date: Date?): String? {
-        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
         //Log.d("dateToTimestamp", format.format(date))
         return if (date!=null) format.format(date ) else format.format(Date())
     }

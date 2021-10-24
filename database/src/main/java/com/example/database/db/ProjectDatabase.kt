@@ -1,8 +1,6 @@
 package com.example.database.db
 
 import android.content.Context
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -12,19 +10,12 @@ import com.example.database.entities.*
 
 
 @Database(
-    entities = arrayOf(
-        ProjectEntity::class,
-        UserEntity::class,
-        FileEntity::class,
-        MessageEntity::class,
-        MilestoneEntity::class,
-        TaskEntity::class,
-        SubtaskEntity::class,
-        CommentEntity::class,
-    ), version = 1
+    entities = [ProjectEntity::class, UserEntity::class, FileEntity::class, MessageEntity::class,
+        MilestoneEntity::class, TaskEntity::class, SubtaskEntity::class, CommentEntity::class],
+    version = 1
 )
 @TypeConverters(Converters::class)
-abstract class ProjectDatabase() : RoomDatabase() {
+abstract class ProjectDatabase : RoomDatabase() {
     abstract fun projectDao(): ProjectDao
     abstract fun fileDao(): FileDao
     abstract fun messageDao(): MessageDao
@@ -41,8 +32,8 @@ abstract class ProjectDatabase() : RoomDatabase() {
 
         fun getInstance(context: Context): ProjectDatabase {
             return instance ?: synchronized(this) {
-                ProjectDatabase.instance
-                    ?: ProjectDatabase.buildDatabase(
+                instance
+                    ?: buildDatabase(
                         context
                     ).also { instance = it }
             }

@@ -1,19 +1,8 @@
 package com.example.domain.repository
 
-import android.util.Log
-import com.example.database.entities.ProjectEntity
-import com.example.domain.mappers.toListEntities
-import com.example.domain.mappers.toListUserEntity
-import com.example.domain.mappers.toProjectEntity
+import com.example.domain.Result
 import com.example.domain.model.Project
-import com.example.network.dto.ProjectDto
-import com.example.network.dto.ProjectPost
-import com.example.network.dto.ProjectStatusPost
-import com.example.network.dto.ProjectTeamPost
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 interface ProjectRepository {
     suspend fun getProjects(): Result<String, String>

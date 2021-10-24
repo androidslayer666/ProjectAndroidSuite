@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.projectpage
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,11 +19,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.database.entities.TaskEntity
 import com.example.domain.model.Task
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.ui.parts.customitems.CustomDivider
+import com.example.projectandroidsuite.logic.Constants.FORMAT_SHOW_DATE
 import java.text.SimpleDateFormat
+import java.util.*
 
 
 @Composable
@@ -101,7 +100,7 @@ fun TaskItem(
                     )
                 }
                 Text(
-                    text = SimpleDateFormat("dd/MM/yyyy").format(task.deadline),
+                    text = SimpleDateFormat(FORMAT_SHOW_DATE, Locale.getDefault()).format(task.deadline),
                     style = MaterialTheme.typography.overline
                 )
             }

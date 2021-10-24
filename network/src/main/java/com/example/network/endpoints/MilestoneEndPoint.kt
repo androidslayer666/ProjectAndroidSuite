@@ -1,15 +1,11 @@
 package com.example.network.endpoints
 
-import com.example.network.Constants.BASE_URL_MILESTONES_LATE
 import com.example.network.dto.MilestoneDto
 import com.example.network.dto.MilestonePost
 import com.example.network.dto.MilestonesTransporter
 import retrofit2.http.*
 
 interface MilestoneEndPoint {
-
-    @GET(BASE_URL_MILESTONES_LATE)
-    suspend fun getLateMilestones(): MilestonesTransporter
 
     @GET("api/2.0/project/{id}/milestone")
     suspend fun getLateMilestonesByProjectId(@Path("id") projectId: Int): MilestonesTransporter

@@ -59,8 +59,18 @@ fun CommentEntity.fromCommentEntityToComment(): Comment {
         createdBy = this.createdBy?.fromUserEntityToUser(),
         inactive = this.inactive,
         parentId = this.parentId,
-        text = this.text ?: "",
+        text = this.text,
         taskId = taskId,
         messageId = messageId
     )
 }
+
+
+fun List<CommentDto>.toListCommentIds(): MutableList<String> {
+    val listString = mutableListOf<String>()
+    for (comment in this) {
+        listString.add(comment.id)
+    }
+    return listString
+}
+

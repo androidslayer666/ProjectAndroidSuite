@@ -1,11 +1,9 @@
 package com.example.domain.di
 
+
 import android.content.Context
-import com.example.network.endpoints.*
 import com.example.database.dao.*
 import com.example.database.db.ProjectDatabase
-
-
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

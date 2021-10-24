@@ -46,3 +46,21 @@ fun UserEntity.fromUserEntityToUser(): User {
         avatarMedium = this.avatarMedium
     )
 }
+
+fun List<User>.toStringIds(): String {
+    var string = ""
+    this.map {
+        string += it.id + ","
+    }
+    return string.dropLast(1)
+}
+
+
+
+fun List<User>.fromListUsersToStrings(): List<String> {
+    val listString = mutableListOf<String>()
+    for (user in this) {
+        listString.add(user.id)
+    }
+    return listString
+}

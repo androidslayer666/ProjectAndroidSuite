@@ -2,8 +2,7 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.database.entities.MessageEntity
-import com.example.database.entities.UserEntity
+import com.example.domain.Result
 import com.example.domain.model.Message
 import com.example.domain.model.User
 import com.example.domain.repository.*
@@ -72,7 +71,7 @@ class MessageCreateEditViewModel @Inject constructor(
     fun setMessage(message: Message) {
         messageId = message.id
         _title.value  = message.title
-        _content.value = message.text ?: ""
+        _content.value = message.text
         //_chosenUserList.value = message.
     }
 
@@ -104,7 +103,6 @@ class MessageCreateEditViewModel @Inject constructor(
     }
 
 
-    //todo only users
     fun clearInput() {
         projectId = null
         _title.value = ""
@@ -124,7 +122,6 @@ class MessageCreateEditViewModel @Inject constructor(
     fun createMessage() {
         viewModelScope.launch(IO) {
             val response = messageRepository.putMessageToProject(
-                //todo shouldNot be null
                 projectId ?: 0,
                 Message(
                     title = title.value ?: "",
@@ -143,7 +140,6 @@ class MessageCreateEditViewModel @Inject constructor(
     fun updateMessage() {
         viewModelScope.launch(IO) {
         val response = messageRepository.updateMessage(
-                //todo shouldNot be null
             projectId ?: 0,
                 Message(
                     title = title.value ?: "",

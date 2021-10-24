@@ -1,6 +1,6 @@
 package com.example.domain.repository
 
-import com.example.database.entities.CommentEntity
+import com.example.domain.Result
 import com.example.domain.model.Comment
 import kotlinx.coroutines.flow.Flow
 

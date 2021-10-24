@@ -2,8 +2,7 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.database.entities.ProjectEntity
-import com.example.database.entities.UserEntity
+import com.example.domain.Result
 import com.example.domain.model.Project
 import com.example.domain.model.User
 import com.example.domain.repository.*
@@ -98,7 +97,6 @@ class ProjectCreateEditViewModel @Inject constructor(
     }
 
     fun setResponsible(user: User) {
-        //Log.d("ProjectCreateEditodel", "setting the manager" + user.toString())
         _responsible.value = user
     }
 
@@ -121,12 +119,12 @@ class ProjectCreateEditViewModel @Inject constructor(
         val listIds = _chosenUserList.value!!.getListIds()
         if (listIds.contains(user.id)) {
             _chosenUserList.value!!.remove(_chosenUserList.value!!.getUserById(user.id))
-            Log.d("addOrRemoveUser", "remove user " + user.toString())
+            Log.d("addOrRemoveUser", "remove user $user")
             Log.d("addOrRemoveUser", "list users  " + _chosenUserList.value!!.map{it.displayName}.toString())
             _chosenUserList.forceRefresh()
         } else {
             _chosenUserList.value!!.add(user)
-            Log.d("addOrRemoveUser", "add user " + user.toString())
+            Log.d("addOrRemoveUser", "add user $user")
             _chosenUserList.forceRefresh()
         }
     }
@@ -158,7 +156,6 @@ class ProjectCreateEditViewModel @Inject constructor(
         Log.d("addOrRemoveUser", "list users  " + _chosenUserList.value!!.map{it.displayName}.toString())
         CoroutineScope(IO).launch {
             val response = projectRepository.updateProject(
-                //todo should not be null
                 projectId ?: 0,
                 Project(
                     id =0,
@@ -170,7 +167,7 @@ class ProjectCreateEditViewModel @Inject constructor(
                 when (projectStatus.value) {
                     ProjectStatus.ACTIVE -> "open"
                     ProjectStatus.PAUSED -> "Paused"
-                    ProjectStatus.ACTIVE -> "Closed"
+                    ProjectStatus.STOPPED-> "Closed"
                     else -> "open"
                 }
             )

@@ -15,8 +15,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.domain.repository.Failure
-import com.example.domain.repository.Success
+import com.example.domain.Failure
+import com.example.domain.Success
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.makeToast
 import com.example.projectandroidsuite.ui.parts.*

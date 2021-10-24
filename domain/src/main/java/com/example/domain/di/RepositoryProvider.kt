@@ -46,15 +46,13 @@ class RepositoryProvider {
         messageEndPoint: MessageEndPoint,
         messageDao: MessageDao,
         commentEndPoint: CommentEndPoint,
-        commentDao: CommentDao,
-        commentRepository: CommentRepository
+        commentDao: CommentDao
     ): MessageRepository {
         return MessageRepositoryImpl(
             messageEndPoint,
             messageDao,
             commentEndPoint,
-            commentDao,
-            commentRepository
+            commentDao
         )
     }
 
@@ -81,11 +79,10 @@ class RepositoryProvider {
     @Singleton
     fun provideTaskRepository(
         taskDao: TaskDao,
-        taskEndPoint: TaskEndPoint,
-        projectEndPoint: ProjectEndPoint
+        taskEndPoint: TaskEndPoint
     ): TaskRepository {
         return TaskRepositoryImpl(
-            taskDao, taskEndPoint, projectEndPoint
+            taskDao, taskEndPoint
         )
     }
 

@@ -3,6 +3,8 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.database.entities.*
+import com.example.domain.Result
+import com.example.domain.Success
 import com.example.domain.model.*
 import com.example.domain.repository.*
 import com.example.projectandroidsuite.logic.arrangeMilestonesAndTasks
@@ -82,7 +84,6 @@ class ProjectDetailViewModel @Inject constructor(
         }
     }
 
-    //todo
     fun addCommentToMessage(comment: Comment){
         Log.d("ProjectDetailViewModel", comment.toString())
         CoroutineScope(IO).launch {
