@@ -1,8 +1,8 @@
 package com.example.domain.mappers
 
-import com.example.database.entities.SubtaskEntity
+import com.example.domain.dto.SubtaskDto
+import com.example.domain.entities.SubtaskEntity
 import com.example.domain.model.Subtask
-import com.example.network.dto.SubtaskDto
 
 fun List<SubtaskDto>.toSubtaskEntity() : List<SubtaskEntity>{
     val list = mutableListOf<SubtaskEntity>()

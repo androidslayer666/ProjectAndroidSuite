@@ -1,8 +1,8 @@
 package com.example.domain.mappers
 
-import com.example.database.entities.UserEntity
+import com.example.domain.dto.UserDto
+import com.example.domain.entities.UserEntity
 import com.example.domain.model.User
-import com.example.network.dto.UserDto
 
 
 fun UserDto.toUserEntity(): UserEntity {

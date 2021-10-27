@@ -16,9 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.database.entities.CommentEntity
-import com.example.database.entities.MessageEntity
-import com.example.domain.mappers.fromListCommentEntitiesToListComments
 import com.example.domain.model.Comment
 import com.example.domain.model.Message
 import com.example.projectandroidsuite.R

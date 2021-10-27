@@ -10,6 +10,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -28,10 +29,10 @@ import java.util.*
 
 @Composable
 fun TaskList(
-    viewModel: ProjectViewModel,
+    viewModel: TasksViewModel,
     navController: NavHostController
 ) {
-    val list by viewModel.tasks.observeAsState()
+    val list by viewModel.tasks.collectAsState()
     LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
         list?.let {
             items(list!!) { task ->

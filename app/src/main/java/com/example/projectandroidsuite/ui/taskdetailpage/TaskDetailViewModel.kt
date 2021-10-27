@@ -4,80 +4,73 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.domain.Result
 import com.example.domain.Success
+import com.example.domain.interactor.GetFilesByTaskId
+import com.example.domain.interactor.comment.DeleteComment
+import com.example.domain.interactor.comment.GetCommentByTaskId
+import com.example.domain.interactor.comment.PutCommentToTask
+import com.example.domain.interactor.milestone.GetMilestoneById
+import com.example.domain.interactor.task.DeleteTask
+import com.example.domain.interactor.task.GetTaskById
+import com.example.domain.interactor.task.UpdateTaskStatus
 import com.example.domain.model.Comment
-import com.example.domain.model.Milestone
-import com.example.domain.repository.*
+import com.example.domain.model.File
+import com.example.domain.model.Task
+import com.example.domain.repository.CommentRepository
+import com.example.domain.repository.MilestoneRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class TaskDetailViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
-    private val fileRepository: FileRepository,
-    private val commentRepository: CommentRepository,
-    private val milestoneRepository: MilestoneRepository
+    private val getTaskById: GetTaskById,
+    private val deleteTask: DeleteTask,
+    private val updateTaskStatus: UpdateTaskStatus,
+    private val getFilesByTaskId: GetFilesByTaskId,
+    private val getCommentByTaskId: GetCommentByTaskId,
+    private val getMilestoneById: GetMilestoneById,
+    private val putCommentToTask: PutCommentToTask,
+    private val deleteComment: DeleteComment
 ) : ViewModel() {
 
-    private var _taskId = MutableLiveData<Int>()
-    val taskId: LiveData<Int> = _taskId
+    private var _taskId = MutableLiveData<Int?>(null)
+    val taskId: LiveData<Int?> = _taskId
 
-    val currentTask = _taskId.switchMap { taskId ->
-        taskRepository.getTaskById(taskId).asLiveData()
+    val currentTask = _taskId.switchMap <Int?, Task?> { taskId ->
+        getTaskById(taskId?:0).asLiveData()
     }
 
     val taskMilestone = currentTask.switchMap { task ->
-        if (task?.milestoneId != null) {
-            liveData<Milestone> { emit(milestoneRepository.getMilestoneById(task.milestoneId!!)) }
-        } else liveData {}
+        getMilestoneById(task?.milestoneId).asLiveData()
     }
 
-    val filesForTask = _taskId.switchMap { taskId ->
-        fileRepository.getFilesWithTaskId(taskId).asLiveData()
+    val filesForTask = _taskId.switchMap<Int?, List<File>> { taskId ->
+        getFilesByTaskId(taskId ?: 0).asLiveData()
     }
 
-    val listComments = _taskId.switchMap {
-        commentRepository.getCommentByTaskId(it).asLiveData()
+    val listComments = _taskId.asFlow().transform<Int?, List<Comment>?> { taskId ->
+        getCommentByTaskId(taskId).collect { emit(it) }
     }
 
-    private var _taskDeletionStatus = MutableLiveData<Result<String, String>?>()
-    val taskDeletionStatus: LiveData<Result<String, String>?> = _taskDeletionStatus
-
+    private var _taskDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
+    val taskDeletionStatus: StateFlow<Result<String, String>?> = _taskDeletionStatus
 
     fun setCurrentTask(taskId: Int) {
         _taskId.value = taskId
-        viewModelScope.launch(IO) {
-            //Log.d("TaskDetailViewModel", "Populating tasks with task ID" + taskId.toString())
-            commentRepository.populateCommentsWithTaskId(taskId)
-            fileRepository.populateTaskFiles(taskId)
-        }
     }
 
     fun deleteTask() {
-        taskId.value?.let {
-            CoroutineScope(IO).launch {
-                val result = taskRepository.deleteTask(it)
-                withContext(Main) {
-                    if (_taskDeletionStatus.value == null) {
-                        _taskDeletionStatus.value = result
-                    }
-                }
-            }
+        CoroutineScope(IO).launch {
+            _taskDeletionStatus.value = deleteTask(taskId.value)
         }
     }
 
     fun addCommentToTask(comment: Comment) {
-        //Log.d("ProjectDetailViewModel", comment.toString())
         CoroutineScope(IO).launch {
-            val result = commentRepository.putCommentToTask(taskId.value ?: 0, comment)
-            if (result is Success) {
-                //Log.d("ProjectDetailViewModel", projectId.value.toString())
-                taskId.value?.let { commentRepository.populateCommentsWithTaskId(it) }
-            }
+            putCommentToTask(taskId.value ?: 0, comment)
         }
     }
 
@@ -87,24 +80,13 @@ class TaskDetailViewModel @Inject constructor(
 
     fun deleteComment(commentEntity: Comment) {
         CoroutineScope(IO).launch {
-            commentRepository.deleteComment(commentEntity.id, taskId.value ?: 0)
+            deleteComment(commentEntity.id, taskId.value)
         }
     }
 
     fun changeTaskStatus() {
         viewModelScope.launch(IO) {
-            Log.d("ProjectDetailViewModel", taskId.value.toString())
-            Log.d("ProjectDetailViewModel", currentTask.value?.status.toString())
-            if (taskId.value != null && currentTask.value?.status != null) {
-                taskRepository.updateTaskStatus(
-                    taskId.value!!,
-                    when (currentTask.value?.status) {
-                        1 -> "closed"
-                        2 -> "open"
-                        else -> "open"
-                    }
-                )
-            }
+            updateTaskStatus(taskId.value, currentTask.value?.status)
         }
     }
 }

@@ -1,8 +1,8 @@
 package com.example.domain.mappers
 
-import com.example.database.entities.FileEntity
+import com.example.domain.dto.FileDto
+import com.example.domain.entities.FileEntity
 import com.example.domain.model.File
-import com.example.network.dto.FileDto
 
 fun List<FileDto>.toListEntities(taskId: Int? = null, projectId: Int? = null): List<FileEntity> {
 

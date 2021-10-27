@@ -3,15 +3,24 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.domain.Result
+import com.example.domain.UserFilter
+import com.example.domain.filterUsersByFilter
+import com.example.domain.interactor.message.UpdateMessage
+import com.example.domain.interactor.milestone.PutMilestoneToProject
+import com.example.domain.interactor.milestone.UpdateMilestone
+import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Milestone
 import com.example.domain.model.User
 import com.example.domain.repository.*
-import com.example.projectandroidsuite.logic.UserFilter
+
 import com.example.projectandroidsuite.logic.combineWith
-import com.example.projectandroidsuite.logic.filterUsersByFilter
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -19,9 +28,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MilestoneCreateEditViewModel @Inject constructor(
-    private val teamRepository: TeamRepository,
-    private val projectRepository: ProjectRepository,
-    private val milestoneRepository: MilestoneRepository
+    private val getAllUsers: GetAllUsers,
+    private val putMilestoneToProject: PutMilestoneToProject,
+
+    private val updateMilestone: UpdateMilestone
 ) : ViewModel() {
 
     private var projectId: Int? = null
@@ -41,8 +51,6 @@ class MilestoneCreateEditViewModel @Inject constructor(
     private var _responsible = MutableLiveData<User?>()
     val responsible: LiveData<User?> = _responsible
 
-    private var userSearch = MutableLiveData<UserFilter>()
-
     private var _userSearchQuery = MutableLiveData<String>()
     val userSearchQuery: LiveData<String> = _userSearchQuery
 
@@ -55,18 +63,24 @@ class MilestoneCreateEditViewModel @Inject constructor(
     private var _milestoneUpdatingStatus = MutableLiveData<Result<String, String>?>()
     val subtaskUpdatingStatus: LiveData<Result<String, String>?> = _milestoneUpdatingStatus
 
-    val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
-        .combineWith(userSearch) { listProject, filter ->
-            if (filter != null) listProject?.filterUsersByFilter(filter)
-            else listProject
-        }
+//    val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
+//        .combineWith(userSearch) { listProject, filter ->
+//            if (filter != null) listProject?.filterUsersByFilter(filter)
+//            else listProject
+//        }
 
-    init {
+    private var _users = MutableStateFlow<List<User>>(listOf())
+    val users: StateFlow<List<User>> = _users
+
+    init{
         viewModelScope.launch(IO) {
-            teamRepository.populateAllPortalUsers()
-            projectRepository.getProjects()
-            //if(projectResponse is Failure<String>) _problemWithFetchingProjects.value = projectResponse.reason!!
+            getAllUsers().collectLatest { _users.value = it }
         }
+    }
+
+    fun setUserSearch(query: String) {
+        _userSearchQuery.value = query
+        getAllUsers.setFilter(query)
     }
 
     fun setMilestone(milestone: Milestone) {
@@ -114,16 +128,16 @@ class MilestoneCreateEditViewModel @Inject constructor(
         _milestoneUpdatingStatus.value = null
     }
 
-    fun setUserSearch(query: String) {
-        _userSearchQuery.value = query
-        userSearch.value =
-            UserFilter(query)
-    }
+//    fun setUserSearch(query: String) {
+//        _userSearchQuery.value = query
+//        userSearch.value =
+//            UserFilter(query)
+//    }
 
 
     fun createMilestone() {
         viewModelScope.launch(IO) {
-            val response = milestoneRepository.putMilestoneToProject(
+            val response = putMilestoneToProject(
                 projectId ?: 0,
                 Milestone(
                     id =0,
@@ -143,7 +157,7 @@ class MilestoneCreateEditViewModel @Inject constructor(
 
     fun updateMilestone() {
         viewModelScope.launch(IO) {
-            val response = milestoneRepository.updateMilestoneToProject(
+            val response = updateMilestone(
                 projectId ?: 0,
                 Milestone(
                     title = title.value ?: "",

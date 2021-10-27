@@ -1,9 +1,9 @@
 package com.example.domain.mappers
 
-import com.example.database.entities.ProjectEntity
+import com.example.domain.dto.ProjectDto
+import com.example.domain.dto.ProjectPost
+import com.example.domain.entities.ProjectEntity
 import com.example.domain.model.Project
-import com.example.network.dto.ProjectDto
-import com.example.network.dto.ProjectPost
 import java.util.*
 
 fun List<ProjectDto>.toListEntities(): MutableList<ProjectEntity> {

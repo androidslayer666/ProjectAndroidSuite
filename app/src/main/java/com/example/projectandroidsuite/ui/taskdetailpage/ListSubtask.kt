@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.database.entities.SubtaskEntity
 import com.example.domain.model.Subtask
 import com.example.projectandroidsuite.R
 

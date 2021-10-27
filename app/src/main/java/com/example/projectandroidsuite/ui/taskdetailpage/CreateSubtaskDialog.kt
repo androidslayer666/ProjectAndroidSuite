@@ -26,11 +26,11 @@ fun CreateSubtaskDialog(
     viewModel.setTaskId(taskId)
     subtask?.let { viewModel.setSubtask(it) }
 
-    val taskUpdatingStatus by viewModel.subtaskUpdatingStatus.observeAsState()
-    val taskCreationStatus by viewModel.subtaskCreationStatus.observeAsState()
+    val taskUpdatingStatus by viewModel.subtaskUpdatingStatus.collectAsState()
+    val taskCreationStatus by viewModel.subtaskCreationStatus.collectAsState()
     val userSearch by viewModel.userSearchQuery.observeAsState("")
     var showTeamPicker by remember { mutableStateOf(false) }
-    val listUsersFlow by viewModel.userListFlow.observeAsState()
+    val listUsersFlow by viewModel.users.collectAsState()
 
     if (taskCreationStatus is Success<String>) {
         onSubtaskDeletedOrEdited((taskCreationStatus as Success<String>).value)
@@ -82,7 +82,7 @@ fun CreateSubtaskDialogInput(viewModel: SubtaskCreateEditViewModel,
 
 
     val title by viewModel.title.observeAsState("")
-    val listUsersFlow by viewModel.userListFlow.observeAsState()
+    val listUsersFlow by viewModel.users.collectAsState()
 
     val responsible by viewModel.responsible.observeAsState()
 

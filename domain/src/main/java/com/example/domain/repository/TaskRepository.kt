@@ -19,7 +19,7 @@ interface TaskRepository {
 
     fun getUserTasks(userId: Int): Flow<List<Task>>
 
-    suspend fun createTask(milestoneId: Int, task: Task): Result<String, String>
+    suspend fun createTask(milestoneId: Int?, task: Task): Result<String, String>
 
     suspend fun createSubtask(subtask: Subtask): Result<String, String>
 
@@ -29,7 +29,7 @@ interface TaskRepository {
         taskStatus: String
     ): Result<String, String>
 
-    suspend fun updateTaskStatus(taskId: Int, taskStatus: String)
+    suspend fun updateTaskStatus(taskId: Int, taskStatus: String): Result<String, String>
 
     suspend fun deleteTask(taskId: Int): Result<String, String>
 

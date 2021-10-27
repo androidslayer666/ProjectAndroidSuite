@@ -12,10 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.domain.Success
+import com.example.domain.TaskStatus
 import com.example.domain.model.Task
 import com.example.projectandroidsuite.logic.Constants.FORMAT_SHOW_DATE
 import com.example.projectandroidsuite.logic.PickerType
-import com.example.projectandroidsuite.logic.TaskStatus
+
 import com.example.projectandroidsuite.logic.makeToast
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
@@ -36,13 +37,13 @@ fun CreateUpdateTaskDialog(
     task?.let { viewModel.setTask(it) }
 
     val taskUpdatingStatus by viewModel.taskUpdatingStatus.observeAsState()
-    val taskCreationStatus by viewModel.taskCreationStatus.observeAsState()
+    val taskCreationStatus by viewModel.taskCreationStatus.collectAsState()
 
     var showTeamPicker by remember { mutableStateOf(false) }
     var showProjectPicker by remember { mutableStateOf(false) }
     var showMilestonePicker by remember { mutableStateOf(false) }
     val listMilestones by viewModel.milestonesList.observeAsState()
-    val listProjects by viewModel.projectList.observeAsState()
+    val listProjects by viewModel.projectList.collectAsState()
     val listUsersFlow by viewModel.userList.observeAsState()
     val project by viewModel.project.observeAsState()
 
@@ -98,7 +99,7 @@ fun CreateUpdateTaskDialog(
             closeDialog = { showProjectPicker = false },
             ifChooseResponsibleOrTeam = PickerType.SINGLE,
             searchString = projectSearch,
-            onSearchChanged = { query -> viewModel.setProjectSearch(query) }
+            onSearchChanged = { query -> viewModel.setStringForFilteringProjects(query) }
         )
     }
 
@@ -155,7 +156,7 @@ fun CreateTaskDialogInput(
 
     val title by viewModel.title.observeAsState("")
     val description by viewModel.description.observeAsState("")
-    val listProjects by viewModel.projectList.observeAsState()
+    val listProjects by viewModel.projectList.collectAsState()
     val project by viewModel.project.observeAsState()
     val listUsersFlow by viewModel.userList.observeAsState()
     val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf())

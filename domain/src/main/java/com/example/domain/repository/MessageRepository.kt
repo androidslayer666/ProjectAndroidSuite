@@ -9,6 +9,7 @@ interface MessageRepository {
 
     suspend fun populateMessageWithProjectId(projectId: Int): Result<String, String>
 
+    suspend fun updateMessageComments(messageId:Int, projectId: Int)
 
     fun getMessagesByProjectId(projectId: Int): Flow<List<Message>>
 

@@ -1,10 +1,10 @@
 package com.example.domain.mappers
 
-import com.example.database.entities.TaskEntity
 import com.example.domain.Constants.FORMAT_API_DATE
+import com.example.domain.dto.TaskDto
+import com.example.domain.dto.TaskPost
+import com.example.domain.entities.TaskEntity
 import com.example.domain.model.Task
-import com.example.network.dto.TaskDto
-import com.example.network.dto.TaskPost
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,7 +49,7 @@ fun Task.fromTaskEntityToPost(milestoneId: Int? = 0): TaskPost {
         title = title,
         responsibles = responsibles.fromListUsersToStrings(),
         startDate = SimpleDateFormat(FORMAT_API_DATE, Locale.getDefault()).format(Date()),
-        milestoneid = milestoneId ?: 0,
+        milestoneid = milestoneId,
         priority = priority?.priorityToString(),
     )
 }

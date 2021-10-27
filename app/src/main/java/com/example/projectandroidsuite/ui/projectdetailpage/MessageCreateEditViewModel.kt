@@ -3,6 +3,12 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.domain.Result
+import com.example.domain.UserFilter
+import com.example.domain.filterUsersByFilter
+import com.example.domain.getListIds
+import com.example.domain.interactor.message.CreateMessage
+import com.example.domain.interactor.message.UpdateMessage
+import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Message
 import com.example.domain.model.User
 import com.example.domain.repository.*
@@ -13,6 +19,8 @@ import com.example.projectandroidsuite.ui.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -20,9 +28,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MessageCreateEditViewModel @Inject constructor(
-    private val teamRepository: TeamRepository,
-    private val projectRepository: ProjectRepository,
-    private val messageRepository: MessageRepository
+    private val getAllUsers: GetAllUsers,
+    private val createMessage: CreateMessage,
+    private val updateMessage: UpdateMessage
 ) : ViewModel() {
 
     private var projectId: Int? = null
@@ -49,22 +57,23 @@ class MessageCreateEditViewModel @Inject constructor(
     private var _updatingStatus = MutableLiveData<Result<String, String>?>()
     val updatingStatus: LiveData<Result<String, String>?> = _updatingStatus
 
-    val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
-        .combineWith(chosenUserList) { users, chosenUsers ->
-            users?.forEach { user ->
-                user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
-            }
-            return@combineWith users
-        }
-        .combineWith(userSearch) { listProject, filter ->
-            if (filter != null) listProject?.filterUsersByFilter(filter)
-            else listProject
-        }
+    private var _users = MutableStateFlow<List<User>?>(null)
+    val users: StateFlow<List<User>?> = _users
 
     init {
         viewModelScope.launch(IO) {
-            teamRepository.populateAllPortalUsers()
-            projectRepository.getProjects()
+
+            getAllUsers().asLiveData().combineWith(chosenUserList) { users, chosenUsers ->
+                Log.d("ProjectCreateEditModel", chosenUsers?.map{it.displayName}.toString())
+                users?.forEach { user ->
+                    user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
+                }
+                return@combineWith users
+            }
+                .combineWith(userSearch) { listProject, filter ->
+                    _users.value = listProject?.filterUsersByFilter(filter)
+                }
+
         }
     }
 
@@ -121,7 +130,7 @@ class MessageCreateEditViewModel @Inject constructor(
 
     fun createMessage() {
         viewModelScope.launch(IO) {
-            val response = messageRepository.putMessageToProject(
+            val response = createMessage(
                 projectId ?: 0,
                 Message(
                     title = title.value ?: "",
@@ -139,7 +148,7 @@ class MessageCreateEditViewModel @Inject constructor(
 
     fun updateMessage() {
         viewModelScope.launch(IO) {
-        val response = messageRepository.updateMessage(
+        val response = updateMessage(
             projectId ?: 0,
                 Message(
                     title = title.value ?: "",

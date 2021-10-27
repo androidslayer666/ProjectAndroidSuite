@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.asLiveData
 import androidx.navigation.NavHostController
 import com.example.domain.Failure
 import com.example.domain.Success
@@ -34,6 +36,8 @@ fun TaskDetailPage(
         viewModel.setCurrentTask(taskId)
     }
 
+
+
     val context = LocalContext.current
 
     var state by remember { mutableStateOf(0) }
@@ -44,16 +48,15 @@ fun TaskDetailPage(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showUpdateStatusDialog by remember { mutableStateOf(false) }
 
-    val task by viewModel.currentTask.observeAsState()
-    val comments by viewModel.listComments.observeAsState()
+    val task by viewModel.currentTask.observeAsState(null)
+    val comments by viewModel.listComments.collectAsState(listOf())
     val files by viewModel.filesForTask.observeAsState(listOf())
-    val taskDeletionStatus by viewModel.taskDeletionStatus.observeAsState()
-    val taskMilestone by viewModel.taskMilestone.observeAsState()
-
+    val taskDeletionStatus by viewModel.taskDeletionStatus.collectAsState()
+    val taskMilestone by viewModel.taskMilestone.observeAsState(null)
 
     CustomScaffold(navController = navController, viewModel = hiltViewModel()) {
         Column {
-            Row() {
+            Row {
                 Column(Modifier.weight(5F)) {
                     DetailHeaderWrapper(
                         title = task?.title,
@@ -79,7 +82,9 @@ fun TaskDetailPage(
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            modifier = Modifier.height(50.dp).background(MaterialTheme.colors.primary),
+                            modifier = Modifier
+                                .height(50.dp)
+                                .background(MaterialTheme.colors.primary),
                             text = {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(title)
@@ -100,11 +105,11 @@ fun TaskDetailPage(
                 }
                 when (state) {
                     0 -> ListSubtask(task?.subtasks ?: listOf())
-                    1 -> ListFiles(listFiles = files)
-                    2 -> ListComments(
+                    1 -> ListComments(
                         listComments = comments,
                         onReplyClick = { comment -> viewModel.addCommentToTask(comment) },
                         onDeleteClick = { comment -> viewModel.deleteComment(comment) })
+                    2 -> ListFiles(listFiles = files)
                 }
             }
         }

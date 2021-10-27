@@ -2,27 +2,32 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.domain.Result
+import com.example.domain.*
+import com.example.domain.interactor.project.CreateProject
+import com.example.domain.interactor.project.UpdateProject
+import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Project
 import com.example.domain.model.User
 import com.example.domain.repository.*
-
-import com.example.projectandroidsuite.logic.*
-
+import com.example.projectandroidsuite.logic.combineWith
+import com.example.projectandroidsuite.logic.forceRefresh
+import com.example.projectandroidsuite.logic.getUserById
 import com.example.projectandroidsuite.ui.*
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class ProjectCreateEditViewModel @Inject constructor(
-    private val teamRepository: TeamRepository,
-    private val projectRepository: ProjectRepository
+    private val getAllUsers: GetAllUsers,
+    private val createProject: CreateProject,
+    private val updateProject: UpdateProject,
 ) : ViewModel() {
 
     private var projectId: Int? = null
@@ -53,22 +58,36 @@ class ProjectCreateEditViewModel @Inject constructor(
     private var _projectUpdatingStatus = MutableLiveData<Result<String, String>?>()
     val projectUpdatingStatus: LiveData<Result<String, String>?> = _projectUpdatingStatus
 
-    val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
-        .combineWith(chosenUserList) { users, chosenUsers ->
-            Log.d("ProjectCreateEditModel", chosenUsers?.map{it.displayName}.toString())
-            users?.forEach { user ->
-                user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
-            }
-            return@combineWith users
-        }
-        .combineWith(userSearch) { listProject, filter ->
-            if (filter != null) listProject?.filterUsersByFilter(filter)
-            else listProject
-        }
+    private var _users = MutableStateFlow<List<User>?>(null)
+    val users: StateFlow<List<User>?> = _users
+
+//    val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
+//        .combineWith(chosenUserList) { users, chosenUsers ->
+//            Log.d("ProjectCreateEditModel", chosenUsers?.map{it.displayName}.toString())
+//            users?.forEach { user ->
+//                user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
+//            }
+//            return@combineWith users
+//        }
+//        .combineWith(userSearch) { listProject, filter ->
+//            if (filter != null) listProject?.filterUsersByFilter(filter)
+//            else listProject
+//        }
 
     init {
         viewModelScope.launch(IO) {
-            teamRepository.populateAllPortalUsers()
+            //teamRepository.populateAllPortalUsers()
+            getAllUsers().asLiveData().combineWith(chosenUserList) { users, chosenUsers ->
+                Log.d("ProjectCreateEditModel", chosenUsers?.map{it.displayName}.toString())
+                users?.forEach { user ->
+                    user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
+                }
+                return@combineWith users
+            }
+                .combineWith(userSearch) { listProject, filter ->
+                    _users.value = listProject?.filterUsersByFilter(filter)
+                }
+
         }
     }
 
@@ -136,7 +155,7 @@ class ProjectCreateEditViewModel @Inject constructor(
 
     fun createProject() {
         CoroutineScope(IO).launch {
-            val response = projectRepository.createProject(
+            val response = createProject(
                 Project(
                     id =0,
                     title = title.value?:"",
@@ -155,7 +174,7 @@ class ProjectCreateEditViewModel @Inject constructor(
     fun updateProject() {
         Log.d("addOrRemoveUser", "list users  " + _chosenUserList.value!!.map{it.displayName}.toString())
         CoroutineScope(IO).launch {
-            val response = projectRepository.updateProject(
+            val response = updateProject(
                 projectId ?: 0,
                 Project(
                     id =0,
@@ -164,14 +183,8 @@ class ProjectCreateEditViewModel @Inject constructor(
                     team = chosenUserList.value,
                     responsible = responsible.value
                 ),
-                when (projectStatus.value) {
-                    ProjectStatus.ACTIVE -> "open"
-                    ProjectStatus.PAUSED -> "Paused"
-                    ProjectStatus.STOPPED-> "Closed"
-                    else -> "open"
-                }
+                projectStatus.value
             )
-
             withContext(Main) {
                 Log.d("updateProject", response.toString())
                 _projectUpdatingStatus.value = response

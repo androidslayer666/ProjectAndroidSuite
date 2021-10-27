@@ -1,7 +1,8 @@
 package com.example.domain
 
-import com.example.database.entities.CommentEntity
+import com.example.domain.entities.CommentEntity
 import com.example.domain.Constants.COMMENT_ID_ALL_NULLS
+import com.example.domain.model.User
 
 fun arrangingComments(list: List<CommentEntity>): List<CommentEntity> {
     val childList = mutableListOf<CommentEntity>()
@@ -73,4 +74,13 @@ suspend fun <T> networkCaller(
     } catch (e: Exception) {
         Failure(onFailureString)
     }
+}
+
+
+fun List<User>.getListIds(): List<String> {
+    val listIds = mutableListOf<String>()
+    for (user in this) {
+        listIds.add(user.id)
+    }
+    return listIds
 }

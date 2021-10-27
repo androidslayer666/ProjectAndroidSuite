@@ -5,11 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
@@ -17,7 +14,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.database.entities.ProjectEntity
 import com.example.domain.model.Project
 import com.example.projectandroidsuite.logic.PickerType
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
@@ -60,8 +56,8 @@ fun ProjectPickerBody(
     problemWithFetchingProjects: String? = null
 ) {
     Column {
-        if (problemWithFetchingProjects != null) {
-            Text(text = problemWithFetchingProjects!!)
+        problemWithFetchingProjects?.let {
+            Text(text = it)
         }
         TextField(value = searchString, onValueChange = onSearchChanged)
         LazyColumn {

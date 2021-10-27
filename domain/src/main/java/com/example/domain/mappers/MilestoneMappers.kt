@@ -1,11 +1,11 @@
 package com.example.domain.mappers
 
 
-import com.example.database.entities.MilestoneEntity
 import com.example.domain.Constants.FORMAT_API_DATE
+import com.example.domain.dto.MilestoneDto
+import com.example.domain.dto.MilestonePost
+import com.example.domain.entities.MilestoneEntity
 import com.example.domain.model.Milestone
-import com.example.network.dto.MilestoneDto
-import com.example.network.dto.MilestonePost
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -44,12 +44,14 @@ fun Milestone.toMilestonePost(): MilestonePost {
     return MilestonePost(
         title = this.title,
         description = this.description,
-        deadline = SimpleDateFormat(FORMAT_API_DATE, Locale.getDefault()).format(this.deadline ?: Date()),
+        deadline = SimpleDateFormat(FORMAT_API_DATE, Locale.getDefault()).format(
+            this.deadline ?: Date()
+        ),
         responsible = this.responsible?.id,
         notifyResponsible = true,
         isNotify = true,
         isKey = true
-        )
+    )
 }
 
 fun List<MilestoneEntity>.fromListMilestoneEntitiesToListMilestone(): MutableList<Milestone> {

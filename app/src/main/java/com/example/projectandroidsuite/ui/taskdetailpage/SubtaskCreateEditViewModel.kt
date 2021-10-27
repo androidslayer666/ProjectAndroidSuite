@@ -6,23 +6,27 @@ import com.example.domain.model.Subtask
 import com.example.domain.model.User
 import com.example.domain.repository.ProjectRepository
 import com.example.domain.Result
+import com.example.domain.UserFilter
+import com.example.domain.filterUsersByFilter
+import com.example.domain.interactor.CreateSubtask
+import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.repository.TaskRepository
 import com.example.domain.repository.TeamRepository
-import com.example.projectandroidsuite.logic.UserFilter
 import com.example.projectandroidsuite.logic.combineWith
-import com.example.projectandroidsuite.logic.filterUsersByFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class SubtaskCreateEditViewModel @Inject constructor(
-    private val teamRepository: TeamRepository,
-    private val taskRepository: TaskRepository,
-    private val projectRepository: ProjectRepository
+    private val getAllUsers: GetAllUsers,
+    private val createSubtask: CreateSubtask
 ) : ViewModel() {
 
     private var taskId: Int? = null
@@ -33,29 +37,27 @@ class SubtaskCreateEditViewModel @Inject constructor(
     private var _responsible = MutableLiveData<User?>()
     val responsible: LiveData<User?> = _responsible
 
-    private var userSearch = MutableLiveData<UserFilter>()
-
     private var _userSearchQuery = MutableLiveData<String>()
     val userSearchQuery: LiveData<String> = _userSearchQuery
 
-    private var _subtaskCreationStatus = MutableLiveData<Result<String, String>?>()
-    val subtaskCreationStatus: LiveData<Result<String, String>?> = _subtaskCreationStatus
+    private var _subtaskCreationStatus = MutableStateFlow<Result<String, String>?>(null)
+    val subtaskCreationStatus: StateFlow<Result<String, String>?> = _subtaskCreationStatus
 
-    private var _subtaskUpdatingStatus = MutableLiveData<Result<String, String>?>()
-    val subtaskUpdatingStatus: LiveData<Result<String, String>?> = _subtaskUpdatingStatus
+    private var _subtaskUpdatingStatus = MutableStateFlow<Result<String, String>?>(null)
+    val subtaskUpdatingStatus: StateFlow<Result<String, String>?> = _subtaskUpdatingStatus
 
-    val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
-        .combineWith(userSearch) { listProject, filter ->
-            if (filter != null) listProject?.filterUsersByFilter(filter)
-            else listProject
-        }
+    private var _users = MutableStateFlow<List<User>>(listOf())
+    val users: StateFlow<List<User>> = _users
 
-
-    init {
+    init{
         viewModelScope.launch(IO) {
-            teamRepository.populateAllPortalUsers()
-            projectRepository.getProjects()
+            getAllUsers().collectLatest { _users.value = it }
         }
+    }
+
+    fun setUserSearch(query: String) {
+        _userSearchQuery.value = query
+        getAllUsers.setFilter(query)
     }
 
     fun setSubtask(subtask: Subtask) {
@@ -86,15 +88,9 @@ class SubtaskCreateEditViewModel @Inject constructor(
         _subtaskUpdatingStatus.value = null
     }
 
-    fun setUserSearch(query: String) {
-        _userSearchQuery.value = query
-        userSearch.value =
-            UserFilter(query)
-    }
-
     fun createSubtask() {
         viewModelScope.launch(IO) {
-            val response = taskRepository.createSubtask(
+            _subtaskCreationStatus.value = createSubtask(
                 Subtask(
                     id = 0,
                     title = title.value ?: "",
@@ -102,10 +98,6 @@ class SubtaskCreateEditViewModel @Inject constructor(
                     taskId = taskId ?: 0
                 )
             )
-            withContext(Dispatchers.Main) {
-                Log.d("", response.toString())
-                _subtaskCreationStatus.value = response
-            }
         }
     }
 }

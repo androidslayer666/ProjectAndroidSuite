@@ -41,7 +41,7 @@ fun CreateMilestoneDialog(
     val milestoneUpdatingStatus by viewModel.subtaskUpdatingStatus.observeAsState()
     val milestoneCreationStatus by viewModel.subtaskCreationStatus.observeAsState()
 
-    val listUsersFlow by viewModel.userListFlow.observeAsState()
+    val listUsersFlow by viewModel.users.collectAsState()
     val userSearch by viewModel.userSearchQuery.observeAsState("")
 
     if (milestoneCreationStatus is Success<String>) {

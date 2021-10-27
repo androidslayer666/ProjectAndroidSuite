@@ -10,9 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.domain.ProjectSorting
+import com.example.domain.ProjectStatus
 import com.example.projectandroidsuite.logic.PickerType
-import com.example.projectandroidsuite.logic.ProjectSorting
-import com.example.projectandroidsuite.logic.ProjectStatus
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
@@ -21,11 +21,11 @@ import com.example.projectandroidsuite.ui.parts.customitems.CustomSortButton
 
 @Composable
 fun FilterProjects(
-    viewModel: ProjectViewModel,
+    viewModel: ProjectsViewModel,
 ) {
     var showUserPicker by remember { mutableStateOf(false) }
 
-    val listUsersFlow by viewModel.userListFlow.observeAsState()
+    val listUsersFlow by viewModel.users.collectAsState()
     val userSearch by viewModel.userSearchProject.observeAsState("")
     val stage by viewModel.stageForFilteringProject.observeAsState()
     val user by viewModel.userForFilteringProject.observeAsState()
@@ -49,30 +49,28 @@ fun FilterProjects(
                         CustomButton(
                             text = "Active",
                             clicked = (stage == ProjectStatus.ACTIVE),
-                            onClick = { viewModel.setStageForFiltering(ProjectStatus.ACTIVE) })
+                            onClick = { viewModel.setStatusForFilteringProjects(ProjectStatus.ACTIVE) })
                         Spacer(Modifier.size(12.dp))
                         CustomButton(
                             text = "Paused",
                             clicked = (stage == ProjectStatus.PAUSED),
-                            onClick = { viewModel.setStageForFiltering(ProjectStatus.PAUSED) })
+                            onClick = { viewModel.setStatusForFilteringProjects(ProjectStatus.PAUSED) })
                         Spacer(Modifier.size(12.dp))
                         CustomButton(
                             text = "Stopped",
                             clicked = (stage == ProjectStatus.STOPPED),
-                            onClick = { viewModel.setStageForFiltering(ProjectStatus.STOPPED) }
+                            onClick = { viewModel.setStatusForFilteringProjects(ProjectStatus.STOPPED) }
                         )
                         Spacer(Modifier.size(24.dp))
 
                         listUsersFlow?.let {
-                            Column() {
-
+                            Column {
                                 ButtonUsers(
                                     singleUser = true,
                                     onClicked = { showUserPicker = true }
                                 )
                                 Spacer(Modifier.size(12.dp))
-                                user?.let { it1 -> CardTeamMember(user = it1) }
-
+                                user?.let{user -> CardTeamMember(user = user)}
                             }
                         }
 
@@ -141,7 +139,7 @@ fun FilterProjects(
                 TeamPickerDialog(
                     list = it,
                     onSubmit = { },
-                    onClick = { user -> viewModel.setUserForFilteringProject(user) },
+                    onClick = { user -> viewModel.setUserForFilteringProjects( user = user) },
                     closeDialog = { showUserPicker = false },
                     pickerType = PickerType.SINGLE,
                     userSearch,

@@ -12,6 +12,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.domain.TaskSorting
+import com.example.domain.TaskStatus
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.logic.*
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
@@ -22,11 +24,11 @@ import com.example.projectandroidsuite.ui.parts.customitems.CustomSortButton
 
 @Composable
 fun FilterTasks(
-    viewModel: ProjectViewModel,
+    viewModel: TasksViewModel,
 ) {
     var showUserPicker by remember { mutableStateOf(false) }
 
-    val listUsersFlow by viewModel.userListFlow.observeAsState()
+    val listUsersFlow by viewModel.users.collectAsState()
     val userSearch by viewModel.userSearchProject.observeAsState("")
     val stage by viewModel.stageForFilteringTask.observeAsState()
     val user by viewModel.userForFilteringTask.observeAsState()
@@ -51,12 +53,12 @@ fun FilterTasks(
                         CustomButton(
                             text = "Active",
                             clicked = (stage == TaskStatus.ACTIVE),
-                            onClick = { viewModel.setStageForFilteringTask(TaskStatus.ACTIVE) })
+                            onClick = { viewModel.setStatusForFilteringTask(TaskStatus.ACTIVE) })
                         Spacer(Modifier.size(12.dp))
                         CustomButton(
                             text = "Complete",
                             clicked = (stage == TaskStatus.COMPLETE),
-                            onClick = { viewModel.setStageForFilteringTask(TaskStatus.COMPLETE) })
+                            onClick = { viewModel.setStatusForFilteringTask(TaskStatus.COMPLETE) })
                         Spacer(Modifier.size(24.dp))
                         listUsersFlow?.let {
                             Column(modifier = Modifier.padding(vertical = 12.dp)) {
@@ -147,7 +149,6 @@ fun FilterTasks(
                             }
                         }
                     }
-
                 }
             }
 

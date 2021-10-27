@@ -1,9 +1,10 @@
 package com.example.domain.mappers
 
-import com.example.database.entities.CommentEntity
+import com.example.domain.dto.CommentDto
+import com.example.domain.dto.CommentPost
+import com.example.domain.entities.CommentEntity
 import com.example.domain.model.Comment
-import com.example.network.dto.CommentDto
-import com.example.network.dto.CommentPost
+
 import java.util.*
 
 fun List<CommentDto>.toListEntities(

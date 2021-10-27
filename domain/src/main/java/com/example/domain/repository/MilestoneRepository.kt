@@ -1,6 +1,7 @@
 package com.example.domain.repository
 
 import com.example.domain.Result
+import com.example.domain.entities.MilestoneEntity
 import com.example.domain.model.Milestone
 import kotlinx.coroutines.flow.Flow
 
@@ -10,8 +11,11 @@ interface MilestoneRepository {
 
     fun getMilestonesByProjectFlow(projectId: Int): Flow<List<Milestone>>
 
-    suspend fun getMilestoneById(milestoneId: Int): Milestone
+    suspend fun getMilestoneById(milestoneId: Int): Milestone?
 
+    fun getMilestoneByIdFlow(milestoneId: Int): Flow<Milestone?>
+
+    fun getMilestones() : Flow<List<Milestone>>
 
     suspend fun putMilestoneToProject(
         projectId: Int,

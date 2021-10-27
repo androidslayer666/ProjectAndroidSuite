@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.database.entities.UserEntity
 import com.example.domain.model.User
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.TitleOverflowedText
@@ -33,8 +32,6 @@ fun DetailHeaderWrapper(
     onEditClick: (()-> Unit)? = null,
     onStatusClicked: (()-> Unit)? = null
 ) {
-
-    var showTitleOverflow by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.defaultMinSize(minHeight = 100.dp)) {
         Row() {

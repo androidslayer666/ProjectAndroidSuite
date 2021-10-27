@@ -1,10 +1,10 @@
 package com.example.domain.mappers
 
-import com.example.database.entities.MessageEntity
+import com.example.domain.dto.MessageDto
+import com.example.domain.dto.MessagePost
+import com.example.domain.entities.MessageEntity
 import com.example.domain.model.Message
 import com.example.domain.model.User
-import com.example.network.dto.MessageDto
-import com.example.network.dto.MessagePost
 import java.util.*
 
 fun List<MessageDto>.toListEntities(projectId: Int): List<MessageEntity> {

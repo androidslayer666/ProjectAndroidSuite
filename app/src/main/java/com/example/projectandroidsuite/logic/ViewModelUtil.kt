@@ -3,6 +3,9 @@ package com.example.projectandroidsuite.logic
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.TaskFilter
+import com.example.domain.TaskStatus
+import com.example.domain.filterTaskByFilter
 import com.example.domain.model.Milestone
 import com.example.domain.model.Task
 import com.example.domain.model.User

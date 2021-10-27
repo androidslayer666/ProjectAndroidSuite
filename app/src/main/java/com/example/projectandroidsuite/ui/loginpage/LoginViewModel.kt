@@ -22,8 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val authCredentialsProvider: AuthCredentialsProvider
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private var _inputPortalValidated = MutableLiveData<Boolean>(false)

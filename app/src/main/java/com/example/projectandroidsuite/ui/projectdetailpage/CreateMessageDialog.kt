@@ -30,7 +30,7 @@ fun CreateMessageDialog(
 
     val messageUpdatingStatus by viewModel.updatingStatus.observeAsState()
     val messageCreationStatus by viewModel.creationStatus.observeAsState()
-    val listUsersFlow by viewModel.userListFlow.observeAsState()
+    val listUsersFlow by viewModel.users.collectAsState()
     var showTeamPicker by remember { mutableStateOf(false) }
     val userSearch by viewModel.userSearchQuery.observeAsState("")
 

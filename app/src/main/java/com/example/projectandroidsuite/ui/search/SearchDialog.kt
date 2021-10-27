@@ -10,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -40,10 +41,12 @@ fun SearchBody(
     navController: NavHostController
 ) {
     val searchString by viewModel.searchString.observeAsState("")
-    val projects by viewModel.projects.observeAsState(listOf())
-    val tasks by viewModel.tasks.observeAsState(listOf())
-    val milestones by viewModel.milestones.observeAsState(listOf())
-    val files by viewModel.files.observeAsState(listOf())
+    val projects by viewModel.projects.collectAsState(listOf())
+    val tasks by viewModel.tasks.collectAsState(listOf())
+    val milestones by viewModel.milestones.collectAsState(listOf())
+    val files by viewModel.files.collectAsState(listOf())
+
+
 
     Column(Modifier.defaultMinSize(minHeight = 600.dp)) {
         TextField(

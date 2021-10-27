@@ -4,9 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.database.entities.UserEntity
 import com.example.domain.model.User
-import com.example.domain.repositoryimpl.AuthRepositoryImpl
+import com.example.data.repository.AuthRepositoryImpl
+import com.example.domain.interactor.login.GetSelfProfile
+import com.example.domain.interactor.login.Logout
+import com.example.domain.repository.AuthRepository
 import com.example.domain.repository.TeamRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.Main
@@ -16,8 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScaffoldViewModel @Inject constructor(
-    private val teamRepository: TeamRepository,
-    private val authRepository: AuthRepositoryImpl
+    private val logout: Logout,
+    private val getSelfProfile: GetSelfProfile
 ) :ViewModel(){
 
     private var _self = MutableLiveData<User>()
@@ -27,19 +29,20 @@ class ScaffoldViewModel @Inject constructor(
         getSelf()
     }
 
-    fun getSelf() {
+    private fun getSelf() {
         viewModelScope.launch {
-            val self = teamRepository.getSelfProfile()
+            val self = getSelfProfile()
             //Log.d("ScaffoldViewModel", self.toString())
             withContext(Main){
-                if(self != null)
-                _self.value = self!!
+                self?.let {
+                    _self.value = it
+                }
             }
         }
     }
 
     fun logOut(){
-        authRepository.logOut()
+        logout()
     }
 
 

@@ -8,6 +8,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ProjectAndroidSuite"
 include ':app'
-include ':network'
 include ':domain'
-include ':database'
+include ':data'
