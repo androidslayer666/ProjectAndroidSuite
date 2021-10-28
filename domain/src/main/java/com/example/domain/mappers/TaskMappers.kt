@@ -5,6 +5,7 @@ import com.example.domain.dto.TaskDto
 import com.example.domain.dto.TaskPost
 import com.example.domain.entities.TaskEntity
 import com.example.domain.model.Task
+import com.example.domain.utils.TaskStatus
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -78,7 +79,7 @@ fun TaskEntity.fromTaskEntityToTask(): Task {
         title = this.title,
         description = this.description,
         priority = this.priority,
-        status = this.status,
+        status = this.status?.fromIntToTaskStatus(),
         responsible = this.responsible?.fromUserEntityToUser(),
         updatedBy = this.updatedBy?.fromUserEntityToUser(),
         created = this.created,
@@ -90,4 +91,19 @@ fun TaskEntity.fromTaskEntityToTask(): Task {
         responsibles = this.responsibles.map { it.fromUserEntityToUser() }.toMutableList(),
         projectOwner = this.projectOwner?.fromProjectEntityToProject(),
     )
+}
+
+fun Int.fromIntToTaskStatus(): TaskStatus {
+    return when (this) {
+        1 -> TaskStatus.COMPLETE
+        2 -> TaskStatus.ACTIVE
+        else -> TaskStatus.ACTIVE
+    }
+}
+
+fun TaskStatus.fromTaskStatusToString(): String {
+    return when (this) {
+        TaskStatus.COMPLETE -> "closed"
+        TaskStatus.ACTIVE -> "open"
+    }
 }

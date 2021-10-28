@@ -60,7 +60,6 @@ class MessageRepositoryImpl @Inject constructor(
     private suspend fun putCommentsToMessage(message: MessageEntity) {
         val comments = commentEndPoint.getMessageComments(message.id).listCommentDtos
 
-
         if (comments != null) {
             Log.d(
                 "populateMessageWiectId",
@@ -69,7 +68,12 @@ class MessageRepositoryImpl @Inject constructor(
             message.listComments = arrangingComments(comments.toListEntities())
         }
 
-        //todo delete comments that are not in server
+        val commentFromDb = commentDao.getCommentsByMessageId(message.id)
+        commentFromDb.forEach {
+            if(comments?.toListCommentIds()?.contains(it.id) != true) {
+                commentDao.deleteComment(it.id)
+            }
+        }
         messageDao.insertMessage(message)
     }
 

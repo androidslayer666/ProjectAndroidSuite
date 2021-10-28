@@ -77,7 +77,7 @@ fun List<Task>.filterTaskByFilter(filter: TaskFilter?): List<Task> {
             }
         }
         if(filter?.status != null){
-            if(filter.status!!.index != task.status) {
+            if(filter.status!!!= task.status) {
                 newList.remove(task)
             }
         }

@@ -36,8 +36,6 @@ fun TaskDetailPage(
         viewModel.setCurrentTask(taskId)
     }
 
-
-
     val context = LocalContext.current
 
     var state by remember { mutableStateOf(0) }
@@ -109,7 +107,7 @@ fun TaskDetailPage(
                         listComments = comments,
                         onReplyClick = { comment -> viewModel.addCommentToTask(comment) },
                         onDeleteClick = { comment -> viewModel.deleteComment(comment) })
-                    2 -> ListFiles(listFiles = files)
+                    2 -> ListFiles(listFiles = files?: listOf())
                 }
             }
         }

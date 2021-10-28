@@ -1,5 +1,6 @@
 package com.example.domain.model
 
+import com.example.domain.utils.TaskStatus
 import java.util.*
 
 
@@ -16,7 +17,7 @@ data class Task(
     val priority: Int? = null,
     val milestoneId: Int? = null,
     var projectOwner: Project? = null,
-    val status: Int? = null,
+    val status: TaskStatus? = null,
     val responsible: User? = null,
     val updatedBy: User? = null,
     var created: Date = Date(),

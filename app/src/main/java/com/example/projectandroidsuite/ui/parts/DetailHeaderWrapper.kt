@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.domain.model.User
 import com.example.domain.utils.ProjectStatus
+import com.example.domain.utils.TaskStatus
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.TitleOverflowedText
 import java.text.SimpleDateFormat
@@ -25,7 +26,7 @@ fun DetailHeaderWrapper(
     responsible: User? = null,
     team: List<User>?,
     endDate: Date? = null,
-    taskStatus: Int? = null,
+    taskStatus: TaskStatus? = null,
     projectStatus: ProjectStatus? = null,
     project: String? = null,
     milestone: String? = null,
@@ -62,8 +63,8 @@ fun DetailHeaderWrapper(
                     Image(
                         painterResource(
                             when (taskStatus) {
-                                1 -> R.drawable.ic_project_status_active
-                                2 -> R.drawable.ic_project_status_done
+                                TaskStatus.ACTIVE -> R.drawable.ic_project_status_active
+                                TaskStatus.COMPLETE  -> R.drawable.ic_project_status_done
                                 else -> R.drawable.ic_project_status_active
                             }
                         ),
@@ -72,8 +73,7 @@ fun DetailHeaderWrapper(
                             .weight(1f)
                             .padding(horizontal = 4.dp)
                             .clickable {
-                                if (onStatusClicked != null) onStatusClicked() else {
-                                }
+                                if (onStatusClicked != null) onStatusClicked()
                             }
                     )
                 }
@@ -161,6 +161,5 @@ fun DetailHeaderWrapper(
                 Text(milestone)
             }
         }
-
     }
 }

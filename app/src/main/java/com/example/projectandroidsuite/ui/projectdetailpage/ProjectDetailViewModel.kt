@@ -17,10 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,17 +36,17 @@ class ProjectDetailViewModel @Inject constructor(
     private var _projectId = MutableStateFlow<Int?>(null)
     val projectId: StateFlow<Int?> = _projectId
 
-    val currentProject = _projectId.transform <Int?, Project> { projectId ->
-        getProjectById(projectId)
-    }
+    private var _currentProject = MutableStateFlow<Project?>(null)
+    val currentProject: StateFlow<Project?> = _currentProject
 
-    val listDiscussions = _projectId.transform <Int?, List<Message>> { projectId ->
-        getMessageByProjectId(projectId)
-    }
+    private var _listDiscussions = MutableStateFlow<List<Message>?>(null)
+    val listDiscussions: StateFlow<List<Message>?> = _listDiscussions
 
-    val listFiles = _projectId.transform<Int?, List<File>> { projectId ->
-        getFilesByProjectId(projectId)
-    }
+    private var _taskAndMilestones = MutableStateFlow<Map<Milestone?, List<Task>>?>(null)
+    val taskAndMilestones: StateFlow<Map<Milestone?, List<Task>>?> = _taskAndMilestones
+
+    private var _listFiles = MutableStateFlow<List<File>?>(null)
+    val listFiles: StateFlow<List<File>?> = _listFiles
 
     private var _projectDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
     val projectDeletionStatus: StateFlow<Result<String, String>?> = _projectDeletionStatus
@@ -63,13 +60,21 @@ class ProjectDetailViewModel @Inject constructor(
     private var _milestoneDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
     val milestoneDeletionStatus: StateFlow<Result<String, String>?> = _milestoneDeletionStatus
 
-    val taskAndMilestones =
-        _projectId.transform<Int?, Map<Milestone?, List<Task>>> { projectId ->
-            getTaskAndMilestonesForProject(projectId?:0)
-        }
-
     fun setProject(projectId: Int) {
         _projectId.value = projectId
+        viewModelScope.launch { getProjectById(projectId).collectLatest {
+            Log.d("getProjectById", it.toString())
+            _currentProject.value = it } }
+        viewModelScope.launch { getMessageByProjectId(projectId).collectLatest {
+            Log.d("getMessageByProjectId", it.toString())
+            _listDiscussions.value = it } }
+        viewModelScope.launch { getTaskAndMilestonesForProject(projectId).collectLatest {
+            Log.d("getTaskAndMilestones", it.toString())
+            _taskAndMilestones.value = it } }
+        viewModelScope.launch { getFilesByProjectId(projectId).collectLatest {
+            Log.d("getFilesByProjectId", it.toString())
+            _listFiles.value = it } }
+
     }
 
     fun deleteProject() {
@@ -91,7 +96,6 @@ class ProjectDetailViewModel @Inject constructor(
             _milestoneDeletionStatus.value = deleteMilestone(milestoneEntity?.id, projectId.value)
         }
     }
-
 
     fun resetState() {
         _projectDeletionStatus.value = null

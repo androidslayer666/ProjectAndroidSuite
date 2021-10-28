@@ -160,7 +160,7 @@ fun ProjectDetailPage(
                             showEditMessageDialog = true
                         },
                         onDeleteCommentClick = { comment -> viewModel.deleteComment(comment) })
-                    2 -> ListFiles(listFiles = listFiles)
+                    2 -> ListFiles(listFiles = listFiles?:listOf())
                 }
             }
         }

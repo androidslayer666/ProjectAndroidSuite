@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.domain.model.Task
+import com.example.domain.utils.TaskStatus
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import java.text.SimpleDateFormat
@@ -58,8 +59,8 @@ fun TaskItem(
             Image(
                 painterResource(
                     when (task.status) {
-                        1 -> R.drawable.ic_project_status_active
-                        2 -> R.drawable.ic_project_status_done
+                        TaskStatus.ACTIVE -> R.drawable.ic_project_status_active
+                        TaskStatus.COMPLETE -> R.drawable.ic_project_status_done
                         else -> R.drawable.ic_project_status_active
                     }
                 ),

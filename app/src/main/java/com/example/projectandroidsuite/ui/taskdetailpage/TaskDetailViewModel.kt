@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -19,10 +20,7 @@ import com.example.domain.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,27 +39,43 @@ class TaskDetailViewModel @Inject constructor(
     private var _taskId = MutableStateFlow<Int?>(null)
     val taskId: StateFlow<Int?> = _taskId
 
-    val currentTask = _taskId.transform <Int?, Task?> { taskId ->
-        getTaskById(taskId?:0)
-    }
+    private var _currentTask = MutableStateFlow<Task?>(null)
+    val currentTask: StateFlow<Task?> = _currentTask
 
-    val taskMilestone = currentTask.transform<Task?, Milestone> { task ->
-        getMilestoneById(task?.milestoneId)
-    }
+    private var _taskMilestone = MutableStateFlow<Milestone?>(null)
+    val taskMilestone: StateFlow<Milestone?> = _taskMilestone
 
-    val filesForTask = _taskId.transform<Int?, List<File>> { taskId ->
-        getFilesByTaskId(taskId ?: 0)
-    }
+    private var _filesForTask = MutableStateFlow<List<File>?>(null)
+    val filesForTask: StateFlow<List<File>?> = _filesForTask
 
-    val listComments = _taskId.transform { taskId ->
-        getCommentByTaskId(taskId).collect { emit(it) }
-    }
+    private var _listComments = MutableStateFlow<List<Comment>?>(null)
+    val listComments: StateFlow<List<Comment>?> = _listComments
 
     private var _taskDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
     val taskDeletionStatus: StateFlow<Result<String, String>?> = _taskDeletionStatus
 
     fun setCurrentTask(taskId: Int) {
         _taskId.value = taskId
+        viewModelScope.launch {
+            getTaskById(taskId).collectLatest {
+                _currentTask.value = it
+            }
+        }
+        viewModelScope.launch {
+            getTaskById(taskId).collectLatest {
+                _currentTask.value = it
+            }
+        }
+        viewModelScope.launch {
+            getCommentByTaskId(taskId).collectLatest {
+                _listComments.value = it
+            }
+        }
+        viewModelScope.launch {
+            getFilesByTaskId(taskId).collectLatest {
+                _filesForTask.value = it
+            }
+        }
     }
 
     fun deleteTask() {
