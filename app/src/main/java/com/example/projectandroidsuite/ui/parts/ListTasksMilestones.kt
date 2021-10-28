@@ -91,11 +91,7 @@ fun ListTasksMilestones(
                             projectId = milestone?.projectId ?: 0,
                             viewModel = hiltViewModel(),
                             closeDialog = { showEditDialog = false },
-                            onDeleteClick = {
-//                                if (milestone?.canDelete == true) {
-//                                    showDeleteDialog = true
-//                                }
-                            }
+                            onDeleteClick = { }
                         )
                     }
                 }

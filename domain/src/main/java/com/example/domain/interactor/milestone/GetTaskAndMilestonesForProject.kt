@@ -9,6 +9,7 @@ import com.example.domain.repository.TaskRepository
 import com.example.domain.utils.arrangeMilestonesAndTasks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
@@ -17,7 +18,7 @@ class GetTaskAndMilestonesForProject(
     private val milestoneRepository: MilestoneRepository,
 ) {
 
-    operator fun invoke(projectId: Int): LiveData<Map<Milestone?, List<Task>>> {
+    operator fun invoke(projectId: Int): Flow<Map<Milestone?, List<Task>>> {
         CoroutineScope(Dispatchers.IO).launch {
             taskRepository.populateTasksByProject(projectId)
             milestoneRepository.populateMilestonesByProject(projectId)
@@ -26,6 +27,6 @@ class GetTaskAndMilestonesForProject(
             .combine (milestoneRepository.getMilestonesByProjectFlow(projectId))
             { taskList, milestoneList ->
                 return@combine arrangeMilestonesAndTasks(milestoneList, taskList)
-            }.asLiveData()
+            }
     }
 }

@@ -19,7 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.BackHandler
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDivider
 
@@ -40,7 +39,7 @@ fun SearchBody(
     viewModel: SearchViewModel,
     navController: NavHostController
 ) {
-    val searchString by viewModel.searchString.observeAsState("")
+    val searchString by viewModel.searchString.collectAsState("")
     val projects by viewModel.projects.collectAsState(listOf())
     val tasks by viewModel.tasks.collectAsState(listOf())
     val milestones by viewModel.milestones.collectAsState(listOf())

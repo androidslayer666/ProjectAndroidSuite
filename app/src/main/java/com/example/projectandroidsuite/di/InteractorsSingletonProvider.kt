@@ -28,57 +28,7 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 
-@InstallIn(ViewModelComponent::class)
-@Module
-class InteractorsViewModelScopeProvider {
-    @Provides
-    @ViewModelScoped
-    fun provideGetAllProjects(projectRepository: ProjectRepository): GetAllProjects {
-        return GetAllProjects(projectRepository)
-    }
 
-    @Provides
-    @ViewModelScoped
-    fun provideGetAllUsers(teamRepository: TeamRepository): GetAllUsers {
-        return GetAllUsers(teamRepository)
-    }
-
-    @Provides
-    @ViewModelScoped
-    fun provideGetAllTasks(taskRepository: TaskRepository): GetAllTasks {
-        return GetAllTasks(taskRepository)
-    }
-
-    @Provides
-    @ViewModelScoped
-    fun provideGetTaskAndMilestonesForProject(
-        taskRepository: TaskRepository,
-        milestoneRepository: MilestoneRepository,
-    ): GetTaskAndMilestonesForProject {
-        return GetTaskAndMilestonesForProject(taskRepository, milestoneRepository)
-    }
-
-    @Provides
-    @ViewModelScoped
-    fun provideGetAllMilestones(
-        projectRepository: ProjectRepository,
-        milestoneRepository: MilestoneRepository,
-    ): GetAllMilestones {
-        return GetAllMilestones(projectRepository, milestoneRepository)
-    }
-
-
-    @Provides
-    @ViewModelScoped
-    fun provideGetAllFiles(
-        fileRepository: FileRepository,
-        projectRepository: ProjectRepository
-    ): GetAllFiles {
-        return GetAllFiles(fileRepository, projectRepository)
-    }
-
-
-}
 
 
 @InstallIn(SingletonComponent::class)

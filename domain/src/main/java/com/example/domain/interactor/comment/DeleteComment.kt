@@ -1,10 +1,8 @@
 package com.example.domain.interactor.comment
 
-import com.example.domain.Result
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
 import com.example.domain.repository.CommentRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class DeleteComment(
     private val commentRepository: CommentRepository

@@ -1,6 +1,5 @@
-package com.example.domain
+package com.example.domain.utils
 
-import android.util.Log
 import com.example.domain.model.*
 import java.util.*
 
@@ -28,7 +27,7 @@ fun List<Project>.filterProjectsByFilter(filter: ProjectFilter?): List<Project> 
             }
         }
         if(filter?.status != null){
-            if(filter.status!!.index != project.status)
+            if(filter.status!! != project.status)
             {
                 newList.remove(project)
             }
@@ -73,7 +72,7 @@ fun List<Task>.filterTaskByFilter(filter: TaskFilter?): List<Task> {
                 newList.remove(task)
             }
         if (filter?.responsible != null){
-            if(!task.responsibles.getListIds().contains(filter.responsible!!.id)){
+            if(!task.responsibles.getListUserIdsFromList().contains(filter.responsible!!.id)){
                 newList.remove(task)
             }
         }

@@ -6,8 +6,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Subtask
-import com.example.domain.Success
-import com.example.projectandroidsuite.logic.PickerType
+import com.example.domain.utils.Success
+import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
@@ -28,7 +28,7 @@ fun CreateSubtaskDialog(
 
     val taskUpdatingStatus by viewModel.subtaskUpdatingStatus.collectAsState()
     val taskCreationStatus by viewModel.subtaskCreationStatus.collectAsState()
-    val userSearch by viewModel.userSearchQuery.observeAsState("")
+    val userSearch by viewModel.userSearchQuery.collectAsState("")
     var showTeamPicker by remember { mutableStateOf(false) }
     val listUsersFlow by viewModel.users.collectAsState()
 
@@ -81,10 +81,9 @@ fun CreateSubtaskDialogInput(viewModel: SubtaskCreateEditViewModel,
                              ) {
 
 
-    val title by viewModel.title.observeAsState("")
+    val title by viewModel.title.collectAsState("")
     val listUsersFlow by viewModel.users.collectAsState()
-
-    val responsible by viewModel.responsible.observeAsState()
+    val responsible by viewModel.responsible.collectAsState()
 
     Column {
         Row(Modifier.padding(vertical = 12.dp)) {

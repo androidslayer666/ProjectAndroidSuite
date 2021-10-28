@@ -10,9 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.domain.ProjectSorting
-import com.example.domain.ProjectStatus
-import com.example.projectandroidsuite.logic.PickerType
+import com.example.domain.utils.ProjectSorting
+import com.example.domain.utils.ProjectStatus
+import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
@@ -26,10 +26,10 @@ fun FilterProjects(
     var showUserPicker by remember { mutableStateOf(false) }
 
     val listUsersFlow by viewModel.users.collectAsState()
-    val userSearch by viewModel.userSearchProject.observeAsState("")
-    val stage by viewModel.stageForFilteringProject.observeAsState()
-    val user by viewModel.userForFilteringProject.observeAsState()
-    val sorting by viewModel.projectSorting.observeAsState()
+    val userSearch by viewModel.userSearchProject.collectAsState("")
+    val stage by viewModel.stageForFilteringProject.collectAsState()
+    val user by viewModel.userForFilteringProject.collectAsState()
+    val sorting by viewModel.projectSorting.collectAsState()
 
     Box {
         Row {

@@ -6,23 +6,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.domain.Success
-import com.example.domain.TaskStatus
 import com.example.domain.model.Task
-import com.example.projectandroidsuite.logic.Constants.FORMAT_SHOW_DATE
-import com.example.projectandroidsuite.logic.PickerType
-
-import com.example.projectandroidsuite.logic.makeToast
+import com.example.domain.utils.Success
+import com.example.domain.utils.TaskStatus
+import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.utils.PickerType
+import com.example.projectandroidsuite.ui.utils.makeToast
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,19 +34,19 @@ fun CreateUpdateTaskDialog(
 ) {
     task?.let { viewModel.setTask(it) }
 
-    val taskUpdatingStatus by viewModel.taskUpdatingStatus.observeAsState()
+    val taskUpdatingStatus by viewModel.taskUpdatingStatus.collectAsState()
     val taskCreationStatus by viewModel.taskCreationStatus.collectAsState()
 
     var showTeamPicker by remember { mutableStateOf(false) }
     var showProjectPicker by remember { mutableStateOf(false) }
     var showMilestonePicker by remember { mutableStateOf(false) }
-    val listMilestones by viewModel.milestonesList.observeAsState()
+    val listMilestones by viewModel.milestonesList.collectAsState(listOf())
     val listProjects by viewModel.projectList.collectAsState()
-    val listUsersFlow by viewModel.userList.observeAsState()
-    val project by viewModel.project.observeAsState()
+    val listUsersFlow by viewModel.userList.collectAsState(listOf())
+    val project by viewModel.project.collectAsState()
 
-    val projectSearch by viewModel.projectSearchQuery.observeAsState("")
-    val userSearch by viewModel.userSearchQuery.observeAsState("")
+    val projectSearch by viewModel.projectSearchQuery.collectAsState("")
+    val userSearch by viewModel.userSearchQuery.collectAsState("")
 
     Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
 
@@ -89,7 +87,7 @@ fun CreateUpdateTaskDialog(
 
     if (showProjectPicker) {
         ProjectPickerDialog(
-            list = listProjects!!,
+            list = listProjects,
             onSubmit = { showProjectPicker = false },
             onClick = { projectClicked ->
                 run {
@@ -154,18 +152,18 @@ fun CreateTaskDialogInput(
 
     var showDatePicker by remember { mutableStateOf(false) }
 
-    val title by viewModel.title.observeAsState("")
-    val description by viewModel.description.observeAsState("")
+    val title by viewModel.title.collectAsState("")
+    val description by viewModel.description.collectAsState("")
     val listProjects by viewModel.projectList.collectAsState()
-    val project by viewModel.project.observeAsState()
-    val listUsersFlow by viewModel.userList.observeAsState()
-    val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf())
-    val endDate by viewModel.endDate.observeAsState(Date())
+    val project by viewModel.project.collectAsState()
+    val listUsersFlow by viewModel.userList.collectAsState(listOf())
+    val listChosenUsers by viewModel.chosenUserList.collectAsState(mutableListOf())
+    val endDate by viewModel.endDate.collectAsState(Date())
 
-    val taskStatus by viewModel.taskStatus.observeAsState()
-    val milestone by viewModel.milestone.observeAsState()
-    val listMilestones by viewModel.milestonesList.observeAsState()
-    val priority by viewModel.priority.observeAsState()
+    val taskStatus by viewModel.taskStatus.collectAsState()
+    val milestone by viewModel.milestone.collectAsState()
+    val listMilestones by viewModel.milestonesList.collectAsState(listOf())
+    val priority by viewModel.priority.collectAsState()
 
     Column(Modifier.defaultMinSize(minHeight = 350.dp)) {
         Row {

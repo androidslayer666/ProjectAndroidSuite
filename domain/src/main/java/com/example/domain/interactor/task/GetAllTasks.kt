@@ -1,14 +1,12 @@
 package com.example.domain.interactor.task
 
-import android.util.Log
-import com.example.domain.*
 import com.example.domain.model.Task
 import com.example.domain.model.User
 import com.example.domain.repository.TaskRepository
+import com.example.domain.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class GetAllTasks(

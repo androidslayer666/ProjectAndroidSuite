@@ -1,6 +1,7 @@
 package com.example.domain.interactor.message
 
-import com.example.domain.Result
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
 import com.example.domain.repository.MessageRepository
 
 class DeleteMessage(

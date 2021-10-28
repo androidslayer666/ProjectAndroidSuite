@@ -1,4 +1,4 @@
-package com.example.domain
+package com.example.domain.utils
 
 import com.example.domain.model.Project
 import com.example.domain.model.Task

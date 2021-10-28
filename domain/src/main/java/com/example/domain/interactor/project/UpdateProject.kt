@@ -1,7 +1,8 @@
 package com.example.domain.interactor.project
 
-import com.example.domain.ProjectStatus
-import com.example.domain.Result
+import com.example.domain.utils.ProjectStatus
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
 import com.example.domain.model.Project
 import com.example.domain.repository.ProjectRepository
 import kotlinx.coroutines.CoroutineScope

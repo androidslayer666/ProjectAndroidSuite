@@ -1,13 +1,10 @@
 package com.example.domain.interactor.message
 
-import com.example.domain.Result
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
 import com.example.domain.model.Message
-import com.example.domain.model.Milestone
-import com.example.domain.model.Project
 import com.example.domain.model.User
 import com.example.domain.repository.MessageRepository
-import com.example.domain.repository.MilestoneRepository
-import com.example.domain.repository.ProjectRepository
 
 class UpdateMessage(
     private val messageRepository:MessageRepository

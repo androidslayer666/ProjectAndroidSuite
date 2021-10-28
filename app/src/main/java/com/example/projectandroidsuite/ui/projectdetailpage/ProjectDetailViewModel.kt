@@ -2,9 +2,6 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.domain.entities.*
-import com.example.domain.Result
-import com.example.domain.Success
 import com.example.domain.interactor.comment.DeleteComment
 import com.example.domain.interactor.comment.PutCommentToMessage
 import com.example.domain.interactor.files.GetFilesByProjectId
@@ -15,13 +12,15 @@ import com.example.domain.interactor.milestone.GetTaskAndMilestonesForProject
 import com.example.domain.interactor.project.DeleteProject
 import com.example.domain.interactor.project.GetProjectById
 import com.example.domain.model.*
-import com.example.domain.repository.*
-import com.example.projectandroidsuite.logic.arrangeMilestonesAndTasks
+import com.example.domain.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.transform
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,36 +36,36 @@ class ProjectDetailViewModel @Inject constructor(
     private val putCommentToMessage: PutCommentToMessage
 ) : ViewModel() {
 
-    private var _projectId = MutableLiveData<Int>()
-    val projectId: LiveData<Int> = _projectId
+    private var _projectId = MutableStateFlow<Int?>(null)
+    val projectId: StateFlow<Int?> = _projectId
 
-    val currentProject = _projectId.switchMap { projectId ->
-        getProjectById(projectId).asLiveData()
+    val currentProject = _projectId.transform <Int?, Project> { projectId ->
+        getProjectById(projectId)
     }
 
-    val listDiscussions = _projectId.switchMap { projectId ->
-        getMessageByProjectId(projectId).asLiveData()
+    val listDiscussions = _projectId.transform <Int?, List<Message>> { projectId ->
+        getMessageByProjectId(projectId)
     }
 
-    val listFiles: LiveData<List<File>> = _projectId.switchMap { projectId ->
-        getFilesByProjectId(projectId).asLiveData()
+    val listFiles = _projectId.transform<Int?, List<File>> { projectId ->
+        getFilesByProjectId(projectId)
     }
 
-    private var _projectDeletionStatus = MutableLiveData<Result<String, String>?>()
-    val projectDeletionStatus: LiveData<Result<String, String>?> = _projectDeletionStatus
+    private var _projectDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
+    val projectDeletionStatus: StateFlow<Result<String, String>?> = _projectDeletionStatus
 
-    private var _messageDeletionStatus = MutableLiveData<Result<String, String>?>()
-    val messageDeletionStatus: LiveData<Result<String, String>?> = _messageDeletionStatus
+    private var _messageDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
+    val messageDeletionStatus: StateFlow<Result<String, String>?> = _messageDeletionStatus
 
-    private var _commentDeletionStatus = MutableLiveData<Result<String, String>?>()
-    val commentDeletionStatus: LiveData<Result<String, String>?> = _commentDeletionStatus
+    private var _commentDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
+    val commentDeletionStatus: StateFlow<Result<String, String>?> = _commentDeletionStatus
 
-    private var _milestoneDeletionStatus = MutableLiveData<Result<String, String>?>()
-    val milestoneDeletionStatus: LiveData<Result<String, String>?> = _milestoneDeletionStatus
+    private var _milestoneDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
+    val milestoneDeletionStatus: StateFlow<Result<String, String>?> = _milestoneDeletionStatus
 
-    val taskAndMilestones: LiveData<Map<Milestone?, List<Task>>> =
-        _projectId.switchMap { projectId ->
-            getTaskAndMilestonesForProject(projectId)
+    val taskAndMilestones =
+        _projectId.transform<Int?, Map<Milestone?, List<Task>>> { projectId ->
+            getTaskAndMilestonesForProject(projectId?:0)
         }
 
     fun setProject(projectId: Int) {
@@ -76,63 +75,37 @@ class ProjectDetailViewModel @Inject constructor(
     fun deleteProject() {
         if (projectId.value != null) {
             CoroutineScope(IO).launch {
-                val result = deleteProject(projectId.value!!)
-                if(_projectDeletionStatus.value == null) {
-                    withContext(Main) {
-                        _projectDeletionStatus.value = result
-                    }
-                }
+                _projectDeletionStatus.value = deleteProject(projectId.value!!)
             }
         }
     }
 
-    fun addCommentToMessage(comment: Comment){
-        Log.d("ProjectDetailViewModel", comment.toString())
+    fun addCommentToMessage(comment: Comment) {
         CoroutineScope(IO).launch {
-            val result = putCommentToMessage(comment.messageId, comment, projectId.value)
-            if (result is Success) {
-                //Log.d("ProjectDetailViewModel", projectId.value.toString())
-                //projectId.value?.let { messageRepository.populateMessageWithProjectId(it) }
-            }
+            putCommentToMessage(comment.messageId, comment, projectId.value)
         }
     }
 
     fun deleteMilestone(milestoneEntity: Milestone?) {
         CoroutineScope(IO).launch {
-            if(milestoneEntity != null){
-                val response = deleteMilestone(milestoneEntity.id, projectId.value)
-                withContext(Main){
-                    _milestoneDeletionStatus.value = response
-                }
-            }
+            _milestoneDeletionStatus.value = deleteMilestone(milestoneEntity?.id, projectId.value)
         }
     }
 
-    fun resetState(){
+
+    fun resetState() {
         _projectDeletionStatus.value = null
     }
 
-    fun deleteComment(commentEntity: Comment){
+    fun deleteComment(commentEntity: Comment) {
         CoroutineScope(IO).launch {
-            val response = deleteComment(commentEntity.id)
-            if(projectId.value != null) {
-                //messageRepository.populateMessageWithProjectId(projectId.value!!)
-                withContext(Main){
-                    _commentDeletionStatus.value = response
-                }
-            }
+            _commentDeletionStatus.value = deleteComment(commentEntity.id)
         }
     }
 
     fun deleteMessage(message: Message) {
         CoroutineScope(IO).launch {
-            val response = deleteMessage(message.id)
-            if(projectId.value != null) {
-                //messageRepository.populateMessageWithProjectId(projectId.value!!)
-                withContext(Main){
-                    _messageDeletionStatus.value = response
-                }
-            }
+            _messageDeletionStatus.value = deleteMessage(message.id)
         }
     }
 }

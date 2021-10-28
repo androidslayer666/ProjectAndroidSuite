@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -8,21 +7,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.asLiveData
 import androidx.navigation.NavHostController
-import com.example.domain.Failure
-import com.example.domain.Success
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Success
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.makeToast
-import com.example.projectandroidsuite.ui.parts.*
+import com.example.projectandroidsuite.ui.parts.ConfirmationDialog
+import com.example.projectandroidsuite.ui.parts.DetailHeaderWrapper
+import com.example.projectandroidsuite.ui.parts.ListComments
+import com.example.projectandroidsuite.ui.parts.ListFiles
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
+import com.example.projectandroidsuite.ui.utils.makeToast
 
 
 @Composable
@@ -48,11 +48,11 @@ fun TaskDetailPage(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showUpdateStatusDialog by remember { mutableStateOf(false) }
 
-    val task by viewModel.currentTask.observeAsState(null)
+    val task by viewModel.currentTask.collectAsState(null)
     val comments by viewModel.listComments.collectAsState(listOf())
-    val files by viewModel.filesForTask.observeAsState(listOf())
+    val files by viewModel.filesForTask.collectAsState(listOf())
     val taskDeletionStatus by viewModel.taskDeletionStatus.collectAsState()
-    val taskMilestone by viewModel.taskMilestone.observeAsState(null)
+    val taskMilestone by viewModel.taskMilestone.collectAsState(null)
 
     CustomScaffold(navController = navController, viewModel = hiltViewModel()) {
         Column {
@@ -118,7 +118,7 @@ fun TaskDetailPage(
             CreateUpdateTaskDialog(
                 viewModel = hiltViewModel(),
                 closeDialog = { showUpdateTaskDialog = false },
-                task = viewModel.currentTask.value,
+                task = task,
                 onTaskDeletedOrEdited = { string -> makeToast(string, context) },
                 onDeleteClick = { if (task?.canDelete == true) showDeleteDialog = true }
             )

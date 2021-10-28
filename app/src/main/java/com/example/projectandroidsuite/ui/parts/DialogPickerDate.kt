@@ -9,7 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.Constants.FORMAT_SHOW_DATE
+import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialogButton
 import java.text.SimpleDateFormat
 import java.util.*

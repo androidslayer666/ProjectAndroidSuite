@@ -1,7 +1,7 @@
 package com.example.domain.interactor.task
 
-import com.example.domain.Failure
-import com.example.domain.Result
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
 import com.example.domain.repository.TaskRepository
 
 class UpdateTaskStatus(

@@ -1,8 +1,5 @@
 package com.example.domain.utils
 
-import com.example.domain.TaskFilter
-import com.example.domain.TaskStatus
-import com.example.domain.filterTaskByFilter
 import com.example.domain.model.Milestone
 import com.example.domain.model.Task
 

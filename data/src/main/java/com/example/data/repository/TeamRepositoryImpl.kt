@@ -2,9 +2,9 @@ package com.example.data.repository
 
 import android.util.Log
 import com.example.data.dao.UserDao
-import com.example.domain.Failure
-import com.example.domain.Result
-import com.example.domain.Success
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
+import com.example.domain.utils.Success
 import com.example.domain.mappers.fromListUserEntitiesToListUsers
 import com.example.domain.mappers.fromUserEntityToUser
 import com.example.domain.mappers.toListUserEntity

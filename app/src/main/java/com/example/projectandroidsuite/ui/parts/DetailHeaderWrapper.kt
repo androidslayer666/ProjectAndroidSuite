@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.domain.model.User
+import com.example.domain.utils.ProjectStatus
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.TitleOverflowedText
 import java.text.SimpleDateFormat
@@ -25,7 +26,7 @@ fun DetailHeaderWrapper(
     team: List<User>?,
     endDate: Date? = null,
     taskStatus: Int? = null,
-    projectStatus: Int? = null,
+    projectStatus: ProjectStatus? = null,
     project: String? = null,
     milestone: String? = null,
     priority: Int? = null,
@@ -45,9 +46,9 @@ fun DetailHeaderWrapper(
                     Image(
                         painterResource(
                             when (projectStatus) {
-                                0 -> R.drawable.ic_project_status_active
-                                1 -> R.drawable.ic_project_status_done
-                                2 -> R.drawable.ic_project_status_paused
+                                ProjectStatus.ACTIVE -> R.drawable.ic_project_status_active
+                                ProjectStatus.STOPPED -> R.drawable.ic_project_status_done
+                                ProjectStatus.PAUSED -> R.drawable.ic_project_status_paused
                                 else -> R.drawable.ic_project_status_active
                             }
                         ),

@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.makeToast
 import com.example.projectandroidsuite.ui.ProjectsScreens
-import com.example.projectandroidsuite.ui.parts.CreateUpdateProjectDialog
-import com.example.projectandroidsuite.ui.taskdetailpage.CreateUpdateTaskDialog
+import com.example.projectandroidsuite.ui.projectdetailpage.CreateUpdateProjectDialog
 import com.example.projectandroidsuite.ui.search.SearchDialog
+import com.example.projectandroidsuite.ui.taskdetailpage.CreateUpdateTaskDialog
+import com.example.projectandroidsuite.ui.utils.makeToast
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -45,7 +45,7 @@ fun CustomScaffold(
     val context = LocalContext.current
     var showUserOptions by remember { mutableStateOf(false) }
 
-    val self by viewModel.self.observeAsState()
+    val self by viewModel.self.collectAsState()
 
     Box {
         Scaffold(

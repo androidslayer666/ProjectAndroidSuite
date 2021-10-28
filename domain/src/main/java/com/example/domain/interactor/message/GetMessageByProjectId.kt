@@ -8,9 +8,9 @@ class GetMessageByProjectId(
     private val messageRepository: MessageRepository
 ) {
 
-    operator fun invoke(projectId: Int): Flow<List<Message>> {
+    operator fun invoke(projectId: Int?): Flow<List<Message>> {
 
 
-        return messageRepository.getMessagesByProjectId(projectId)
+        return messageRepository.getMessagesByProjectId(projectId?:0)
     }
 }

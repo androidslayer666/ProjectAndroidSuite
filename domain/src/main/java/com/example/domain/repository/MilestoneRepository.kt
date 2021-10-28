@@ -1,7 +1,7 @@
 package com.example.domain.repository
 
-import com.example.domain.Result
-import com.example.domain.entities.MilestoneEntity
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
 import com.example.domain.model.Milestone
 import kotlinx.coroutines.flow.Flow
 

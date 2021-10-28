@@ -14,7 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.User
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 
 @Composable

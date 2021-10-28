@@ -1,5 +1,6 @@
 package com.example.domain.model
 
+import com.example.domain.utils.ProjectStatus
 import java.util.*
 
 
@@ -10,7 +11,7 @@ data class Project(
     var id: Int,
     var title: String = "",
     var description: String = "",
-    val status: Int? = null,
+    val status: ProjectStatus? = null,
     var responsible: User? = null,
     val isPrivate: Boolean? = null,
     val taskCount: Int? = null,

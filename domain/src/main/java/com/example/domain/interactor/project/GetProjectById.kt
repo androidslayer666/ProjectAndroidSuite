@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 class GetProjectById(
     private val projectRepository: ProjectRepository
 ) {
-    operator fun invoke (projectId: Int): Flow<Project?> {
-        return projectRepository.getProjectFromDbById(projectId)
+    operator fun invoke (projectId: Int?): Flow<Project?> {
+        return projectRepository.getProjectFromDbById(projectId?:0)
     }
 }

@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.domain.Failure
-import com.example.domain.Result
-import com.example.domain.Success
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
+import com.example.domain.utils.Success
 import com.example.domain.mappers.fromLoginResponseDtoToLoginResponse
 import com.example.domain.model.LoginResponse
 import com.example.domain.repository.AuthRepository

@@ -2,17 +2,17 @@ package com.example.data.repository
 
 import android.util.Log
 import com.example.data.dao.TaskDao
-import com.example.domain.Failure
-import com.example.domain.Result
-import com.example.domain.Success
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
+import com.example.domain.utils.Success
 import com.example.domain.mappers.*
 import com.example.domain.model.Subtask
 import com.example.domain.model.Task
-import com.example.domain.networkCaller
 import com.example.domain.repository.TaskRepository
 import com.example.domain.dto.SubtaskPost
 import com.example.domain.dto.TaskStatusPost
 import com.example.data.endpoints.TaskEndPoint
+import com.example.domain.utils.networkCaller
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
 import javax.inject.Inject

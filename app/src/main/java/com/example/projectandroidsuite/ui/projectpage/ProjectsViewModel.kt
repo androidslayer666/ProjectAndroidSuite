@@ -1,11 +1,13 @@
 package com.example.projectandroidsuite.ui.projectpage
 
+import android.util.Log
 import androidx.lifecycle.*
-import com.example.domain.*
 import com.example.domain.interactor.project.GetAllProjects
 import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Project
 import com.example.domain.model.User
+import com.example.domain.utils.ProjectSorting
+import com.example.domain.utils.ProjectStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,17 +22,17 @@ class ProjectsViewModel @Inject constructor(
     private val getAllUsers: GetAllUsers
 ) : ViewModel() {
 
-    private var _statusForFilteringProject = MutableLiveData<ProjectStatus?>()
-    val stageForFilteringProject: LiveData<ProjectStatus?> = _statusForFilteringProject
+    private var _statusForFilteringProject = MutableStateFlow<ProjectStatus?>(null)
+    val stageForFilteringProject: StateFlow<ProjectStatus?> = _statusForFilteringProject
 
-    private var _userForFilteringProject = MutableLiveData<User?>()
-    val userForFilteringProject: LiveData<User?> = _userForFilteringProject
+    private var _userForFilteringProject = MutableStateFlow<User?>(null)
+    val userForFilteringProject: StateFlow<User?> = _userForFilteringProject
 
-    private var _userSearchQuery = MutableLiveData<String>()
-    val userSearchProject: LiveData<String> = _userSearchQuery
+    private var _userSearchQuery = MutableStateFlow<String>("")
+    val userSearchProject: StateFlow<String> = _userSearchQuery
 
-    private var _projectSorting = MutableLiveData(ProjectSorting.STAGE_ASC)
-    val projectSorting: LiveData<ProjectSorting> = _projectSorting
+    private var _projectSorting = MutableStateFlow(ProjectSorting.STAGE_ASC)
+    val projectSorting: StateFlow<ProjectSorting> = _projectSorting
 
     private var _projects = MutableStateFlow<List<Project>>(listOf())
     val projects: StateFlow<List<Project>> = _projects
@@ -43,7 +45,9 @@ class ProjectsViewModel @Inject constructor(
             getAllProjects().collectLatest { _projects.value = it }
         }
         viewModelScope.launch(IO) {
-            getAllUsers().collectLatest { _users.value = it }
+            getAllUsers().collectLatest {
+                _users.value = it
+            }
         }
     }
 

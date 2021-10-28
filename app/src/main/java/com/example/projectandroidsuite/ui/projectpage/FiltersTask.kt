@@ -12,15 +12,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.domain.TaskSorting
-import com.example.domain.TaskStatus
+import com.example.domain.utils.TaskSorting
+import com.example.domain.utils.TaskStatus
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.*
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
 import com.example.projectandroidsuite.ui.parts.customitems.CustomSortButton
+import com.example.projectandroidsuite.ui.utils.PickerType
 
 @Composable
 fun FilterTasks(
@@ -29,10 +29,10 @@ fun FilterTasks(
     var showUserPicker by remember { mutableStateOf(false) }
 
     val listUsersFlow by viewModel.users.collectAsState()
-    val userSearch by viewModel.userSearchProject.observeAsState("")
-    val stage by viewModel.stageForFilteringTask.observeAsState()
-    val user by viewModel.userForFilteringTask.observeAsState()
-    val sorting by viewModel.taskSorting.observeAsState()
+    val userSearch by viewModel.userSearchProject.collectAsState("")
+    val stage by viewModel.stageForFilteringTask.collectAsState()
+    val user by viewModel.userForFilteringTask.collectAsState()
+    val sorting by viewModel.taskSorting.collectAsState()
     Box {
     Row {
 

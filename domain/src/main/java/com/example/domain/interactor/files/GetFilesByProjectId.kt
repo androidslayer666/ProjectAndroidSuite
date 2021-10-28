@@ -10,10 +10,10 @@ import kotlinx.coroutines.launch
 class GetFilesByProjectId(
     private val fileRepository: FileRepository
 ) {
-    operator fun invoke(projectId: Int): Flow<List<File>> {
+    operator fun invoke(projectId: Int?): Flow<List<File>> {
         CoroutineScope(Dispatchers.IO).launch {
-            fileRepository.populateProjectFiles(projectId)
+            fileRepository.populateProjectFiles(projectId?:0)
         }
-        return fileRepository.getFilesWithProjectId(projectId)
+        return fileRepository.getFilesWithProjectId(projectId?:0)
     }
 }

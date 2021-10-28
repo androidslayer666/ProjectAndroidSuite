@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.domain.model.Project
+import com.example.domain.utils.ProjectStatus
 import com.example.projectandroidsuite.R
 
 
@@ -60,9 +61,9 @@ fun ProjectItem(project: Project, onClick: (projectId: Int) -> Unit) {
         Image(
             painterResource(
                 when (project.status) {
-                    0 -> R.drawable.ic_project_status_active
-                    1 -> R.drawable.ic_project_status_done
-                    2 -> R.drawable.ic_project_status_paused
+                    ProjectStatus.ACTIVE -> R.drawable.ic_project_status_active
+                    ProjectStatus.STOPPED -> R.drawable.ic_project_status_done
+                    ProjectStatus.PAUSED -> R.drawable.ic_project_status_paused
                     else -> R.drawable.ic_project_status_active
                 }
             ),

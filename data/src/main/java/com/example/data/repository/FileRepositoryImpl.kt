@@ -1,13 +1,15 @@
 package com.example.data.repository
 
 import com.example.data.dao.FileDao
-import com.example.domain.Result
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
+import com.example.domain.utils.Success
 import com.example.domain.mappers.fromListFileEntitiesToListFiles
 import com.example.domain.mappers.toListEntities
 import com.example.domain.model.File
-import com.example.domain.networkCaller
 import com.example.domain.repository.FileRepository
 import com.example.data.endpoints.FileEndPoint
+import com.example.domain.utils.networkCaller
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
 import javax.inject.Inject

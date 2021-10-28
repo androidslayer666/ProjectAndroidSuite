@@ -1,28 +1,20 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
-import androidx.lifecycle.*
-import com.example.domain.Result
-import com.example.domain.UserFilter
-import com.example.domain.filterUsersByFilter
-import com.example.domain.interactor.message.UpdateMessage
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.domain.interactor.milestone.PutMilestoneToProject
 import com.example.domain.interactor.milestone.UpdateMilestone
 import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Milestone
 import com.example.domain.model.User
-import com.example.domain.repository.*
-
-import com.example.projectandroidsuite.logic.combineWith
-
+import com.example.domain.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
@@ -36,43 +28,37 @@ class MilestoneCreateEditViewModel @Inject constructor(
 
     private var projectId: Int? = null
 
-    private var _milestone = MutableLiveData<Milestone>()
-    val milestone: LiveData<Milestone> = _milestone
+    private var _milestone = MutableStateFlow<Milestone?>(null)
+    val milestone: StateFlow<Milestone?> = _milestone
 
-    private var _title = MutableLiveData("")
-    val title: LiveData<String> = _title
+    private var _title = MutableStateFlow("")
+    val title: StateFlow<String> = _title
 
-    private var _description = MutableLiveData("")
-    val description: LiveData<String> = _description
+    private var _description = MutableStateFlow("")
+    val description: StateFlow<String> = _description
 
-    private var _priority = MutableLiveData(false)
-    val priority: LiveData<Boolean?> = _priority
+    private var _priority = MutableStateFlow(false)
+    val priority: StateFlow<Boolean?> = _priority
 
-    private var _responsible = MutableLiveData<User?>()
-    val responsible: LiveData<User?> = _responsible
+    private var _responsible = MutableStateFlow<User?>(null)
+    val responsible: StateFlow<User?> = _responsible
 
-    private var _userSearchQuery = MutableLiveData<String>()
-    val userSearchQuery: LiveData<String> = _userSearchQuery
+    private var _userSearchQuery = MutableStateFlow("")
+    val userSearchQuery: StateFlow<String> = _userSearchQuery
 
-    private var _endDate = MutableLiveData(Date())
-    val endDate: LiveData<Date> = _endDate
+    private var _endDate = MutableStateFlow(Date())
+    val endDate: StateFlow<Date> = _endDate
 
-    private var _milestoneCreationStatus = MutableLiveData<Result<String, String>?>()
-    val subtaskCreationStatus: LiveData<Result<String, String>?> = _milestoneCreationStatus
+    private var _milestoneCreationStatus = MutableStateFlow<Result<String, String>?>(null)
+    val subtaskCreationStatus: StateFlow<Result<String, String>?> = _milestoneCreationStatus
 
-    private var _milestoneUpdatingStatus = MutableLiveData<Result<String, String>?>()
-    val subtaskUpdatingStatus: LiveData<Result<String, String>?> = _milestoneUpdatingStatus
-
-//    val userListFlow = teamRepository.getAllPortalUsers().asLiveData()
-//        .combineWith(userSearch) { listProject, filter ->
-//            if (filter != null) listProject?.filterUsersByFilter(filter)
-//            else listProject
-//        }
+    private var _milestoneUpdatingStatus = MutableStateFlow<Result<String, String>?>(null)
+    val subtaskUpdatingStatus: StateFlow<Result<String, String>?> = _milestoneUpdatingStatus
 
     private var _users = MutableStateFlow<List<User>>(listOf())
     val users: StateFlow<List<User>> = _users
 
-    init{
+    init {
         viewModelScope.launch(IO) {
             getAllUsers().collectLatest { _users.value = it }
         }
@@ -85,9 +71,9 @@ class MilestoneCreateEditViewModel @Inject constructor(
 
     fun setMilestone(milestone: Milestone) {
         _milestone.value = milestone
-        _title.value = milestone.title
-        _priority.value = milestone.isKey
-        _description.value = milestone.description
+        _title.value = milestone.title ?: ""
+        _priority.value = milestone.isKey ?: false
+        _description.value = milestone.description ?: ""
         _endDate.value = milestone.deadline ?: Date()
         _responsible.value = milestone.responsible
     }
@@ -128,30 +114,20 @@ class MilestoneCreateEditViewModel @Inject constructor(
         _milestoneUpdatingStatus.value = null
     }
 
-//    fun setUserSearch(query: String) {
-//        _userSearchQuery.value = query
-//        userSearch.value =
-//            UserFilter(query)
-//    }
-
-
     fun createMilestone() {
         viewModelScope.launch(IO) {
             val response = putMilestoneToProject(
                 projectId ?: 0,
                 Milestone(
-                    id =0,
-                    title = title.value ?: "",
+                    id = 0,
+                    title = title.value,
                     responsible = responsible.value,
                     description = description.value,
                     isKey = priority.value,
                     deadline = endDate.value,
                 )
             )
-            withContext(Dispatchers.Main) {
-                Log.d("", response.toString())
-                _milestoneCreationStatus.value = response
-            }
+            _milestoneCreationStatus.value = response
         }
     }
 
@@ -160,17 +136,14 @@ class MilestoneCreateEditViewModel @Inject constructor(
             val response = updateMilestone(
                 projectId ?: 0,
                 Milestone(
-                    title = title.value ?: "",
+                    title = title.value,
                     responsible = responsible.value,
                     description = description.value,
                     id = milestone.value?.id ?: 0,
                     deadline = endDate.value
                 )
             )
-            withContext(Dispatchers.Main) {
-                Log.d("", response.toString())
-                _milestoneCreationStatus.value = response
-            }
+            _milestoneCreationStatus.value = response
         }
     }
 

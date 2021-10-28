@@ -8,13 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.domain.Success
 import com.example.domain.model.Milestone
-import com.example.projectandroidsuite.logic.Constants.FORMAT_SHOW_DATE
-import com.example.projectandroidsuite.logic.PickerType
+import com.example.domain.utils.Success
+import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
+import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.DatePicker
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
@@ -37,12 +36,10 @@ fun CreateMilestoneDialog(
     if (milestone != null) viewModel.setMilestone(milestone)
 
     var showResponsiblePicker by remember { mutableStateOf(false) }
-
-    val milestoneUpdatingStatus by viewModel.subtaskUpdatingStatus.observeAsState()
-    val milestoneCreationStatus by viewModel.subtaskCreationStatus.observeAsState()
-
+    val milestoneUpdatingStatus by viewModel.subtaskUpdatingStatus.collectAsState()
+    val milestoneCreationStatus by viewModel.subtaskCreationStatus.collectAsState()
     val listUsersFlow by viewModel.users.collectAsState()
-    val userSearch by viewModel.userSearchQuery.observeAsState("")
+    val userSearch by viewModel.userSearchQuery.collectAsState("")
 
     if (milestoneCreationStatus is Success<String>) {
         onMilestoneDeletedOrEdited((milestoneCreationStatus as Success<String>).value)
@@ -74,7 +71,7 @@ fun CreateMilestoneDialog(
         }
 
 
-        listUsersFlow?.let {
+        listUsersFlow.let {
             if (showResponsiblePicker) {
                 TeamPickerDialog(
                     list = it,
@@ -103,11 +100,11 @@ fun CreateMilestoneDialogInput(
 ) {
 
     var showDatePicker by remember { mutableStateOf(false) }
-    val title by viewModel.title.observeAsState("")
-    val description by viewModel.description.observeAsState("")
-    val responsible by viewModel.responsible.observeAsState()
-    val endDate by viewModel.endDate.observeAsState(Date())
-    val priority by viewModel.priority.observeAsState()
+    val title by viewModel.title.collectAsState("")
+    val description by viewModel.description.collectAsState("")
+    val responsible by viewModel.responsible.collectAsState()
+    val endDate by viewModel.endDate.collectAsState(Date())
+    val priority by viewModel.priority.collectAsState()
 
     Column{
         Row {

@@ -1,10 +1,10 @@
 package com.example.domain.interactor.task
 
-import com.example.domain.Failure
-import com.example.domain.Result
-import com.example.domain.TaskStatus
+import com.example.domain.utils.Result
+import com.example.domain.utils.TaskStatus
 import com.example.domain.model.Task
 import com.example.domain.repository.TaskRepository
+import com.example.domain.utils.Failure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

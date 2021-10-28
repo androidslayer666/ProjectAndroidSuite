@@ -18,10 +18,10 @@ import androidx.navigation.NavHostController
 import com.example.domain.model.Message
 import com.example.domain.model.Milestone
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.makeToast
-import com.example.projectandroidsuite.logic.showResultToast
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
+import com.example.projectandroidsuite.ui.utils.makeToast
+import com.example.projectandroidsuite.ui.utils.showResultToast
 
 @Composable
 fun ProjectDetailPage(
@@ -51,14 +51,14 @@ fun ProjectDetailPage(
     var showDeleteMessageDialog by remember { mutableStateOf(false) }
 
 
-    val project by viewModel.currentProject.observeAsState()
-    val listTasksAndMilestones by viewModel.taskAndMilestones.observeAsState()
-    val listMessages by viewModel.listDiscussions.observeAsState(null)
-    val listFiles by viewModel.listFiles.observeAsState(listOf())
-    val projectDeletionStatus by viewModel.projectDeletionStatus.observeAsState()
-    val milestoneDeletionStatus by viewModel.milestoneDeletionStatus.observeAsState()
-    val messageDeletionStatus by viewModel.messageDeletionStatus.observeAsState()
-    val commentDeletionStatus by viewModel.commentDeletionStatus.observeAsState()
+    val project by viewModel.currentProject.collectAsState(null)
+    val listTasksAndMilestones by viewModel.taskAndMilestones.collectAsState(null)
+    val listMessages by viewModel.listDiscussions.collectAsState(null)
+    val listFiles by viewModel.listFiles.collectAsState(listOf())
+    val projectDeletionStatus by viewModel.projectDeletionStatus.collectAsState()
+    val milestoneDeletionStatus by viewModel.milestoneDeletionStatus.collectAsState()
+    val messageDeletionStatus by viewModel.messageDeletionStatus.collectAsState()
+    val commentDeletionStatus by viewModel.commentDeletionStatus.collectAsState()
 
     showResultToast(
         result = milestoneDeletionStatus,
@@ -169,7 +169,7 @@ fun ProjectDetailPage(
             CreateUpdateProjectDialog(
                 hiltViewModel(),
                 { showUpdateProjectDialog = false },
-                viewModel.currentProject.value,
+                project,
                 { string -> makeToast(string, context) },
                 onDeleteClick = { if (project?.canDelete == true) showDeleteDialog = true }
             )

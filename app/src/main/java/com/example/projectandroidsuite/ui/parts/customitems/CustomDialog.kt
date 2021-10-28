@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.projectandroidsuite.logic.BackHandler
+import com.example.projectandroidsuite.ui.utils.BackPressedHandler
 
 
 @Composable
@@ -26,7 +26,7 @@ fun CustomDialog(
     content: @Composable () -> Unit
 ) {
 
-    BackHandler(true) {hide()}
+    BackPressedHandler(true) {hide()}
     if (show) {
         Surface(
             color = Color.Black.copy(alpha = 0.8F),

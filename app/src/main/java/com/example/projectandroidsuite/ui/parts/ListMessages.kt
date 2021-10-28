@@ -32,7 +32,7 @@ fun ListMessages(
 
     listMessages?.let {
 
-        LazyColumn() {
+        LazyColumn {
             items(listMessages) { message ->
                 var expandComments by remember { mutableStateOf(false) }
                 var replyText by remember { mutableStateOf("") }

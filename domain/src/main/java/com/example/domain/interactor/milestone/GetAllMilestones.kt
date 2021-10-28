@@ -1,12 +1,7 @@
 package com.example.domain.interactor.milestone
 
-import android.util.Log
-import androidx.lifecycle.viewModelScope
-import com.example.domain.MilestoneFilter
-import com.example.domain.TaskFilter
-import com.example.domain.entities.MilestoneEntity
-import com.example.domain.filterMilestoneByFilter
-import com.example.domain.interactor.project.GetAllProjects
+import com.example.domain.utils.MilestoneFilter
+import com.example.domain.utils.filterMilestoneByFilter
 import com.example.domain.model.Milestone
 import com.example.domain.model.Project
 import com.example.domain.repository.MilestoneRepository

@@ -15,7 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Project
-import com.example.projectandroidsuite.logic.PickerType
+import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 
 @Composable

@@ -2,7 +2,6 @@ package com.example.projectandroidsuite.ui.parts
 
 import android.os.Build
 import android.text.Html
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -20,7 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Comment
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.fromHtml
+import com.example.projectandroidsuite.ui.utils.fromHtml
 
 @Composable
 fun ListComments(

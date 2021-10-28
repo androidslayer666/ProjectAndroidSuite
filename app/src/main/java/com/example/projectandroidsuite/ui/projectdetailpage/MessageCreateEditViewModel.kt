@@ -1,29 +1,24 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
-import android.util.Log
 import androidx.lifecycle.*
-import com.example.domain.Result
-import com.example.domain.UserFilter
-import com.example.domain.filterUsersByFilter
-import com.example.domain.getListIds
+import com.example.domain.utils.Result
+import com.example.domain.utils.UserFilter
+
 import com.example.domain.interactor.message.CreateMessage
 import com.example.domain.interactor.message.UpdateMessage
 import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Message
 import com.example.domain.model.User
-import com.example.domain.repository.*
-import com.example.projectandroidsuite.logic.*
+import com.example.domain.utils.getListUserIdsFromList
 
-import com.example.projectandroidsuite.ui.*
+import com.example.projectandroidsuite.ui.utils.getUserById
 
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,53 +32,42 @@ class MessageCreateEditViewModel @Inject constructor(
 
     private var messageId: Int? = null
 
-    private var _title = MutableLiveData("")
-    val title: LiveData<String> = _title
+    private var _title = MutableStateFlow("")
+    val title: StateFlow<String> = _title
 
-    private var _content = MutableLiveData("")
-    val content: LiveData<String> = _content
+    private var _content = MutableStateFlow("")
+    val content: StateFlow<String> = _content
 
-    private var _chosenUserList = MutableLiveData<MutableList<User>>(mutableListOf())
-    val chosenUserList: LiveData<MutableList<User>> = _chosenUserList
+    private var _chosenUserList = MutableStateFlow<MutableList<User>>(mutableListOf())
+    val chosenUserList: StateFlow<MutableList<User>> = _chosenUserList
 
-    private var userSearch = MutableLiveData<UserFilter>()
+    private var userSearch = MutableStateFlow<UserFilter?>(null)
 
-    private var _userSearchQuery = MutableLiveData<String>()
-    val userSearchQuery: LiveData<String> = _userSearchQuery
+    private var _userSearchQuery = MutableStateFlow("")
+    val userSearchQuery: StateFlow<String> = _userSearchQuery
 
-    private var _creationStatus = MutableLiveData<Result<String, String>?>()
-    val creationStatus: LiveData<Result<String, String>?> = _creationStatus
+    private var _creationStatus = MutableStateFlow<Result<String, String>?>(null)
+    val creationStatus: StateFlow<Result<String, String>?> = _creationStatus
 
-    private var _updatingStatus = MutableLiveData<Result<String, String>?>()
-    val updatingStatus: LiveData<Result<String, String>?> = _updatingStatus
+    private var _updatingStatus = MutableStateFlow<Result<String, String>?>(null)
+    val updatingStatus: StateFlow<Result<String, String>?> = _updatingStatus
 
     private var _users = MutableStateFlow<List<User>?>(null)
     val users: StateFlow<List<User>?> = _users
 
     init {
         viewModelScope.launch(IO) {
-
-            getAllUsers().asLiveData().combineWith(chosenUserList) { users, chosenUsers ->
-                Log.d("ProjectCreateEditModel", chosenUsers?.map{it.displayName}.toString())
-                users?.forEach { user ->
-                    user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
-                }
-                return@combineWith users
+            getAllUsers().collectLatest { listUsers ->
+                _users.value = listUsers
             }
-                .combineWith(userSearch) { listProject, filter ->
-                    _users.value = listProject?.filterUsersByFilter(filter)
-                }
-
         }
     }
 
     fun setMessage(message: Message) {
         messageId = message.id
-        _title.value  = message.title
+        _title.value = message.title
         _content.value = message.text
-        //_chosenUserList.value = message.
     }
-
 
     fun setTitle(string: String) {
         _title.value = string
@@ -97,20 +81,18 @@ class MessageCreateEditViewModel @Inject constructor(
         this.projectId = projectId
     }
 
-    fun addOrRemoveUser(user: User) {
-        //Log.d("addOrRemoveUser", user.toString())
-        val listIds = _chosenUserList.value!!.getListIds()
-        if (listIds.contains(user.id)) {
-            _chosenUserList.value!!.remove(_chosenUserList.value!!.getUserById(user.id))
-            _chosenUserList.forceRefresh()
-            //Log.d("addOrRemoveUser", task.value.toString())
-        } else {
-            _chosenUserList.value!!.add(user)
-            _chosenUserList.forceRefresh()
-            //Log.d("addOrRemoveUser", task.value.toString())
-        }
+    fun updateChosenUsers(){
+        getAllUsers.setChosenUsersList(_chosenUserList.value)
     }
 
+    fun addOrRemoveUser(user: User) {
+        val listIds = _chosenUserList.value.getListUserIdsFromList()
+        if (listIds.contains(user.id)) {
+            _chosenUserList.value.remove(_chosenUserList.value.getUserById(user.id))
+        } else {
+            _chosenUserList.value.add(user)
+        }
+    }
 
     fun clearInput() {
         projectId = null
@@ -127,7 +109,6 @@ class MessageCreateEditViewModel @Inject constructor(
             UserFilter(query)
     }
 
-
     fun createMessage() {
         viewModelScope.launch(IO) {
             val response = createMessage(
@@ -137,30 +118,24 @@ class MessageCreateEditViewModel @Inject constructor(
                     id = 0,
                     description = content.value,
                 ),
-                chosenUserList.value?: listOf()
+                chosenUserList.value
             )
-            withContext(Dispatchers.Main) {
-                Log.d("", response.toString())
-                _creationStatus.value = response
-            }
+            _creationStatus.value = response
         }
     }
 
     fun updateMessage() {
         viewModelScope.launch(IO) {
-        val response = updateMessage(
-            projectId ?: 0,
+            val response = updateMessage(
+                projectId ?: 0,
                 Message(
                     title = title.value ?: "",
                     id = messageId ?: 0,
                     description = content.value,
                 ),
-            chosenUserList.value?: listOf()
+                chosenUserList.value
             )
-            withContext(Dispatchers.Main) {
-                Log.d("", response.toString())
-                _creationStatus.value = response
-            }
+            _creationStatus.value = response
         }
     }
 }

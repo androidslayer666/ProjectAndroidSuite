@@ -1,8 +1,8 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
 import android.util.Log
-import androidx.lifecycle.*
-import com.example.domain.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.domain.interactor.milestone.GetMilestoneById
 import com.example.domain.interactor.milestone.GetMilestonesForProject
 import com.example.domain.interactor.project.GetAllProjects
@@ -13,16 +13,16 @@ import com.example.domain.model.Milestone
 import com.example.domain.model.Project
 import com.example.domain.model.Task
 import com.example.domain.model.User
-import com.example.domain.repository.*
-import com.example.projectandroidsuite.logic.*
-import com.example.projectandroidsuite.logic.getListIds
-import com.example.projectandroidsuite.ui.*
+import com.example.domain.utils.Result
+import com.example.domain.utils.TaskStatus
+import com.example.domain.utils.UserFilter
+import com.example.domain.utils.filterUsersByFilter
+import com.example.projectandroidsuite.ui.utils.getListIds
+import com.example.projectandroidsuite.ui.utils.getUserById
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -40,43 +40,43 @@ class TaskCreateEditViewModel @Inject constructor(
 
     private var taskId: Int? = null
 
-    private var _title = MutableLiveData("")
-    val title: LiveData<String> = _title
+    private var _title = MutableStateFlow("")
+    val title: StateFlow<String> = _title
 
-    private var _description = MutableLiveData("")
-    val description: LiveData<String> = _description
+    private var _description = MutableStateFlow("")
+    val description: StateFlow<String> = _description
 
-    private var _priority = MutableLiveData(0)
-    val priority: LiveData<Int> = _priority
+    private var _priority = MutableStateFlow(0)
+    val priority: StateFlow<Int> = _priority
 
-    private var _chosenUserList = MutableLiveData<MutableList<User>>(mutableListOf())
-    val chosenUserList: LiveData<MutableList<User>> = _chosenUserList
+    private var _chosenUserList = MutableStateFlow<MutableList<User>>(mutableListOf())
+    val chosenUserList: StateFlow<MutableList<User>> = _chosenUserList
 
-    private var _project = MutableLiveData<Project?>()
-    val project: LiveData<Project?> = _project
+    private var _project = MutableStateFlow<Project?>(null)
+    val project: StateFlow<Project?> = _project
 
-    private var _milestone = MutableLiveData<Milestone?>()
-    val milestone: LiveData<Milestone?> = _milestone
+    private var _milestone = MutableStateFlow<Milestone?>(null)
+    val milestone: StateFlow<Milestone?> = _milestone
 
-    private var userSearch = MutableLiveData<UserFilter>()
+    private var userSearch = MutableStateFlow<UserFilter?>(null)
 
-    private var _userSearchQuery = MutableLiveData<String>()
-    val userSearchQuery: LiveData<String> = _userSearchQuery
+    private var _userSearchQuery = MutableStateFlow("")
+    val userSearchQuery: StateFlow<String> = _userSearchQuery
 
-    private var _taskStatus = MutableLiveData<TaskStatus>()
-    val taskStatus: LiveData<TaskStatus> = _taskStatus
+    private var _taskStatus = MutableStateFlow<TaskStatus?>(null)
+    val taskStatus: StateFlow<TaskStatus?> = _taskStatus
 
-    private var _projectSearchQuery = MutableLiveData<String>()
-    val projectSearchQuery: LiveData<String> = _projectSearchQuery
+    private var _projectSearchQuery = MutableStateFlow("")
+    val projectSearchQuery: StateFlow<String> = _projectSearchQuery
 
     private var _taskCreationStatus = MutableStateFlow<Result<String, String>?>(null)
     val taskCreationStatus: StateFlow<Result<String, String>?> = _taskCreationStatus
 
-    private var _taskUpdatingStatus = MutableLiveData<Result<String, String>?>()
-    val taskUpdatingStatus: LiveData<Result<String, String>?> = _taskUpdatingStatus
+    private var _taskUpdatingStatus = MutableStateFlow<Result<String, String>?>(null)
+    val taskUpdatingStatus: StateFlow<Result<String, String>?> = _taskUpdatingStatus
 
-    private var _endDate = MutableLiveData(Date())
-    val endDate: LiveData<Date> = _endDate
+    private var _endDate = MutableStateFlow(Date())
+    val endDate: StateFlow<Date> = _endDate
 
     private var _projectList = MutableStateFlow<List<Project>>(listOf())
     val projectList: StateFlow<List<Project>> = _projectList
@@ -86,25 +86,22 @@ class TaskCreateEditViewModel @Inject constructor(
         getAllProjects.setFilter(searchQuery = value)
     }
 
-    val userList = project.switchMap { project ->
-        liveData { emit(project?.team) }
+    val userList = project.transform { project ->
+         emit(project?.team)
     }
-        .combineWith(chosenUserList) { users, chosenUsers ->
+        .combine(chosenUserList) { users, chosenUsers ->
             users?.forEach { user ->
-                user.chosen = chosenUsers?.getListIds()?.contains(user.id) == true
+                user.chosen = chosenUsers.getListIds().contains(user.id) == true
             }
-            return@combineWith users
+            users
         }
-        .combineWith(userSearch) { users, filter ->
+        .combine(userSearch) { users, filter ->
             if (filter != null) users?.filterUsersByFilter(filter)
             else users
         }
 
-    val milestonesList = project.switchMap {
-        if (it?.id != null)
-            getMilestonesForProject(it.id).asLiveData()
-        else
-            liveData { }
+    val milestonesList = project.transform<Project?, List<Milestone>> {
+            getMilestonesForProject(it?.id?:0)
     }
 
 
@@ -117,13 +114,12 @@ class TaskCreateEditViewModel @Inject constructor(
     }
 
     fun setTask(task: Task) {
-        //Log.d("setTask", task.toString())
         taskId = task.id
         _title.value = task.title
         _description.value = task.description
         _chosenUserList.value = task.responsibles
         _endDate.value = task.deadline
-        _priority.value = task.priority
+        _priority.value = task.priority?:0
         task.projectOwner?.let { projectOwner ->
             viewModelScope.launch {
                 getProjectById(projectOwner.id).collectLatest { project ->
@@ -187,16 +183,11 @@ class TaskCreateEditViewModel @Inject constructor(
     }
 
     fun addOrRemoveUser(user: User) {
-        //Log.d("addOrRemoveUser", user.toString())
-        val listIds = _chosenUserList.value!!.getListIds()
+        val listIds = _chosenUserList.value.getListIds()
         if (listIds.contains(user.id)) {
-            _chosenUserList.value!!.remove(_chosenUserList.value!!.getUserById(user.id))
-            Log.d("addOrRemoveUser", "remove user $user")
-            _chosenUserList.forceRefresh()
+            _chosenUserList.value.remove(_chosenUserList.value.getUserById(user.id))
         } else {
-            _chosenUserList.value!!.add(user)
-            Log.d("addOrRemoveUser", "add user $user")
-            _chosenUserList.forceRefresh()
+            _chosenUserList.value.add(user)
         }
     }
 
@@ -213,11 +204,11 @@ class TaskCreateEditViewModel @Inject constructor(
                 milestone.value?.id,
                 Task(
                     id = 0,
-                    description = description.value ?: "",
-                    deadline = endDate.value ?: Date(),
-                    title = title.value ?: "",
+                    description = description.value,
+                    deadline = endDate.value,
+                    title = title.value,
                     projectOwner = project.value,
-                    responsibles = chosenUserList.value ?: mutableListOf(),
+                    responsibles = chosenUserList.value,
                     priority = priority.value
                 )
             )
@@ -230,11 +221,11 @@ class TaskCreateEditViewModel @Inject constructor(
                 taskId,
                 Task(
                     id = 0,
-                    description = description.value ?: "",
-                    deadline = endDate.value ?: Date(),
-                    title = title.value ?: "",
+                    description = description.value,
+                    deadline = endDate.value,
+                    title = title.value,
                     projectOwner = project.value,
-                    responsibles = chosenUserList.value ?: mutableListOf(),
+                    responsibles = chosenUserList.value,
                     priority = priority.value
                 ),
                 taskStatus.value

@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.projectdetailpage
 
 import android.util.Log
 import androidx.compose.foundation.layout.*
@@ -8,14 +8,16 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.domain.ProjectStatus
+import com.example.domain.utils.ProjectStatus
 import com.example.domain.model.Project
-import com.example.domain.model.User
-import com.example.domain.Success
-import com.example.projectandroidsuite.logic.PickerType
+import com.example.domain.utils.Success
+import com.example.projectandroidsuite.ui.parts.CardTeamMember
+import com.example.projectandroidsuite.ui.parts.RowTeamMember
+import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+
+import com.example.projectandroidsuite.ui.utils.PickerType
 
 import com.example.projectandroidsuite.ui.parts.customitems.*
-import com.example.projectandroidsuite.ui.projectdetailpage.ProjectCreateEditViewModel
 
 @Composable
 fun CreateUpdateProjectDialog(
@@ -27,8 +29,8 @@ fun CreateUpdateProjectDialog(
 ) {
     project?.let { viewModel.setProject(it) }
 
-    val projectUpdatingStatus by viewModel.projectUpdatingStatus.observeAsState()
-    val projectCreationStatus by viewModel.projectCreationStatus.observeAsState()
+    val projectUpdatingStatus by viewModel.projectUpdatingStatus.collectAsState()
+    val projectCreationStatus by viewModel.projectCreationStatus.collectAsState()
     val userSearch by viewModel.userSearchQuery.observeAsState("")
     val listUsersFlow by viewModel.users.collectAsState()
 
@@ -37,14 +39,14 @@ fun CreateUpdateProjectDialog(
 
 
     if (projectCreationStatus is Success<String>) {
-        Log.d("CreateUpdateectDialog", "Success"+(projectCreationStatus as Success<String>).value)
+        Log.d("CreateUpdateectDialog", "Success" + (projectCreationStatus as Success<String>).value)
         onSuccessProjectCreation((projectCreationStatus as Success<String>).value)
         closeDialog()
         viewModel.clearInput()
     }
 
     if (projectUpdatingStatus is Success<String>) {
-        Log.d("CreateUpdateectDialog", "Success"+(projectUpdatingStatus as Success<String>).value)
+        Log.d("CreateUpdateectDialog", "Success" + (projectUpdatingStatus as Success<String>).value)
         onSuccessProjectCreation((projectUpdatingStatus as Success<String>).value)
         closeDialog()
         viewModel.clearInput()
@@ -65,14 +67,14 @@ fun CreateUpdateProjectDialog(
             onDeleteClick = onDeleteClick
         ) {
             CreateProjectDialogInput(viewModel, project != null,
-                {showTeamPicker = true},
-                {showResponsiblePicker = true})
+                { showTeamPicker = true },
+                { showResponsiblePicker = true })
         }
 
         if (showResponsiblePicker) {
             TeamPickerDialog(
                 list = listUsersFlow!!,
-                onSubmit = { },
+                onSubmit = {  },
                 onClick = { user ->
                     run {
                         viewModel.setResponsible(user)
@@ -88,14 +90,16 @@ fun CreateUpdateProjectDialog(
         if (showTeamPicker) {
             TeamPickerDialog(
                 list = listUsersFlow!!,
-                onSubmit = { showTeamPicker = false },
+                onSubmit = { showTeamPicker = false
+                    viewModel.updateChosenUsers()},
                 onClick = { user ->
                     viewModel.addOrRemoveUser(user)
                 },
                 closeDialog = { showTeamPicker = false },
                 pickerType = PickerType.MULTIPLE,
                 userSearch,
-                { query -> viewModel.setUserSearch(query)
+                { query ->
+                    viewModel.setUserSearch(query)
                     showTeamPicker = false
                 }
             )
@@ -115,10 +119,9 @@ fun CreateProjectDialogInput(
     val title by viewModel.title.observeAsState("")
     val description by viewModel.description.observeAsState("\n")
     val listUsersFlow by viewModel.users.collectAsState()
-    val listChosenUsers by viewModel.chosenUserList.observeAsState(mutableListOf())
+    val listChosenUsers by viewModel.chosenUserList.collectAsState()
     val responsible by viewModel.responsible.observeAsState()
     val projectStatus by viewModel.projectStatus.observeAsState()
-
 
     Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
 

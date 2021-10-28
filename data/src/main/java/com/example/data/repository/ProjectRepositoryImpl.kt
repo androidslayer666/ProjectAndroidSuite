@@ -2,16 +2,18 @@ package com.example.data.repository
 
 import android.util.Log
 import com.example.data.dao.ProjectDao
-import com.example.domain.Result
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
+import com.example.domain.utils.Success
 import com.example.domain.mappers.*
 import com.example.domain.model.Project
-import com.example.domain.networkCaller
 import com.example.domain.repository.ProjectRepository
 import com.example.domain.dto.ProjectDto
 import com.example.domain.dto.ProjectStatusPost
 import com.example.domain.dto.ProjectTeamPost
 import com.example.data.endpoints.ProjectEndPoint
 import com.example.data.endpoints.TeamEndPoint
+import com.example.domain.utils.networkCaller
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

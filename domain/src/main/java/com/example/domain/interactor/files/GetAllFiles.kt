@@ -1,7 +1,7 @@
 package com.example.domain.interactor.files
 
-import com.example.domain.FileFilter
-import com.example.domain.filterFileByFilter
+import com.example.domain.utils.FileFilter
+import com.example.domain.utils.filterFileByFilter
 import com.example.domain.model.File
 import com.example.domain.repository.FileRepository
 import com.example.domain.repository.ProjectRepository

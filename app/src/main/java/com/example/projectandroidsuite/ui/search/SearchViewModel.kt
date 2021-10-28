@@ -1,8 +1,9 @@
 package com.example.projectandroidsuite.ui.search
 
-import android.util.Log
-import androidx.lifecycle.*
-import com.example.domain.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.domain.interactor.files.GetAllFiles
 import com.example.domain.interactor.milestone.GetAllMilestones
 import com.example.domain.interactor.project.GetAllProjects
@@ -11,11 +12,6 @@ import com.example.domain.model.File
 import com.example.domain.model.Milestone
 import com.example.domain.model.Project
 import com.example.domain.model.Task
-import com.example.domain.repository.FileRepository
-import com.example.domain.repository.MilestoneRepository
-import com.example.domain.repository.ProjectRepository
-import com.example.domain.repository.TaskRepository
-import com.example.projectandroidsuite.logic.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,8 +28,8 @@ class SearchViewModel @Inject constructor(
     private val getAllFiles: GetAllFiles,
 ) : ViewModel() {
 
-    private var _searchString = MutableLiveData<String>()
-    val searchString: LiveData<String> = _searchString
+    private var _searchString = MutableStateFlow<String>("")
+    val searchString: StateFlow<String> = _searchString
 
     private var _projects = MutableStateFlow<List<Project>>(listOf())
     val projects: StateFlow<List<Project>> = _projects

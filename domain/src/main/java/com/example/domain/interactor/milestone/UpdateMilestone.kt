@@ -1,10 +1,9 @@
 package com.example.domain.interactor.milestone
 
-import com.example.domain.Result
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
 import com.example.domain.model.Milestone
-import com.example.domain.model.Project
 import com.example.domain.repository.MilestoneRepository
-import com.example.domain.repository.ProjectRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

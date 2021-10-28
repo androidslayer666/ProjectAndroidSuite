@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
 import com.example.domain.model.User
-import com.example.projectandroidsuite.logic.coilRequestBuilder
+import com.example.projectandroidsuite.ui.utils.coilRequestBuilder
 
 @Composable
 fun RowTeamMember(

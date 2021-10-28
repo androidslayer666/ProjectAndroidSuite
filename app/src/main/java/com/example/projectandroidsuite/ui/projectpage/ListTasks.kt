@@ -12,7 +12,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -22,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.domain.model.Task
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.Constants.FORMAT_SHOW_DATE
+import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import java.text.SimpleDateFormat
 import java.util.*
 

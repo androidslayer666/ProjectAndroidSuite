@@ -4,6 +4,7 @@ import com.example.domain.dto.ProjectDto
 import com.example.domain.dto.ProjectPost
 import com.example.domain.entities.ProjectEntity
 import com.example.domain.model.Project
+import com.example.domain.utils.ProjectStatus
 import java.util.*
 
 fun List<ProjectDto>.toListEntities(): MutableList<ProjectEntity> {
@@ -69,7 +70,12 @@ fun ProjectEntity.fromProjectEntityToProject(): Project {
         id = this.id,
         title = this.title,
         description = this.description,
-        status = this.status,
+        status = when (this.status) {
+            0 -> ProjectStatus.ACTIVE
+            1 -> ProjectStatus.STOPPED
+            2 -> ProjectStatus.PAUSED
+            else -> ProjectStatus.ACTIVE
+        },
         responsible = this.responsible?.fromUserEntityToUser(),
         isPrivate = this.isPrivate,
         taskCount = this.taskCount,

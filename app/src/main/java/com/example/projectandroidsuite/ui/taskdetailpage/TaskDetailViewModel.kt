@@ -1,9 +1,8 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
-import android.util.Log
-import androidx.lifecycle.*
-import com.example.domain.Result
-import com.example.domain.Success
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.domain.interactor.GetFilesByTaskId
 import com.example.domain.interactor.comment.DeleteComment
 import com.example.domain.interactor.comment.GetCommentByTaskId
@@ -14,13 +13,16 @@ import com.example.domain.interactor.task.GetTaskById
 import com.example.domain.interactor.task.UpdateTaskStatus
 import com.example.domain.model.Comment
 import com.example.domain.model.File
+import com.example.domain.model.Milestone
 import com.example.domain.model.Task
-import com.example.domain.repository.CommentRepository
-import com.example.domain.repository.MilestoneRepository
+import com.example.domain.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,22 +38,22 @@ class TaskDetailViewModel @Inject constructor(
     private val deleteComment: DeleteComment
 ) : ViewModel() {
 
-    private var _taskId = MutableLiveData<Int?>(null)
-    val taskId: LiveData<Int?> = _taskId
+    private var _taskId = MutableStateFlow<Int?>(null)
+    val taskId: StateFlow<Int?> = _taskId
 
-    val currentTask = _taskId.switchMap <Int?, Task?> { taskId ->
-        getTaskById(taskId?:0).asLiveData()
+    val currentTask = _taskId.transform <Int?, Task?> { taskId ->
+        getTaskById(taskId?:0)
     }
 
-    val taskMilestone = currentTask.switchMap { task ->
-        getMilestoneById(task?.milestoneId).asLiveData()
+    val taskMilestone = currentTask.transform<Task?, Milestone> { task ->
+        getMilestoneById(task?.milestoneId)
     }
 
-    val filesForTask = _taskId.switchMap<Int?, List<File>> { taskId ->
-        getFilesByTaskId(taskId ?: 0).asLiveData()
+    val filesForTask = _taskId.transform<Int?, List<File>> { taskId ->
+        getFilesByTaskId(taskId ?: 0)
     }
 
-    val listComments = _taskId.asFlow().transform<Int?, List<Comment>?> { taskId ->
+    val listComments = _taskId.transform { taskId ->
         getCommentByTaskId(taskId).collect { emit(it) }
     }
 
@@ -86,7 +88,7 @@ class TaskDetailViewModel @Inject constructor(
 
     fun changeTaskStatus() {
         viewModelScope.launch(IO) {
-            updateTaskStatus(taskId.value, currentTask.value?.status)
+            updateTaskStatus(taskId.value, currentTask.asLiveData().value?.status)
         }
     }
 }

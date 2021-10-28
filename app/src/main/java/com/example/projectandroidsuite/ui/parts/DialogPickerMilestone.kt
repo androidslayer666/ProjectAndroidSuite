@@ -27,8 +27,8 @@ fun DialogPickerMilestone(
         showButtons = false,
         ) {
         PickerMilestoneBody(
-            list = list, { project -> onClick(project) }
-        )
+            list = list
+        ) { project -> onClick(project) }
     }
 }
 

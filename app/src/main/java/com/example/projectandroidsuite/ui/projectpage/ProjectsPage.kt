@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.logic.BackHandler
-import com.example.projectandroidsuite.logic.SwipeDirections
-import com.example.projectandroidsuite.logic.expandScrollingViewportWidthBy
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
+import com.example.projectandroidsuite.ui.utils.BackPressedHandler
+import com.example.projectandroidsuite.ui.utils.SwipeDirections
+import com.example.projectandroidsuite.ui.utils.expandScrollingViewportWidthBy
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -48,7 +48,7 @@ fun ProjectsPage(
     var sizeMeasured by remember { mutableStateOf(0) }
     var animateTo by remember { mutableStateOf(0) }
 
-    BackHandler(showFilters) { showFilters = !showFilters }
+    BackPressedHandler(showFilters) { showFilters = !showFilters }
 
     //Log.d("ProjectsPage", initialOffset.toString())
 
