@@ -8,8 +8,7 @@ import com.example.domain.interactor.comment.PutCommentToMessage
 import com.example.domain.interactor.comment.PutCommentToTask
 import com.example.domain.interactor.files.GetAllFiles
 import com.example.domain.interactor.files.GetFilesByProjectId
-import com.example.domain.interactor.login.GetSelfProfile
-import com.example.domain.interactor.login.Logout
+import com.example.domain.interactor.login.*
 import com.example.domain.interactor.message.CreateMessage
 import com.example.domain.interactor.message.DeleteMessage
 import com.example.domain.interactor.message.GetMessageByProjectId
@@ -211,5 +210,30 @@ class InteractorsSingletonProvider {
     fun provideGetSelfProfile(teamRepository: TeamRepository): GetSelfProfile {
         return GetSelfProfile(teamRepository)
     }
+
+    @Provides
+    @Singleton
+    fun provideCheckIfAuthenticated(authRepository: AuthRepository): CheckIfAuthenticated {
+        return CheckIfAuthenticated(authRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRememberPortalAddress(authRepository: AuthRepository): RememberPortalAddress {
+        return RememberPortalAddress(authRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCheckPortalPossibilities(authRepository: AuthRepository): CheckPortalPossibilities {
+        return CheckPortalPossibilities(authRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLogin(authRepository: AuthRepository): Login {
+        return Login(authRepository)
+    }
+
 
 }

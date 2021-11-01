@@ -24,12 +24,14 @@ import com.example.projectandroidsuite.ui.utils.coilRequestBuilder
 
 @Composable
 fun RowTeamMember(
-    list: List<User>,
+    list: List<User>?,
     modifier : Modifier = Modifier
 ) {
-    LazyRow(modifier = modifier) {
-        items(list) { user ->
-            CardTeamMember(user = user, viewModel = hiltViewModel())
+    list?.let {
+        LazyRow(modifier = modifier) {
+            items(it) { user ->
+                CardTeamMember(user = user, viewModel = hiltViewModel())
+            }
         }
     }
 }

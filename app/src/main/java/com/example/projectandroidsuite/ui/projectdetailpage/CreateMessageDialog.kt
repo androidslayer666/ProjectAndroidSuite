@@ -34,7 +34,7 @@ fun CreateMessageDialog(
     val messageCreationStatus by viewModel.creationStatus.collectAsState()
     val listUsersFlow by viewModel.users.collectAsState()
     var showTeamPicker by remember { mutableStateOf(false) }
-    val userSearch by viewModel.userSearchQuery.collectAsState("")
+    val userSearch by viewModel.userSearchQuery.collectAsState()
 
 
     if (messageCreationStatus is Success<String>) {

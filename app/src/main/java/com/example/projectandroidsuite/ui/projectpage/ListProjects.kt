@@ -29,14 +29,11 @@ fun ProjectList(
     viewModel: ProjectsViewModel,
     navController: NavHostController
 ) {
-    val list by viewModel.projects.collectAsState(listOf())
+    val list by viewModel.projects.collectAsState()
 
     LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
-        list?.let {
-            items(list!!) { project ->
-                ProjectItem(project) { id -> navController.navigate("project/$id") }
-
-            }
+        items(list) { project ->
+            ProjectItem(project) { id -> navController.navigate("project/$id") }
         }
     }
 }

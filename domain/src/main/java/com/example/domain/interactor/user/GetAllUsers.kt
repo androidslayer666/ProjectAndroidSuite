@@ -40,8 +40,8 @@ class GetAllUsers(
         userFilter.value = UserFilter(query)
     }
 
-    fun setChosenUsersList(list: List<User>) {
-        listChosenUsers.value = list.map{it.id}.toString().drop(1).dropLast(1)
+    fun setChosenUsersList(list: List<User>?) {
+        listChosenUsers.value = list?.map{it.id}.toString().drop(1).dropLast(1)
     }
 
 }

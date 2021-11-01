@@ -62,19 +62,29 @@ class ProjectDetailViewModel @Inject constructor(
 
     fun setProject(projectId: Int) {
         _projectId.value = projectId
-        viewModelScope.launch { getProjectById(projectId).collectLatest {
-            Log.d("getProjectById", it.toString())
-            _currentProject.value = it } }
-        viewModelScope.launch { getMessageByProjectId(projectId).collectLatest {
-            Log.d("getMessageByProjectId", it.toString())
-            _listDiscussions.value = it } }
-        viewModelScope.launch { getTaskAndMilestonesForProject(projectId).collectLatest {
-            Log.d("getTaskAndMilestones", it.toString())
-            _taskAndMilestones.value = it } }
-        viewModelScope.launch { getFilesByProjectId(projectId).collectLatest {
-            Log.d("getFilesByProjectId", it.toString())
-            _listFiles.value = it } }
-
+        viewModelScope.launch {
+            getProjectById(projectId).collectLatest {
+                _currentProject.value = it
+            }
+        }
+        viewModelScope.launch {
+            getMessageByProjectId(projectId).collectLatest {
+                //Log.d("getMessageByProjectId", it.toString())
+                _listDiscussions.value = it
+            }
+        }
+        viewModelScope.launch {
+            getTaskAndMilestonesForProject(projectId).collectLatest {
+                //Log.d("getTaskAndMilestones", it.toString())
+                _taskAndMilestones.value = it
+            }
+        }
+        viewModelScope.launch {
+            getFilesByProjectId(projectId).collectLatest {
+                //Log.d("getFilesByProjectId", it.toString())
+                _listFiles.value = it
+            }
+        }
     }
 
     fun deleteProject() {

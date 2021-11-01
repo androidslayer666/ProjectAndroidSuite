@@ -26,7 +26,7 @@ fun FilterProjects(
     var showUserPicker by remember { mutableStateOf(false) }
 
     val listUsersFlow by viewModel.users.collectAsState()
-    val userSearch by viewModel.userSearchProject.collectAsState("")
+    val userSearch by viewModel.userSearchProject.collectAsState()
     val stage by viewModel.stageForFilteringProject.collectAsState()
     val user by viewModel.userForFilteringProject.collectAsState()
     val sorting by viewModel.projectSorting.collectAsState()
@@ -63,16 +63,16 @@ fun FilterProjects(
                         )
                         Spacer(Modifier.size(24.dp))
 
-                        listUsersFlow?.let {
-                            Column {
-                                ButtonUsers(
-                                    singleUser = true,
-                                    onClicked = { showUserPicker = true }
-                                )
-                                Spacer(Modifier.size(12.dp))
-                                user?.let{user -> CardTeamMember(user = user)}
-                            }
+
+                        Column {
+                            ButtonUsers(
+                                singleUser = true,
+                                onClicked = { showUserPicker = true }
+                            )
+                            Spacer(Modifier.size(12.dp))
+                            user?.let { user -> CardTeamMember(user = user) }
                         }
+
 
                         Spacer(Modifier.size(24.dp))
                         Surface(
@@ -135,17 +135,15 @@ fun FilterProjects(
             }
         }
         if (showUserPicker) {
-            listUsersFlow?.let {
-                TeamPickerDialog(
-                    list = it,
-                    onSubmit = { },
-                    onClick = { user -> viewModel.setUserForFilteringProjects( user = user) },
-                    closeDialog = { showUserPicker = false },
-                    pickerType = PickerType.SINGLE,
-                    userSearch,
-                    { query -> viewModel.setUserSearch(query) }
-                )
-            }
+            TeamPickerDialog(
+                list = listUsersFlow,
+                onSubmit = { },
+                onClick = { user -> viewModel.setUserForFilteringProjects(user = user) },
+                closeDialog = { showUserPicker = false },
+                pickerType = PickerType.SINGLE,
+                userSearch,
+                { query -> viewModel.setUserSearch(query) }
+            )
         }
     }
 

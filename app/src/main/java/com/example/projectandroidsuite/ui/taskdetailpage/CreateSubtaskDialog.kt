@@ -48,41 +48,39 @@ fun CreateSubtaskDialog(
         show = true,
         hide = { closeDialog() },
         text = "Create Subtask",
-        onSubmit = {viewModel.createSubtask()},
+        onSubmit = { viewModel.createSubtask() },
         onDeleteClick = onDeleteClick
 
     ) {
-        CreateSubtaskDialogInput(viewModel, {showTeamPicker = true})
+        CreateSubtaskDialogInput(viewModel, { showTeamPicker = true })
     }
 
     if (showTeamPicker) {
-        listUsersFlow?.let {
-            TeamPickerDialog(
-                list = it,
-                onSubmit = { },
-                onClick = { user ->
-                    run {
-                        //listChosenUsers.addOrRemoveIfExisted(user)
-                        viewModel.setResponsible(user)
-                    }
-                },
-                closeDialog = { showTeamPicker = false },
-                pickerType = PickerType.SINGLE,
-                userSearch,
-                { query -> viewModel.setUserSearch(query) }
-            )
-        }
+        TeamPickerDialog(
+            list = listUsersFlow,
+            onSubmit = { },
+            onClick = { user ->
+                run {
+                    //listChosenUsers.addOrRemoveIfExisted(user)
+                    viewModel.setResponsible(user)
+                }
+            },
+            closeDialog = { showTeamPicker = false },
+            pickerType = PickerType.SINGLE,
+            userSearch,
+            { query -> viewModel.setUserSearch(query) }
+        )
     }
 }
 
 @Composable
-fun CreateSubtaskDialogInput(viewModel: SubtaskCreateEditViewModel,
-                             showTeamPicker: ()-> Unit
-                             ) {
+fun CreateSubtaskDialogInput(
+    viewModel: SubtaskCreateEditViewModel,
+    showTeamPicker: () -> Unit
+) {
 
 
-    val title by viewModel.title.collectAsState("")
-    val listUsersFlow by viewModel.users.collectAsState()
+    val title by viewModel.title.collectAsState()
     val responsible by viewModel.responsible.collectAsState()
 
     Column {
@@ -93,21 +91,18 @@ fun CreateSubtaskDialogInput(viewModel: SubtaskCreateEditViewModel,
                 onValueChange = { text -> viewModel.setTitle(text) })
         }
 
-        listUsersFlow?.let {
-            Row(Modifier.padding(vertical = 12.dp)) {
-                ButtonUsers(
-                    singleUser = true,
-                    onClicked = { showTeamPicker() }
-                )
+        Row(Modifier.padding(vertical = 12.dp)) {
+            ButtonUsers(
+                singleUser = true,
+                onClicked = { showTeamPicker() }
+            )
 
-                responsible?.let { user ->
-                    Row(
-                        Modifier
-                            .weight(4F)
-                    ) { CardTeamMember(user = user, showFullName = true) }
-                }
+            responsible?.let { user ->
+                Row(
+                    Modifier
+                        .weight(4F)
+                ) { CardTeamMember(user = user, showFullName = true) }
             }
-
         }
     }
 }

@@ -41,7 +41,9 @@ class MilestoneRepositoryImpl @Inject constructor(
 
     override fun getMilestonesByProjectFlow(projectId: Int): Flow<List<Milestone>> {
         return milestoneDao.getMilestonesByProjectIdFlow(projectId)
-            .transform { emit(it.fromListMilestoneEntitiesToListMilestone()) }
+            .transform {
+                emit(it.fromListMilestoneEntitiesToListMilestone())
+            }
     }
 
     override suspend fun getMilestoneById(milestoneId: Int): Milestone? {

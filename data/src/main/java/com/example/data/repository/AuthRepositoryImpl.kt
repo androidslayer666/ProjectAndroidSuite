@@ -81,7 +81,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun tryPortal(address: String): Result<String, String> {
+    override suspend fun checkPortalPossibilities(address: String): Result<String, String> {
         try {
             val response =
                 apiService.checkPortalPossibilities("https://$address/api/2.0/capabilities")

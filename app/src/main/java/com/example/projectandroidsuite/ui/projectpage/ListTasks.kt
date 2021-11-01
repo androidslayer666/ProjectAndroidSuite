@@ -34,10 +34,8 @@ fun TaskList(
 ) {
     val list by viewModel.tasks.collectAsState()
     LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
-        list?.let {
-            items(list!!) { task ->
-                TaskItem(task) { id -> navController.navigate("task/$id") }
-            }
+        items(list) { task ->
+            TaskItem(task) { id -> navController.navigate("task/$id") }
         }
     }
 }
@@ -101,7 +99,10 @@ fun TaskItem(
                     )
                 }
                 Text(
-                    text = SimpleDateFormat(FORMAT_SHOW_DATE, Locale.getDefault()).format(task.deadline),
+                    text = SimpleDateFormat(
+                        FORMAT_SHOW_DATE,
+                        Locale.getDefault()
+                    ).format(task.deadline),
                     style = MaterialTheme.typography.overline
                 )
             }

@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -31,20 +32,20 @@ class ProjectCreateEditViewModel @Inject constructor(
 
     private var projectId: Int? = null
 
-    private var _title = MutableLiveData("")
-    val title: LiveData<String> = _title
+    private var _title = MutableStateFlow("")
+    val title: StateFlow<String> = _title
 
-    private var _description = MutableLiveData("")
-    val description: LiveData<String> = _description
+    private var _description = MutableStateFlow("")
+    val description: StateFlow<String> = _description
 
-    private var _responsible = MutableLiveData<User?>()
-    val responsible: LiveData<User?> = _responsible
+    private var _responsible = MutableStateFlow<User?>(null)
+    val responsible: StateFlow<User?> = _responsible
 
-    private var _userSearchQuery = MutableLiveData<String>()
-    val userSearchQuery: LiveData<String> = _userSearchQuery
+    private var _userSearchQuery = MutableStateFlow<String?>(null)
+    val userSearchQuery: StateFlow<String?> = _userSearchQuery
 
-    private var _projectStatus = MutableLiveData<ProjectStatus>()
-    val projectStatus: LiveData<ProjectStatus> = _projectStatus
+    private var _projectStatus = MutableStateFlow<ProjectStatus?>(null)
+    val projectStatus: StateFlow<ProjectStatus?> = _projectStatus
 
     private var _projectCreationStatus = MutableStateFlow<Result<String, String>?>(null)
     val projectCreationStatus: StateFlow<Result<String, String>?> = _projectCreationStatus
@@ -55,8 +56,8 @@ class ProjectCreateEditViewModel @Inject constructor(
     private var _users = MutableStateFlow<List<User>?>(null)
     val users: StateFlow<List<User>?> = _users
 
-    private var _chosenUserList = MutableStateFlow<MutableList<User>>(mutableListOf())
-    val chosenUserList: StateFlow<MutableList<User>> = _chosenUserList
+    private var _chosenUserList = MutableStateFlow<MutableList<User>?>(null)
+    val chosenUserList: StateFlow<MutableList<User>?> = _chosenUserList
 
 
     init {
@@ -68,12 +69,16 @@ class ProjectCreateEditViewModel @Inject constructor(
     }
 
     fun setProject(project: Project) {
+        //Log.d("setProject", project.toString())
         projectId = project.id
         _title.value = project.title
         _description.value = project.description
-        project.team?.let { _chosenUserList.value = project.team!! }
+        project.team?.let {
+            _chosenUserList.value = it.toMutableList()
+            updateChosenUsers()
+        }
         project.responsible?.let { _responsible.value = project.responsible!! }
-        project.status?.let { _projectStatus.value = it}
+        project.status?.let { _projectStatus.value = it }
     }
 
     fun setTitle(string: String) {
@@ -85,6 +90,7 @@ class ProjectCreateEditViewModel @Inject constructor(
     }
 
     fun setResponsible(user: User) {
+        //Log.d("setResponsible", "setResponsible")
         _responsible.value = user
     }
 
@@ -103,10 +109,10 @@ class ProjectCreateEditViewModel @Inject constructor(
     }
 
     fun addOrRemoveUser(user: User) {
-        if (_chosenUserList.value.getListUserIdsFromList().contains(user.id)) {
-            _chosenUserList.value.remove(_chosenUserList.value.getUserById(user.id))
+        if (_chosenUserList.value?.getListUserIdsFromList()?.contains(user.id) == true) {
+            _chosenUserList.value?.remove(_chosenUserList.value?.getUserById(user.id))
         } else {
-            _chosenUserList.value.add(user)
+            _chosenUserList.value?.add(user)
         }
     }
 
@@ -115,7 +121,7 @@ class ProjectCreateEditViewModel @Inject constructor(
         getAllUsers.setFilter(query)
     }
 
-    fun updateChosenUsers(){
+    fun updateChosenUsers() {
         getAllUsers.setChosenUsersList(_chosenUserList.value)
     }
 

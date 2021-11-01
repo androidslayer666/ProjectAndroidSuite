@@ -81,13 +81,11 @@ class TaskCreateEditViewModel @Inject constructor(
     private var _projectList = MutableStateFlow<List<Project>>(listOf())
     val projectList: StateFlow<List<Project>> = _projectList
 
-    fun setStringForFilteringProjects(value: String) {
-        _projectSearchQuery.value = value
-        getAllProjects.setFilter(searchQuery = value)
-    }
+    private var _milestonesList = MutableStateFlow<List<Milestone>?>(null)
+    val milestonesList: StateFlow<List<Milestone>?> = _milestonesList
 
     val userList = project.transform { project ->
-         emit(project?.team)
+        emit(project?.team)
     }
         .combine(chosenUserList) { users, chosenUsers ->
             users?.forEach { user ->
@@ -96,14 +94,8 @@ class TaskCreateEditViewModel @Inject constructor(
             users
         }
         .combine(userSearch) { users, filter ->
-            if (filter != null) users?.filterUsersByFilter(filter)
-            else users
+            users?.filterUsersByFilter(filter)
         }
-
-    val milestonesList = project.transform<Project?, List<Milestone>> {
-            getMilestonesForProject(it?.id?:0)
-    }
-
 
     init {
         viewModelScope.launch(IO) {
@@ -117,15 +109,11 @@ class TaskCreateEditViewModel @Inject constructor(
         taskId = task.id
         _title.value = task.title
         _description.value = task.description
-        _chosenUserList.value = task.responsibles
+        _chosenUserList.value = task.responsibles.toMutableList()
         _endDate.value = task.deadline
-        _priority.value = task.priority?:0
+        _priority.value = task.priority ?: 0
         task.projectOwner?.let { projectOwner ->
-            viewModelScope.launch {
-                getProjectById(projectOwner.id).collectLatest { project ->
-                    _project.value = project
-                }
-            }
+            setProject(projectOwner)
         }
         task.milestoneId?.let {
             viewModelScope.launch {
@@ -134,7 +122,6 @@ class TaskCreateEditViewModel @Inject constructor(
                         _milestone.value = it
                     }
                 }
-
             }
         }
     }
@@ -152,8 +139,24 @@ class TaskCreateEditViewModel @Inject constructor(
         _priority.value = value
     }
 
+    fun setStringForFilteringProjects(value: String) {
+        _projectSearchQuery.value = value
+        getAllProjects.setFilter(searchQuery = value)
+    }
+
     fun setProject(project: Project) {
         _project.value = project
+
+        viewModelScope.launch {
+            getProjectById(project.id).collectLatest { project ->
+                _project.value = project
+            }
+        }
+        viewModelScope.launch {
+            getMilestonesForProject(project.id).collectLatest {
+                _milestonesList.value = it
+            }
+        }
         Log.d("setProject", _project.value.toString())
     }
 
@@ -183,8 +186,7 @@ class TaskCreateEditViewModel @Inject constructor(
     }
 
     fun addOrRemoveUser(user: User) {
-        val listIds = _chosenUserList.value.getListIds()
-        if (listIds.contains(user.id)) {
+        if (_chosenUserList.value.getListIds().contains(user.id)) {
             _chosenUserList.value.remove(_chosenUserList.value.getUserById(user.id))
         } else {
             _chosenUserList.value.add(user)

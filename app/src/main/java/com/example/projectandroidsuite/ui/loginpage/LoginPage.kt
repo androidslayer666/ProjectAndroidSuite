@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -17,11 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.ProjectsScreens
 
 
@@ -32,17 +35,15 @@ fun LoginPage(
     navController: NavHostController
 ) {
 
-    val portalAddress by viewModel.portalAddress.observeAsState("")
-    val emailAddress by viewModel.emailInput.observeAsState("")
-    val password by viewModel.passwordInput.observeAsState("")
-    val addressIsValid by viewModel.canConnectToPortal.observeAsState(false)
-    val emailIsValid by viewModel.inputEmailValidated.observeAsState(true)
-    val passwordIsValid by viewModel.inputPasswordValidated.observeAsState(true)
-    val twoFactorAuth by viewModel.twoFactorAuth.observeAsState(false)
-    val tfaGoogleInput by viewModel.tfaGoogleInput.observeAsState("")
-
-
-    val portalIsInCloud by viewModel.portalIsInCloud.observeAsState()
+    val portalAddress by viewModel.portalAddress.collectAsState()
+    val emailAddress by viewModel.emailInput.collectAsState()
+    val password by viewModel.passwordInput.collectAsState()
+    val addressIsValid by viewModel.canConnectToPortal.collectAsState()
+    val emailIsValid by viewModel.inputEmailValidated.collectAsState()
+    val passwordIsValid by viewModel.inputPasswordValidated.collectAsState()
+    val twoFactorAuth by viewModel.twoFactorAuth.collectAsState()
+    val tfaGoogleInput by viewModel.tfaGoogleInput.collectAsState()
+    val portalIsInCloud by viewModel.portalIsInCloud.collectAsState()
 
     val (focusRequesterMail, focusRequesterPassword) = FocusRequester.createRefs()
     val titles = listOf("Cloud portal", "Local portal")
@@ -103,7 +104,7 @@ fun LoginPage(
         if (!addressIsValid) {
             if (portalIsInCloud == 0) {
                 Text(
-                    text = "Input your portal address in a format : xxxxxx.onlyoffice.com/sg/eu",
+                    text = stringResource(R.string.input_your_portal_address_in_a_format),
                     style = MaterialTheme.typography.body1,
                     color = MaterialTheme.colors.onPrimary,
                     modifier = Modifier
@@ -135,7 +136,7 @@ fun LoginPage(
                     onValueChange = { input ->
                         viewModel.onChangeEmail(input)
                     },
-                    label = { Text("Email") },
+                    label = { Text(stringResource(R.string.email)) },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = MaterialTheme.colors.background,
                         textColor = MaterialTheme.colors.onBackground

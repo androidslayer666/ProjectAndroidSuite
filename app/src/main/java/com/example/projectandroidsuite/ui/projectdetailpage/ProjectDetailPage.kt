@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -30,8 +31,10 @@ fun ProjectDetailPage(
     navController: NavHostController
 ) {
 
-    if (projectId != null && viewModel.projectId.value == null) {
-        viewModel.setProject(projectId)
+    LaunchedEffect(key1 = projectId) {
+        if (projectId != null && viewModel.projectId.value == null) {
+            viewModel.setProject(projectId)
+        }
     }
 
     val context = LocalContext.current
@@ -51,14 +54,16 @@ fun ProjectDetailPage(
     var showDeleteMessageDialog by remember { mutableStateOf(false) }
 
 
-    val project by viewModel.currentProject.collectAsState(null)
-    val listTasksAndMilestones by viewModel.taskAndMilestones.collectAsState(null)
-    val listMessages by viewModel.listDiscussions.collectAsState(null)
-    val listFiles by viewModel.listFiles.collectAsState(listOf())
+    val project by viewModel.currentProject.collectAsState()
+    val listTasksAndMilestones by viewModel.taskAndMilestones.collectAsState()
+    val listMessages by viewModel.listDiscussions.collectAsState()
+    val listFiles by viewModel.listFiles.collectAsState()
     val projectDeletionStatus by viewModel.projectDeletionStatus.collectAsState()
     val milestoneDeletionStatus by viewModel.milestoneDeletionStatus.collectAsState()
     val messageDeletionStatus by viewModel.messageDeletionStatus.collectAsState()
     val commentDeletionStatus by viewModel.commentDeletionStatus.collectAsState()
+
+
 
     showResultToast(
         result = milestoneDeletionStatus,

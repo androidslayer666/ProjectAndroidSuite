@@ -24,7 +24,6 @@ fun ProjectTheme(
 ) {
     MaterialTheme(
         colors = if (darkTheme) DarkColors else LightColors,
-        /*...*/
         content = content
     )
 }

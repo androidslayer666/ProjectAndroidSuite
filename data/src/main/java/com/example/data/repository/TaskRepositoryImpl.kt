@@ -45,7 +45,9 @@ class TaskRepositoryImpl @Inject constructor(
     }
 
     override fun getTaskById(taskId: Int): Flow<Task?> {
-        return taskDao.getTaskFromById(taskId).transform { emit(it.fromTaskEntityToTask()) }
+        return taskDao.getTaskFromById(taskId).transform {
+            Log.d("getTaskById", it.toString())
+            emit(it.fromTaskEntityToTask()) }
     }
 
     override suspend fun populateTasks(): Result<String, String> {

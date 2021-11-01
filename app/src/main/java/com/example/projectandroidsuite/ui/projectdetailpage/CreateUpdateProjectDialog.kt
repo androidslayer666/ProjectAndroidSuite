@@ -27,11 +27,13 @@ fun CreateUpdateProjectDialog(
     onSuccessProjectCreation: (String) -> Unit,
     onDeleteClick: (() -> Unit)? = null
 ) {
-    project?.let { viewModel.setProject(it) }
+    LaunchedEffect(key1 = project) {
+            project?.let { viewModel.setProject(it) }
+    }
 
     val projectUpdatingStatus by viewModel.projectUpdatingStatus.collectAsState()
     val projectCreationStatus by viewModel.projectCreationStatus.collectAsState()
-    val userSearch by viewModel.userSearchQuery.observeAsState("")
+    val userSearch by viewModel.userSearchQuery.collectAsState()
     val listUsersFlow by viewModel.users.collectAsState()
 
     var showTeamPicker by remember { mutableStateOf(false) }
@@ -74,7 +76,7 @@ fun CreateUpdateProjectDialog(
         if (showResponsiblePicker) {
             TeamPickerDialog(
                 list = listUsersFlow!!,
-                onSubmit = {  },
+                onSubmit = { },
                 onClick = { user ->
                     run {
                         viewModel.setResponsible(user)
@@ -90,8 +92,10 @@ fun CreateUpdateProjectDialog(
         if (showTeamPicker) {
             TeamPickerDialog(
                 list = listUsersFlow!!,
-                onSubmit = { showTeamPicker = false
-                    viewModel.updateChosenUsers()},
+                onSubmit = {
+                    showTeamPicker = false
+                    viewModel.updateChosenUsers()
+                },
                 onClick = { user ->
                     viewModel.addOrRemoveUser(user)
                 },
@@ -116,12 +120,12 @@ fun CreateProjectDialogInput(
 ) {
 
 
-    val title by viewModel.title.observeAsState("")
-    val description by viewModel.description.observeAsState("\n")
+    val title by viewModel.title.collectAsState()
+    val description by viewModel.description.collectAsState()
     val listUsersFlow by viewModel.users.collectAsState()
     val listChosenUsers by viewModel.chosenUserList.collectAsState()
-    val responsible by viewModel.responsible.observeAsState()
-    val projectStatus by viewModel.projectStatus.observeAsState()
+    val responsible by viewModel.responsible.collectAsState()
+    val projectStatus by viewModel.projectStatus.collectAsState()
 
     Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
 

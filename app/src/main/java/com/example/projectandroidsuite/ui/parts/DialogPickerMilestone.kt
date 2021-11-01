@@ -15,7 +15,7 @@ import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 
 @Composable
 fun DialogPickerMilestone(
-    list: List<Milestone>,
+    list: List<Milestone>?,
     onClick: (user: Milestone) -> Unit,
     closeDialog: () -> Unit
 ) {
@@ -34,10 +34,10 @@ fun DialogPickerMilestone(
 
 @Composable
 fun PickerMilestoneBody(
-    list: List<Milestone>,
+    list: List<Milestone>?,
     onClick: (project: Milestone) -> Unit
 ) {
-if(list.isNotEmpty())
+if(list?.isNotEmpty() == true)
         LazyColumn {
             items(list) { milestone ->
                 Row(Modifier.padding(12.dp).fillMaxWidth()) {

@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -32,8 +33,10 @@ fun TaskDetailPage(
     navController: NavHostController
 ) {
 
-    if (taskId != null && viewModel.taskId.value == null) {
-        viewModel.setCurrentTask(taskId)
+    LaunchedEffect(key1 = taskId) {
+        if (taskId != null && viewModel.taskId.value == null) {
+            viewModel.setCurrentTask(taskId)
+        }
     }
 
     val context = LocalContext.current
@@ -46,16 +49,19 @@ fun TaskDetailPage(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showUpdateStatusDialog by remember { mutableStateOf(false) }
 
-    val task by viewModel.currentTask.collectAsState(null)
-    val comments by viewModel.listComments.collectAsState(listOf())
-    val files by viewModel.filesForTask.collectAsState(listOf())
+    val task by viewModel.currentTask.collectAsState()
+    val comments by viewModel.listComments.collectAsState()
+    val files by viewModel.filesForTask.collectAsState()
     val taskDeletionStatus by viewModel.taskDeletionStatus.collectAsState()
-    val taskMilestone by viewModel.taskMilestone.collectAsState(null)
+    val taskMilestone by viewModel.taskMilestone.collectAsState()
+
+
 
     CustomScaffold(navController = navController, viewModel = hiltViewModel()) {
         Column {
             Row {
                 Column(Modifier.weight(5F)) {
+                    Log.d("TaskDetailPage", task.toString())
                     DetailHeaderWrapper(
                         title = task?.title,
                         description = task?.description,

@@ -32,7 +32,10 @@ fun CreateUpdateTaskDialog(
     onTaskDeletedOrEdited: (String) -> Unit = { },
     onDeleteClick: (() -> Unit)? = null
 ) {
-    task?.let { viewModel.setTask(it) }
+    LaunchedEffect(key1 = task) {
+        task?.let { viewModel.setTask(it) }
+    }
+
 
     val taskUpdatingStatus by viewModel.taskUpdatingStatus.collectAsState()
     val taskCreationStatus by viewModel.taskCreationStatus.collectAsState()
@@ -45,10 +48,8 @@ fun CreateUpdateTaskDialog(
     val listUsersFlow by viewModel.userList.collectAsState(listOf())
     val project by viewModel.project.collectAsState()
 
-    val projectSearch by viewModel.projectSearchQuery.collectAsState("")
-    val userSearch by viewModel.userSearchQuery.collectAsState("")
-
-    Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
+    val projectSearch by viewModel.projectSearchQuery.collectAsState()
+    val userSearch by viewModel.userSearchQuery.collectAsState()
 
     if (taskCreationStatus is Success) {
         Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
@@ -66,13 +67,17 @@ fun CreateUpdateTaskDialog(
 
     CustomDialog(
         show = true,
-        hide = { closeDialog() },
+        hide = { closeDialog()
+               viewModel.clearInput()
+               },
         text = if (task == null) "Create task" else "Update task",
         onSubmit = {
             if (task == null) {
                 viewModel.createTask()
+                viewModel.clearInput()
             } else {
                 viewModel.updateTask()
+                viewModel.clearInput()
             }
         },
         onDeleteClick = onDeleteClick
@@ -106,9 +111,7 @@ fun CreateUpdateTaskDialog(
             list = listUsersFlow!!,
             onSubmit = { showTeamPicker = false},
             onClick = { user ->
-                run {
                     viewModel.addOrRemoveUser(user)
-                }
             },
             closeDialog = { showTeamPicker = false },
             pickerType = PickerType.MULTIPLE,
@@ -117,15 +120,15 @@ fun CreateUpdateTaskDialog(
         )
     }
 
-    if (showMilestonePicker && project != null){
-        makeToast("the project doesn't have milestones", LocalContext.current)
-        showMilestonePicker = false
-    }
+//    if (showMilestonePicker && project != null){
+//        makeToast("the project doesn't have milestones", LocalContext.current)
+//        showMilestonePicker = false
+//    }
 
-    listMilestones?.let {
+    listMilestones.let {
         if (showMilestonePicker && listMilestones?.isNotEmpty() == true) {
             DialogPickerMilestone(
-                list = listMilestones!!,
+                list = listMilestones,
                 onClick = { milestone ->
                     run {
                         viewModel.setMilestone(milestone)
@@ -152,12 +155,14 @@ fun CreateTaskDialogInput(
 
     var showDatePicker by remember { mutableStateOf(false) }
 
+
+
     val title by viewModel.title.collectAsState("")
     val description by viewModel.description.collectAsState("")
     val listProjects by viewModel.projectList.collectAsState()
     val project by viewModel.project.collectAsState()
     val listUsersFlow by viewModel.userList.collectAsState(listOf())
-    val listChosenUsers by viewModel.chosenUserList.collectAsState(mutableListOf())
+    val listChosenUsers by viewModel.chosenUserList.collectAsState(null)
     val endDate by viewModel.endDate.collectAsState(Date())
 
     val taskStatus by viewModel.taskStatus.collectAsState()
@@ -205,7 +210,7 @@ fun CreateTaskDialogInput(
             )
         }
 
-        if (listProjects != null) {
+        if (listProjects.isNotEmpty()) {
 
             Row(Modifier.padding(vertical = 12.dp)) {
                 Text(
@@ -232,7 +237,6 @@ fun CreateTaskDialogInput(
         }
 
         if (listUsersFlow != null) {
-
             Row(
                 Modifier.padding(vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -260,7 +264,7 @@ fun CreateTaskDialogInput(
 
 
 
-        if (listMilestones != null) {
+        if (listMilestones?.isNotEmpty() == true) {
             Row(Modifier.padding(vertical = 12.dp)) {
                 Text(
                     text = "Milestone",

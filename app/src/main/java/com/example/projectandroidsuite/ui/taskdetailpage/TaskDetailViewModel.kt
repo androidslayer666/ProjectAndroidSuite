@@ -55,14 +55,11 @@ class TaskDetailViewModel @Inject constructor(
     val taskDeletionStatus: StateFlow<Result<String, String>?> = _taskDeletionStatus
 
     fun setCurrentTask(taskId: Int) {
+        Log.d("DetailViewModel", taskId.toString())
         _taskId.value = taskId
         viewModelScope.launch {
             getTaskById(taskId).collectLatest {
-                _currentTask.value = it
-            }
-        }
-        viewModelScope.launch {
-            getTaskById(taskId).collectLatest {
+                Log.d("DetailViewModel", it.toString())
                 _currentTask.value = it
             }
         }

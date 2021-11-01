@@ -39,11 +39,11 @@ fun SearchBody(
     viewModel: SearchViewModel,
     navController: NavHostController
 ) {
-    val searchString by viewModel.searchString.collectAsState("")
-    val projects by viewModel.projects.collectAsState(listOf())
-    val tasks by viewModel.tasks.collectAsState(listOf())
-    val milestones by viewModel.milestones.collectAsState(listOf())
-    val files by viewModel.files.collectAsState(listOf())
+    val searchString by viewModel.searchString.collectAsState()
+    val projects by viewModel.projects.collectAsState()
+    val tasks by viewModel.tasks.collectAsState()
+    val milestones by viewModel.milestones.collectAsState()
+    val files by viewModel.files.collectAsState()
 
 
 
@@ -76,7 +76,7 @@ fun SearchBody(
                     .fillMaxWidth()
                     .padding(start = 12.dp)
             ) {
-                items(projects!!) {
+                items(projects) {
                     Text(text = it.title, Modifier
                         .fillMaxWidth()
                         .clickable { navController.navigate("project/${it.id}") }
@@ -99,7 +99,7 @@ fun SearchBody(
                 Modifier
                     .fillMaxWidth()
             ) {
-                items(tasks!!) {
+                items(tasks) {
                     Text(text = it.title, Modifier
                         .fillMaxWidth()
                         .clickable { navController.navigate("task/${it.id}") }
@@ -123,7 +123,7 @@ fun SearchBody(
                     .fillMaxWidth()
                     .padding(start = 12.dp)
             ) {
-                items(milestones!!) {
+                items(milestones) {
                     Text(
                         text = it.title ?: "", Modifier
                             .fillMaxWidth()
@@ -148,7 +148,7 @@ fun SearchBody(
                     .fillMaxWidth()
                     .padding(start = 12.dp)
             ) {
-                items(files!!) {
+                items(files) {
                     Text(
                         text = it.title ?: "", Modifier
                             .fillMaxWidth()

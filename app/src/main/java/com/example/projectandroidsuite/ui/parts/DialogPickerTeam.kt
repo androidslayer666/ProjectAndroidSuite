@@ -24,7 +24,7 @@ fun TeamPickerDialog(
     onClick: (user: User) -> Unit,
     closeDialog: () -> Unit,
     pickerType: PickerType,
-    searchString: String,
+    searchString: String?,
     onSearchChanged: (String) -> Unit
 ) {
 
@@ -48,13 +48,13 @@ fun TeamPickerBody(
     list: List<User>,
     onClick: (name: User) -> Unit,
     pickerType: PickerType,
-    searchString: String,
+    searchString: String?,
     onSearchChanged: (String) -> Unit,
     closeDialog: () -> Unit
 ) {
 
     Column {
-        TextField(value = searchString, onValueChange = onSearchChanged)
+        TextField(value = searchString?:"", onValueChange = onSearchChanged)
         LazyColumn {
             items(list) { user ->
                 var chosen by remember { mutableStateOf(user.chosen == true) }

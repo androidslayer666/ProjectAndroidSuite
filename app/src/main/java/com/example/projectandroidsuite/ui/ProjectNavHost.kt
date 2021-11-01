@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -16,7 +17,6 @@ import com.example.projectandroidsuite.ui.projectdetailpage.ProjectDetailPage
 
 enum class ProjectsScreens() {
     Projects, Login, Project, Task
-
 }
 
 @Composable
@@ -24,10 +24,10 @@ fun ProjectNavHost(
     navController: NavHostController,
     loginViewModel: LoginViewModel
 ) {
-
+    Log.d("checkIfAuthenticated", "checkIfAuthenticated")
     NavHost(
         navController = navController,
-        startDestination = if (loginViewModel.checkIfAuthenticated()) ProjectsScreens.Projects.name
+        startDestination = if (loginViewModel.checkAuthentication()) ProjectsScreens.Projects.name
         else ProjectsScreens.Login.name
     ) {
 

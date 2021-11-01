@@ -17,6 +17,6 @@ interface AuthRepository {
 
     fun isAuthenticated(): Boolean
 
-    suspend fun tryPortal(address: String) : Result<String, String>
+    suspend fun checkPortalPossibilities(address: String) : Result<String, String>
 
 }

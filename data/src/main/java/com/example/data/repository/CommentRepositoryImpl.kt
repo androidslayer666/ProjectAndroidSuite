@@ -26,9 +26,9 @@ class CommentRepositoryImpl @Inject constructor(
 
     override suspend fun populateCommentsWithTaskId(taskId: Int): Result<String, String> {
         try {
-            Log.d("CommentRepository", taskId.toString())
+            //Log.d("CommentRepository", taskId.toString())
             val comments = commentEndPoint.getTaskComment(taskId).listCommentDtos
-            Log.d("CommentRepository", comments.toString())
+            //Log.d("CommentRepository", comments.toString())
 
             return if (comments == null) {
                 Failure("Can't download comments")
