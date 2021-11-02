@@ -1,23 +1,25 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.domain.utils.ProjectStatus
 import com.example.domain.model.Project
+import com.example.domain.utils.Failure
+import com.example.domain.utils.ProjectStatus
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.RowTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
-
+import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
+import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
+import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
+import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.utils.PickerType
-
-import com.example.projectandroidsuite.ui.parts.customitems.*
+import com.example.projectandroidsuite.ui.utils.makeToast
 
 @Composable
 fun CreateUpdateProjectDialog(
@@ -28,36 +30,40 @@ fun CreateUpdateProjectDialog(
     onDeleteClick: (() -> Unit)? = null
 ) {
     LaunchedEffect(key1 = project) {
-            project?.let { viewModel.setProject(it) }
+        project?.let { viewModel.setProject(it) }
     }
-
-    val projectUpdatingStatus by viewModel.projectUpdatingStatus.collectAsState()
-    val projectCreationStatus by viewModel.projectCreationStatus.collectAsState()
-    val userSearch by viewModel.userSearchQuery.collectAsState()
-    val listUsersFlow by viewModel.users.collectAsState()
 
     var showTeamPicker by remember { mutableStateOf(false) }
     var showResponsiblePicker by remember { mutableStateOf(false) }
 
+    val userSearch by viewModel.userSearchQuery.collectAsState()
+    val listUsersFlow by viewModel.users.collectAsState()
+    val projectInputState by viewModel.projectInputState.collectAsState()
 
-    if (projectCreationStatus is Success<String>) {
-        Log.d("CreateUpdateectDialog", "Success" + (projectCreationStatus as Success<String>).value)
-        onSuccessProjectCreation((projectCreationStatus as Success<String>).value)
-        closeDialog()
-        viewModel.clearInput()
-    }
 
-    if (projectUpdatingStatus is Success<String>) {
-        Log.d("CreateUpdateectDialog", "Success" + (projectUpdatingStatus as Success<String>).value)
-        onSuccessProjectCreation((projectUpdatingStatus as Success<String>).value)
-        closeDialog()
-        viewModel.clearInput()
+    when {
+        projectInputState.isTitleEmpty == true -> makeToast("Please enter project title", LocalContext.current)
+        projectInputState.isTeamEmpty == true -> makeToast("Please choose project team", LocalContext.current)
+        projectInputState.isResponsibleEmpty == true -> makeToast("Please enter project responsible", LocalContext.current)
+        projectInputState.serverResponse is Success -> {
+            onSuccessProjectCreation((projectInputState.serverResponse as Success<String>).value)
+            closeDialog()
+            viewModel.clearInput()
+        }
+        projectInputState.serverResponse is Failure -> {
+            onSuccessProjectCreation((projectInputState.serverResponse as Failure<String>).reason)
+            closeDialog()
+            viewModel.clearInput()
+        }
     }
 
     Box {
         CustomDialog(
             show = true,
-            hide = { closeDialog() },
+            hide = {
+                closeDialog()
+                viewModel.clearInput()
+            },
             text = if (project == null) "Create project" else "Update project",
             onSubmit = {
                 if (project == null) {
@@ -68,9 +74,11 @@ fun CreateUpdateProjectDialog(
             },
             onDeleteClick = onDeleteClick
         ) {
-            CreateProjectDialogInput(viewModel, project != null,
-                { showTeamPicker = true },
-                { showResponsiblePicker = true })
+            CreateProjectDialogInput(
+                viewModel = viewModel,
+                modeCreate = project != null,
+                showTeamPicker = { showTeamPicker = true },
+                showResponsiblePicker = { showResponsiblePicker = true })
         }
 
         if (showResponsiblePicker) {

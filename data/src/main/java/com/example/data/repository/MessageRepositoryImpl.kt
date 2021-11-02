@@ -3,18 +3,16 @@ package com.example.data.repository
 import android.util.Log
 import com.example.data.dao.CommentDao
 import com.example.data.dao.MessageDao
-import com.example.domain.*
+import com.example.data.endpoints.CommentEndPoint
+import com.example.data.endpoints.MessageEndPoint
+import com.example.domain.entities.MessageEntity
 import com.example.domain.mappers.*
 import com.example.domain.model.Message
 import com.example.domain.model.User
 import com.example.domain.repository.MessageRepository
-import com.example.data.endpoints.CommentEndPoint
-import com.example.data.endpoints.MessageEndPoint
-import com.example.domain.entities.MessageEntity
 import com.example.domain.utils.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
-import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -52,7 +50,7 @@ class MessageRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateMessageComments(messageId:Int, projectId: Int){
+    override suspend fun updateMessageComments(messageId: Int, projectId: Int) {
         val message = messageEndPoint.getMessageWithId(messageId).message
         message?.toEntity(projectId)?.let { putCommentsToMessage(it) }
     }
@@ -70,7 +68,7 @@ class MessageRepositoryImpl @Inject constructor(
 
         val commentFromDb = commentDao.getCommentsByMessageId(message.id)
         commentFromDb.forEach {
-            if(comments?.toListCommentIds()?.contains(it.id) != true) {
+            if (comments?.toListCommentIds()?.contains(it.id) != true) {
                 commentDao.deleteComment(it.id)
             }
         }
@@ -125,11 +123,11 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun deleteMessage(messageId: Int): Result<String, String> {
+    override suspend fun deleteMessage(messageId: Int, projectId: Int?): Result<String, String> {
 
         return networkCaller(
             call = { messageEndPoint.deleteMessage(messageId) },
-            onSuccess = { },
+            onSuccess = { projectId?.let { populateMessageWithProjectId(it) } },
             onSuccessString = "Message deleted successfully",
             onFailureString = "Having problem while deleting the message, please check the network connection"
         )

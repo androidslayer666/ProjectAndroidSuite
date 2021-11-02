@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -53,7 +51,6 @@ fun ProjectDetailPage(
     var showDeleteMilestoneDialog by remember { mutableStateOf(false) }
     var showDeleteMessageDialog by remember { mutableStateOf(false) }
 
-
     val project by viewModel.currentProject.collectAsState()
     val listTasksAndMilestones by viewModel.taskAndMilestones.collectAsState()
     val listMessages by viewModel.listDiscussions.collectAsState()
@@ -62,8 +59,6 @@ fun ProjectDetailPage(
     val milestoneDeletionStatus by viewModel.milestoneDeletionStatus.collectAsState()
     val messageDeletionStatus by viewModel.messageDeletionStatus.collectAsState()
     val commentDeletionStatus by viewModel.commentDeletionStatus.collectAsState()
-
-
 
     showResultToast(
         result = milestoneDeletionStatus,
@@ -179,7 +174,6 @@ fun ProjectDetailPage(
                 onDeleteClick = { if (project?.canDelete == true) showDeleteDialog = true }
             )
         }
-
 
         if (showCreateMessageDialog) {
             if (projectId != null) {

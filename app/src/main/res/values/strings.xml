@@ -2,5 +2,6 @@
     <string name="app_name">ProjectAndroidSuite</string>
     <string name="input_your_portal_address_in_a_format">Input your portal address in a format : xxxxxx.onlyoffice.com/sg/eu</string>
     <string name="email">Email</string>
+    <string name="create_task">Create task</string>
 
 </resources>

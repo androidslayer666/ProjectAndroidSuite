@@ -1,8 +1,5 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.interactor.project.CreateProject
@@ -11,9 +8,9 @@ import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Project
 import com.example.domain.model.User
 import com.example.domain.utils.ProjectStatus
-import com.example.domain.utils.Result
 import com.example.domain.utils.getListUserIdsFromList
 import com.example.projectandroidsuite.ui.utils.getUserById
+import com.example.projectandroidsuite.ui.utils.validation.ProjectInputState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -47,18 +44,14 @@ class ProjectCreateEditViewModel @Inject constructor(
     private var _projectStatus = MutableStateFlow<ProjectStatus?>(null)
     val projectStatus: StateFlow<ProjectStatus?> = _projectStatus
 
-    private var _projectCreationStatus = MutableStateFlow<Result<String, String>?>(null)
-    val projectCreationStatus: StateFlow<Result<String, String>?> = _projectCreationStatus
-
-    private var _projectUpdatingStatus = MutableStateFlow<Result<String, String>?>(null)
-    val projectUpdatingStatus: StateFlow<Result<String, String>?> = _projectUpdatingStatus
-
     private var _users = MutableStateFlow<List<User>?>(null)
     val users: StateFlow<List<User>?> = _users
 
-    private var _chosenUserList = MutableStateFlow<MutableList<User>?>(null)
-    val chosenUserList: StateFlow<MutableList<User>?> = _chosenUserList
+    private var _chosenUserList = MutableStateFlow<MutableList<User>>(mutableListOf())
+    val chosenUserList: StateFlow<MutableList<User>> = _chosenUserList
 
+    private var _projectInputState = MutableStateFlow(ProjectInputState())
+    val projectInputState: StateFlow<ProjectInputState> = _projectInputState
 
     init {
         viewModelScope.launch(IO) {
@@ -69,7 +62,6 @@ class ProjectCreateEditViewModel @Inject constructor(
     }
 
     fun setProject(project: Project) {
-        //Log.d("setProject", project.toString())
         projectId = project.id
         _title.value = project.title
         _description.value = project.description
@@ -83,6 +75,7 @@ class ProjectCreateEditViewModel @Inject constructor(
 
     fun setTitle(string: String) {
         _title.value = string
+        if (string.isNotEmpty()) _projectInputState.value = _projectInputState.value.copy(isTitleEmpty = false)
     }
 
     fun setDescription(string: String) {
@@ -92,6 +85,7 @@ class ProjectCreateEditViewModel @Inject constructor(
     fun setResponsible(user: User) {
         //Log.d("setResponsible", "setResponsible")
         _responsible.value = user
+        _projectInputState.value = _projectInputState.value.copy(isResponsibleEmpty = false)
     }
 
     fun setProjectStatus(status: ProjectStatus) {
@@ -104,15 +98,16 @@ class ProjectCreateEditViewModel @Inject constructor(
         _description.value = ""
         _chosenUserList.value = mutableListOf()
         _responsible.value = null
-        _projectCreationStatus.value = null
-        _projectUpdatingStatus.value = null
+        _projectInputState.value = ProjectInputState()
+        updateChosenUsers()
     }
 
     fun addOrRemoveUser(user: User) {
-        if (_chosenUserList.value?.getListUserIdsFromList()?.contains(user.id) == true) {
-            _chosenUserList.value?.remove(_chosenUserList.value?.getUserById(user.id))
+        if (_chosenUserList.value.getListUserIdsFromList().contains(user.id)) {
+            _chosenUserList.value.remove(_chosenUserList.value.getUserById(user.id))
         } else {
-            _chosenUserList.value?.add(user)
+            _chosenUserList.value.add(user)
+            _projectInputState.value = _projectInputState.value.copy(isTeamEmpty = false)
         }
     }
 
@@ -126,34 +121,47 @@ class ProjectCreateEditViewModel @Inject constructor(
     }
 
     fun createProject() {
-        CoroutineScope(IO).launch {
-            val response = createProject(
-                Project(
-                    id = 0,
-                    title = title.value ?: "",
-                    description = description.value ?: "",
-                    team = chosenUserList.value,
-                    responsible = responsible.value
+        validateInput {
+            CoroutineScope(IO).launch {
+                val response = createProject(
+                    Project(
+                        id = 0,
+                        title = title.value,
+                        description = description.value,
+                        team = chosenUserList.value,
+                        responsible = responsible.value
+                    )
                 )
-            )
-            _projectCreationStatus.value = response
+                _projectInputState.value = ProjectInputState(serverResponse = response)
+            }
         }
     }
 
     fun updateProject() {
-        CoroutineScope(IO).launch {
-            val response = updateProject(
-                projectId ?: 0,
-                Project(
-                    id = 0,
-                    title = title.value ?: "",
-                    description = description.value ?: "",
-                    team = chosenUserList.value,
-                    responsible = responsible.value
-                ),
-                projectStatus.value
-            )
-            _projectUpdatingStatus.value = response
+        validateInput{
+            CoroutineScope(IO).launch {
+                val response = updateProject(
+                    projectId ?: 0,
+                    Project(
+                        id = 0,
+                        title = title.value,
+                        description = description.value,
+                        team = chosenUserList.value,
+                        responsible = responsible.value
+                    ),
+                    projectStatus.value
+                )
+                _projectInputState.value = ProjectInputState(serverResponse =   response)
+            }
+        }
+    }
+
+    private fun validateInput (onSuccess: ()->Unit) {
+        when{
+            title.value.isEmpty() -> _projectInputState.value = _projectInputState.value.copy(isTitleEmpty = true)
+            chosenUserList.value.size < 1 -> _projectInputState.value = _projectInputState.value.copy(isTeamEmpty = true)
+            responsible.value == null -> _projectInputState.value = _projectInputState.value.copy(isResponsibleEmpty = true)
+            else ->  onSuccess()
         }
     }
 }

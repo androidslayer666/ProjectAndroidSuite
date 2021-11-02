@@ -14,7 +14,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -74,7 +73,7 @@ fun CustomScaffold(
                                 painterResource(R.drawable.ic_baseline_arrow_drop_down_24),
                                 "",
                                 modifier = Modifier
-                                    .clickable { showUserOptions = true }
+                                    .clickable { showUserOptions = !showUserOptions }
                                     .height(50.dp)
                                     .padding(start = 12.dp, end = 12.dp)
                                     .weight(2F)
@@ -203,9 +202,12 @@ fun CustomScaffold(
             )
         }
         if (showUserOptions) {
-            Button(onClick = {
+            Button(modifier =
+            Modifier.padding(start = 200.dp,top = 50.dp)
+            ,onClick = {
                 viewModel.logOut()
                 navController.navigate(ProjectsScreens.Login.name)
+
             }) {
                 Text("Log Out")
             }

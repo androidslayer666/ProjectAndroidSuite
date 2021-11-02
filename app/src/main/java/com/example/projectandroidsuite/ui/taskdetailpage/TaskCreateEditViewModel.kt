@@ -19,6 +19,7 @@ import com.example.domain.utils.UserFilter
 import com.example.domain.utils.filterUsersByFilter
 import com.example.projectandroidsuite.ui.utils.getListIds
 import com.example.projectandroidsuite.ui.utils.getUserById
+import com.example.projectandroidsuite.ui.utils.validation.TaskInputState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -84,6 +85,9 @@ class TaskCreateEditViewModel @Inject constructor(
     private var _milestonesList = MutableStateFlow<List<Milestone>?>(null)
     val milestonesList: StateFlow<List<Milestone>?> = _milestonesList
 
+    private var _taskInputState = MutableStateFlow(TaskInputState())
+    val taskInputState: StateFlow<TaskInputState> = _taskInputState
+
     val userList = project.transform { project ->
         emit(project?.team)
     }
@@ -128,6 +132,7 @@ class TaskCreateEditViewModel @Inject constructor(
 
     fun setTitle(string: String) {
         _title.value = string
+        _taskInputState.value = _taskInputState.value.copy(isTitleEmpty = false)
     }
 
     fun setDescription(string: String) {
@@ -158,6 +163,7 @@ class TaskCreateEditViewModel @Inject constructor(
             }
         }
         Log.d("setProject", _project.value.toString())
+        _taskInputState.value = _taskInputState.value.copy(isProjectEmpty = false)
     }
 
     fun setMilestone(milestone: Milestone) {
@@ -190,6 +196,7 @@ class TaskCreateEditViewModel @Inject constructor(
             _chosenUserList.value.remove(_chosenUserList.value.getUserById(user.id))
         } else {
             _chosenUserList.value.add(user)
+            _taskInputState.value = _taskInputState.value.copy(isTeamEmpty = false)
         }
     }
 
@@ -201,37 +208,54 @@ class TaskCreateEditViewModel @Inject constructor(
 
 
     fun createTask() {
-        viewModelScope.launch(IO) {
-            _taskCreationStatus.value = createTask(
-                milestone.value?.id,
-                Task(
-                    id = 0,
-                    description = description.value,
-                    deadline = endDate.value,
-                    title = title.value,
-                    projectOwner = project.value,
-                    responsibles = chosenUserList.value,
-                    priority = priority.value
+        validateInput {
+            viewModelScope.launch(IO) {
+                Log.d("createTask", "start creating a task")
+                val response = createTask(
+                    milestone.value?.id,
+                    Task(
+                        id = 0,
+                        description = description.value,
+                        deadline = endDate.value,
+                        title = title.value,
+                        projectOwner = project.value,
+                        responsibles = chosenUserList.value,
+                        priority = priority.value,
+                        projectId = project.value?.id
+                    )
                 )
-            )
+                _taskInputState.value = TaskInputState(serverResponse = response)
+            }
         }
     }
 
     fun updateTask() {
-        viewModelScope.launch(IO) {
-            _taskUpdatingStatus.value = updateTask(
-                taskId,
-                Task(
-                    id = 0,
-                    description = description.value,
-                    deadline = endDate.value,
-                    title = title.value,
-                    projectOwner = project.value,
-                    responsibles = chosenUserList.value,
-                    priority = priority.value
-                ),
-                taskStatus.value
-            )
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = updateTask(
+                    taskId,
+                    Task(
+                        id = 0,
+                        description = description.value,
+                        deadline = endDate.value,
+                        title = title.value,
+                        projectOwner = project.value,
+                        responsibles = chosenUserList.value,
+                        priority = priority.value
+                    ),
+                    taskStatus.value
+                )
+                _taskInputState.value = TaskInputState(serverResponse = response)
+            }
+        }
+    }
+
+    private fun validateInput (onSuccess: ()->Unit) {
+        when{
+            title.value.isEmpty() -> _taskInputState.value = _taskInputState.value.copy(isTitleEmpty = true)
+            project.value == null -> _taskInputState.value = _taskInputState.value.copy(isProjectEmpty = true)
+            chosenUserList.value.size < 1 -> _taskInputState.value = _taskInputState.value.copy(isTeamEmpty = true)
+            else ->  onSuccess()
         }
     }
 }

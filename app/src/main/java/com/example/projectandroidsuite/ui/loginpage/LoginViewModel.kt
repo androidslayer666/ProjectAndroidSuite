@@ -7,13 +7,12 @@ import com.example.domain.interactor.login.CheckIfAuthenticated
 import com.example.domain.interactor.login.CheckPortalPossibilities
 import com.example.domain.interactor.login.Login
 import com.example.domain.interactor.login.RememberPortalAddress
-import com.example.domain.repository.AuthRepository
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
-import com.example.projectandroidsuite.ui.utils.validateCode
-import com.example.projectandroidsuite.ui.utils.validateEmail
-import com.example.projectandroidsuite.ui.utils.validatePassword
-import com.example.projectandroidsuite.ui.utils.validatePortalNameInput
+import com.example.projectandroidsuite.ui.utils.validation.validateCode
+import com.example.projectandroidsuite.ui.utils.validation.validateEmail
+import com.example.projectandroidsuite.ui.utils.validation.validatePassword
+import com.example.projectandroidsuite.ui.utils.validation.validatePortalNameInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main

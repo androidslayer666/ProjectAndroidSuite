@@ -1,9 +1,8 @@
 package com.example.domain.repository
 
-import com.example.domain.utils.Failure
-import com.example.domain.utils.Result
 import com.example.domain.model.Message
 import com.example.domain.model.User
+import com.example.domain.utils.Result
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
@@ -27,5 +26,5 @@ interface MessageRepository {
     ): Result<String, String>
 
 
-    suspend fun deleteMessage( messageId: Int): Result<String, String>
+    suspend fun deleteMessage( messageId: Int, projectId: Int?): Result<String, String>
 }

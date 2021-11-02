@@ -1,7 +1,7 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.domain.interactor.comment.DeleteComment
 import com.example.domain.interactor.comment.PutCommentToMessage
 import com.example.domain.interactor.files.GetFilesByProjectId
@@ -14,10 +14,12 @@ import com.example.domain.interactor.project.GetProjectById
 import com.example.domain.model.*
 import com.example.domain.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -119,7 +121,7 @@ class ProjectDetailViewModel @Inject constructor(
 
     fun deleteMessage(message: Message) {
         CoroutineScope(IO).launch {
-            _messageDeletionStatus.value = deleteMessage(message.id)
+            _messageDeletionStatus.value = deleteMessage(message.id, projectId.value)
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.utils
+package com.example.projectandroidsuite.ui.utils.validation
 
 
 fun validatePortalNameInput(input: String): Boolean {

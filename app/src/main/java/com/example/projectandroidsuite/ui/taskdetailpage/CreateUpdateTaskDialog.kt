@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Checkbox
@@ -9,16 +8,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Task
+import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.domain.utils.TaskStatus
-import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 import java.text.SimpleDateFormat
@@ -32,37 +34,34 @@ fun CreateUpdateTaskDialog(
     onTaskDeletedOrEdited: (String) -> Unit = { },
     onDeleteClick: (() -> Unit)? = null
 ) {
-    LaunchedEffect(key1 = task) {
+    LaunchedEffect(key1 = task?.id) {
         task?.let { viewModel.setTask(it) }
     }
-
-
-    val taskUpdatingStatus by viewModel.taskUpdatingStatus.collectAsState()
-    val taskCreationStatus by viewModel.taskCreationStatus.collectAsState()
 
     var showTeamPicker by remember { mutableStateOf(false) }
     var showProjectPicker by remember { mutableStateOf(false) }
     var showMilestonePicker by remember { mutableStateOf(false) }
-    val listMilestones by viewModel.milestonesList.collectAsState(listOf())
-    val listProjects by viewModel.projectList.collectAsState()
-    val listUsersFlow by viewModel.userList.collectAsState(listOf())
-    val project by viewModel.project.collectAsState()
 
+    val listMilestones by viewModel.milestonesList.collectAsState()
+    val listProjects by viewModel.projectList.collectAsState()
+    val listUsersFlow by viewModel.userList.collectAsState(null)
     val projectSearch by viewModel.projectSearchQuery.collectAsState()
     val userSearch by viewModel.userSearchQuery.collectAsState()
+    val taskInputState by viewModel.taskInputState.collectAsState()
 
-    if (taskCreationStatus is Success) {
-        Log.d("CreateTaskDialog ", "Task creating " + taskCreationStatus.toString())
-        onTaskDeletedOrEdited((taskCreationStatus as Success<String>).value)
-        closeDialog()
-        viewModel.clearInput()
-    }
+    when {
+        taskInputState.isTitleEmpty == true -> makeToast("Please enter project title", LocalContext.current)
+        taskInputState.isTeamEmpty == true -> makeToast("Please choose project team", LocalContext.current)
+        taskInputState.isProjectEmpty == true -> makeToast("Please enter project responsible", LocalContext.current)
+        taskInputState.serverResponse is Success -> {
+            onTaskDeletedOrEdited((taskInputState.serverResponse as Success<String>).value)
+            closeDialog()
+            viewModel.clearInput()
+        }
+        taskInputState.serverResponse is Failure -> {
+            onTaskDeletedOrEdited((taskInputState.serverResponse as Failure<String>).reason)
+        }
 
-    if (taskUpdatingStatus is Success) {
-        Log.d("CreateTaskDialog ", "Task updating " + taskUpdatingStatus.toString())
-        onTaskDeletedOrEdited((taskUpdatingStatus as Success<String>).value)
-        closeDialog()
-        viewModel.clearInput()
     }
 
     CustomDialog(
@@ -70,14 +69,12 @@ fun CreateUpdateTaskDialog(
         hide = { closeDialog()
                viewModel.clearInput()
                },
-        text = if (task == null) "Create task" else "Update task",
+        text = if (task == null) stringResource(R.string.create_task) else "Update task",
         onSubmit = {
             if (task == null) {
                 viewModel.createTask()
-                viewModel.clearInput()
             } else {
                 viewModel.updateTask()
-                viewModel.clearInput()
             }
         },
         onDeleteClick = onDeleteClick
@@ -120,11 +117,6 @@ fun CreateUpdateTaskDialog(
         )
     }
 
-//    if (showMilestonePicker && project != null){
-//        makeToast("the project doesn't have milestones", LocalContext.current)
-//        showMilestonePicker = false
-//    }
-
     listMilestones.let {
         if (showMilestonePicker && listMilestones?.isNotEmpty() == true) {
             DialogPickerMilestone(
@@ -155,19 +147,16 @@ fun CreateTaskDialogInput(
 
     var showDatePicker by remember { mutableStateOf(false) }
 
-
-
-    val title by viewModel.title.collectAsState("")
-    val description by viewModel.description.collectAsState("")
+    val title by viewModel.title.collectAsState()
+    val description by viewModel.description.collectAsState()
     val listProjects by viewModel.projectList.collectAsState()
     val project by viewModel.project.collectAsState()
-    val listUsersFlow by viewModel.userList.collectAsState(listOf())
+    val listUsersFlow by viewModel.userList.collectAsState(null)
     val listChosenUsers by viewModel.chosenUserList.collectAsState(null)
     val endDate by viewModel.endDate.collectAsState(Date())
-
     val taskStatus by viewModel.taskStatus.collectAsState()
     val milestone by viewModel.milestone.collectAsState()
-    val listMilestones by viewModel.milestonesList.collectAsState(listOf())
+    val listMilestones by viewModel.milestonesList.collectAsState()
     val priority by viewModel.priority.collectAsState()
 
     Column(Modifier.defaultMinSize(minHeight = 350.dp)) {

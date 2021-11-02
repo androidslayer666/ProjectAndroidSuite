@@ -1,9 +1,8 @@
 package com.example.domain.repository
 
-import com.example.domain.utils.Failure
-import com.example.domain.utils.Result
 import com.example.domain.model.Subtask
 import com.example.domain.model.Task
+import com.example.domain.utils.Result
 import kotlinx.coroutines.flow.Flow
 
 interface TaskRepository {
@@ -20,8 +19,6 @@ interface TaskRepository {
 
     fun getUserTasks(userId: Int): Flow<List<Task>>
 
-    suspend fun createTask(milestoneId: Int?, task: Task): Result<String, String>
-
     suspend fun createSubtask(subtask: Subtask): Result<String, String>
 
     suspend fun updateTask(
@@ -35,5 +32,5 @@ interface TaskRepository {
     suspend fun deleteTask(taskId: Int): Result<String, String>
 
 
-
+    suspend fun createTask(milestoneId: Int?, task: Task, projectId: Int): Result<String, String>
 }

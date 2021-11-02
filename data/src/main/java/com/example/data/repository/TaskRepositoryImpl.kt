@@ -2,16 +2,16 @@ package com.example.data.repository
 
 import android.util.Log
 import com.example.data.dao.TaskDao
-import com.example.domain.utils.Failure
-import com.example.domain.utils.Result
-import com.example.domain.utils.Success
+import com.example.data.endpoints.TaskEndPoint
+import com.example.domain.dto.SubtaskPost
+import com.example.domain.dto.TaskStatusPost
 import com.example.domain.mappers.*
 import com.example.domain.model.Subtask
 import com.example.domain.model.Task
 import com.example.domain.repository.TaskRepository
-import com.example.domain.dto.SubtaskPost
-import com.example.domain.dto.TaskStatusPost
-import com.example.data.endpoints.TaskEndPoint
+import com.example.domain.utils.Failure
+import com.example.domain.utils.Result
+import com.example.domain.utils.Success
 import com.example.domain.utils.networkCaller
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
@@ -69,11 +69,13 @@ class TaskRepositoryImpl @Inject constructor(
         return taskDao.getAllFlow().transform { emit(it.fromListTaskEntitiesToListTasks()) }
     }
 
-    override suspend fun createTask(milestoneId: Int?, task: Task): Result<String, String> {
+    override suspend fun createTask(milestoneId: Int?, task: Task, projectId: Int): Result<String, String> {
         return networkCaller(
             call = {
+                Log.d("createTask", task.fromTaskEntityToPost(milestoneId).toString())
+
                 taskEndPoint.addTaskToProject(
-                    task.id,
+                    projectId,
                     task.fromTaskEntityToPost(milestoneId)
                 )
             },

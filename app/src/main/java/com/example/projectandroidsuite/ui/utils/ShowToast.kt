@@ -11,7 +11,7 @@ import com.example.domain.utils.Success
 fun makeToast(text: String, context: Context) {
     Toast.makeText(
         context, text,
-        Toast.LENGTH_LONG
+        Toast.LENGTH_SHORT
     ).show()
 }
 

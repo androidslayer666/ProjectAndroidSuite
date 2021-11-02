@@ -50,7 +50,7 @@ fun Task.fromTaskEntityToPost(milestoneId: Int? = 0): TaskPost {
         title = title,
         responsibles = responsibles.fromListUsersToStrings(),
         startDate = SimpleDateFormat(FORMAT_API_DATE, Locale.getDefault()).format(Date()),
-        milestoneid = milestoneId,
+        milestoneid = milestoneId?:0,
         priority = priority?.priorityToString(),
     )
 }
