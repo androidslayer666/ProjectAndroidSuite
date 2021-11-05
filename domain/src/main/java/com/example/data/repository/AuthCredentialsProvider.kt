@@ -1,12 +1,10 @@
-package com.example.domain
+package com.example.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AuthCredentialsProvider @Inject constructor(context: Context) {
+
+class AuthCredentialsProvider (context: Context) {
 
     private var prefs: SharedPreferences =
         context.getSharedPreferences("AuthToken", Context.MODE_PRIVATE)

@@ -16,5 +16,7 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUsers(usersList: List<UserEntity>)
 
+    @Query("SELECT * FROM users WHERE self is 1")
+    fun getSelfProfile(): Flow<UserEntity?>
 
 }

@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
+import androidx.navigation.navArgument
 import com.example.projectandroidsuite.ui.loginpage.LoginPage
 import com.example.projectandroidsuite.ui.loginpage.LoginViewModel
 import com.example.projectandroidsuite.ui.projectpage.ProjectsPage
@@ -24,7 +24,6 @@ fun ProjectNavHost(
     navController: NavHostController,
     loginViewModel: LoginViewModel
 ) {
-    Log.d("checkIfAuthenticated", "checkIfAuthenticated")
     NavHost(
         navController = navController,
         startDestination = if (loginViewModel.checkAuthentication()) ProjectsScreens.Projects.name

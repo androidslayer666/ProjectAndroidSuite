@@ -14,5 +14,6 @@ data class UserEntity (
     val avatarSmall : String? = null,
     val avatarMedium : String? = null,
     val profileUrl: String? = null,
-    var chosen: Boolean? = null
+    var chosen: Boolean? = null,
+    var self: Boolean = false
 )

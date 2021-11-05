@@ -6,6 +6,8 @@ import com.example.domain.model.User
 import com.example.domain.utils.Result
 import com.example.domain.interactor.CreateSubtask
 import com.example.domain.interactor.user.GetAllUsers
+import com.example.projectandroidsuite.ui.utils.validation.MilestoneInputState
+import com.example.projectandroidsuite.ui.utils.validation.SubtaskInputState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,14 +33,12 @@ class SubtaskCreateEditViewModel @Inject constructor(
     private var _userSearchQuery = MutableStateFlow("")
     val userSearchQuery: StateFlow<String> = _userSearchQuery
 
-    private var _subtaskCreationStatus = MutableStateFlow<Result<String, String>?>(null)
-    val subtaskCreationStatus: StateFlow<Result<String, String>?> = _subtaskCreationStatus
-
-    private var _subtaskUpdatingStatus = MutableStateFlow<Result<String, String>?>(null)
-    val subtaskUpdatingStatus: StateFlow<Result<String, String>?> = _subtaskUpdatingStatus
 
     private var _users = MutableStateFlow<List<User>>(listOf())
     val users: StateFlow<List<User>> = _users
+
+    private var _subtaskInputState = MutableStateFlow(SubtaskInputState())
+    val subtaskInputState: StateFlow<SubtaskInputState> = _subtaskInputState
 
     init{
         viewModelScope.launch(IO) {
@@ -75,20 +75,30 @@ class SubtaskCreateEditViewModel @Inject constructor(
     fun clearInput() {
         _title.value = ""
         _responsible.value = null
-        _subtaskCreationStatus.value = null
-        _subtaskUpdatingStatus.value = null
+        _subtaskInputState.value = SubtaskInputState()
     }
 
     fun createSubtask() {
-        viewModelScope.launch(IO) {
-            _subtaskCreationStatus.value = createSubtask(
-                Subtask(
-                    id = 0,
-                    title = title.value ?: "",
-                    responsible = responsible.value,
-                    taskId = taskId ?: 0
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = createSubtask(
+                    Subtask(
+                        id = 0,
+                        title = title.value ?: "",
+                        responsible = responsible.value,
+                        taskId = taskId ?: 0
+                    )
                 )
-            )
+                _subtaskInputState.value = SubtaskInputState(serverResponse = response)
+            }
+        }
+    }
+
+    private fun validateInput (onSuccess: ()->Unit) {
+        when{
+            title.value.isEmpty() -> _subtaskInputState.value = _subtaskInputState.value.copy(isTitleEmpty = true)
+            _responsible.value == null -> _subtaskInputState.value = _subtaskInputState.value.copy(isResponsibleEmpty=  true)
+            else ->  onSuccess()
         }
     }
 }

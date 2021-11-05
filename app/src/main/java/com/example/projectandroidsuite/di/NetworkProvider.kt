@@ -2,7 +2,7 @@ package com.example.domain.di
 
 import android.content.Context
 import com.example.data.endpoints.*
-import com.example.domain.AuthCredentialsProvider
+import com.example.data.repository.AuthCredentialsProvider
 import com.example.data.repository.AuthRepositoryImpl
 import com.example.data.buildEndPoint
 import dagger.Module
@@ -100,7 +100,7 @@ class NetworkProvider {
 
     @Provides
     @Singleton
-    fun provideSessionManager(@ApplicationContext context: Context): AuthCredentialsProvider {
+    fun provideAuthCredentialsProvider(@ApplicationContext context: Context): AuthCredentialsProvider {
         return AuthCredentialsProvider(context)
     }
 

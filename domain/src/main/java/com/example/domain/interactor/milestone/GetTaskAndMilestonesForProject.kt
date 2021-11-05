@@ -1,7 +1,5 @@
 package com.example.domain.interactor.milestone
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
 import com.example.domain.model.Milestone
 import com.example.domain.model.Task
 import com.example.domain.repository.MilestoneRepository

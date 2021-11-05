@@ -2,7 +2,6 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -29,11 +28,32 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+
 }
 
+
 dependencies {
-    sharedGroupLifecycle dependencies
-    sharedGroupHilt dependencies
-    sharedGroupNetwork dependencies
     sharedGroupRoom dependencies
+    sharedGroupNetwork dependencies
+
+    def coroutines = "1.5.0"
+
+
+    // Required -- JUnit 4 framework
+    testImplementation("junit:junit:4.13.2")
+    // Optional -- Robolectric environment
+    testImplementation('androidx.test:core:1.4.0')
+    // Optional -- Mockito framework
+    testImplementation("org.mockito:mockito-core:1.10.19")
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines"
+
+    // testImplementation for pure JVM unit tests
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
+
+    // androidTestImplementation for Android instrumentation tests
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
+
 }

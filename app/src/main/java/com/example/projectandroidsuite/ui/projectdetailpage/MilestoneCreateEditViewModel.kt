@@ -9,6 +9,8 @@ import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Milestone
 import com.example.domain.model.User
 import com.example.domain.utils.Result
+import com.example.projectandroidsuite.ui.utils.validation.MilestoneInputState
+import com.example.projectandroidsuite.ui.utils.validation.ProjectInputState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,14 +51,11 @@ class MilestoneCreateEditViewModel @Inject constructor(
     private var _endDate = MutableStateFlow(Date())
     val endDate: StateFlow<Date> = _endDate
 
-    private var _milestoneCreationStatus = MutableStateFlow<Result<String, String>?>(null)
-    val subtaskCreationStatus: StateFlow<Result<String, String>?> = _milestoneCreationStatus
-
-    private var _milestoneUpdatingStatus = MutableStateFlow<Result<String, String>?>(null)
-    val subtaskUpdatingStatus: StateFlow<Result<String, String>?> = _milestoneUpdatingStatus
-
     private var _users = MutableStateFlow<List<User>>(listOf())
     val users: StateFlow<List<User>> = _users
+
+    private var _milestoneInputState = MutableStateFlow(MilestoneInputState())
+    val milestoneInputState: StateFlow<MilestoneInputState> = _milestoneInputState
 
     init {
         viewModelScope.launch(IO) {
@@ -110,42 +109,53 @@ class MilestoneCreateEditViewModel @Inject constructor(
         _priority.value = false
         _endDate.value = Date()
         _responsible.value = null
-        _milestoneCreationStatus.value = null
-        _milestoneUpdatingStatus.value = null
+        _milestoneInputState.value = MilestoneInputState()
     }
 
     fun createMilestone() {
-        viewModelScope.launch(IO) {
-            val response = putMilestoneToProject(
-                projectId ?: 0,
-                Milestone(
-                    id = 0,
-                    title = title.value,
-                    responsible = responsible.value,
-                    description = description.value,
-                    isKey = priority.value,
-                    deadline = endDate.value,
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = putMilestoneToProject(
+                    projectId ?: 0,
+                    Milestone(
+                        id = 0,
+                        title = title.value,
+                        responsible = responsible.value,
+                        description = description.value,
+                        isKey = priority.value,
+                        deadline = endDate.value,
+                    )
                 )
-            )
-            _milestoneCreationStatus.value = response
+                _milestoneInputState.value = MilestoneInputState(serverResponse = response)
+            }
         }
     }
 
     fun updateMilestone() {
-        viewModelScope.launch(IO) {
-            val response = updateMilestone(
-                projectId ?: 0,
-                Milestone(
-                    title = title.value,
-                    responsible = responsible.value,
-                    description = description.value,
-                    id = milestone.value?.id ?: 0,
-                    deadline = endDate.value
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = updateMilestone(
+                    projectId ?: 0,
+                    Milestone(
+                        title = title.value,
+                        responsible = responsible.value,
+                        description = description.value,
+                        id = milestone.value?.id ?: 0,
+                        deadline = endDate.value
+                    )
                 )
-            )
-            _milestoneCreationStatus.value = response
+                _milestoneInputState.value = MilestoneInputState(serverResponse = response)
+            }
         }
     }
 
+
+    private fun validateInput (onSuccess: ()->Unit) {
+        when{
+            title.value.isEmpty() -> _milestoneInputState.value = _milestoneInputState.value.copy(isTitleEmpty = true)
+            _responsible.value == null -> _milestoneInputState.value = _milestoneInputState.value.copy(isResponsibleEmpty=  true)
+            else ->  onSuccess()
+        }
+    }
 }
 

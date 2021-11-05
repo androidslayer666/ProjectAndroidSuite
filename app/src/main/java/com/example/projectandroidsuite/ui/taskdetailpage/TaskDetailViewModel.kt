@@ -2,7 +2,6 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.domain.interactor.GetFilesByTaskId
 import com.example.domain.interactor.comment.DeleteComment
@@ -99,7 +98,7 @@ class TaskDetailViewModel @Inject constructor(
 
     fun changeTaskStatus() {
         viewModelScope.launch(IO) {
-            updateTaskStatus(taskId.value, currentTask.asLiveData().value?.status)
+            updateTaskStatus(taskId.value, currentTask.value?.status)
         }
     }
 }

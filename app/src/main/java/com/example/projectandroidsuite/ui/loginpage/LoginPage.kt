@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.loginpage
 
+import android.util.Log
 import android.view.KeyEvent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -11,13 +12,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.ProjectsScreens
+import com.example.projectandroidsuite.ui.utils.makeToast
 
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
@@ -38,15 +40,16 @@ fun LoginPage(
     val portalAddress by viewModel.portalAddress.collectAsState()
     val emailAddress by viewModel.emailInput.collectAsState()
     val password by viewModel.passwordInput.collectAsState()
-    val addressIsValid by viewModel.canConnectToPortal.collectAsState()
-    val emailIsValid by viewModel.inputEmailValidated.collectAsState()
-    val passwordIsValid by viewModel.inputPasswordValidated.collectAsState()
-    val twoFactorAuth by viewModel.twoFactorAuth.collectAsState()
     val tfaGoogleInput by viewModel.tfaGoogleInput.collectAsState()
     val portalIsInCloud by viewModel.portalIsInCloud.collectAsState()
+    val loginInputState by viewModel.loginInputState.collectAsState()
 
     val (focusRequesterMail, focusRequesterPassword) = FocusRequester.createRefs()
     val titles = listOf("Cloud portal", "Local portal")
+
+    loginInputState.serverResponseError?.let {
+        makeToast(it, LocalContext.current)
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,7 +58,7 @@ fun LoginPage(
             .background(MaterialTheme.colors.primary)
     ) {
         AnimatedVisibility(
-            !addressIsValid,
+            loginInputState.isPortalValidated != true,
             enter = slideInVertically(
 
                 initialOffsetY = { fullHeight -> -fullHeight },
@@ -99,9 +102,9 @@ fun LoginPage(
                 backgroundColor = MaterialTheme.colors.background,
                 textColor = MaterialTheme.colors.onBackground
             ),
-            isError = !addressIsValid && portalAddress.isNotEmpty()
+            isError = loginInputState.isPortalValidated != true && portalAddress.isNotEmpty()
         )
-        if (!addressIsValid) {
+        if (loginInputState.isPortalValidated != true) {
             if (portalIsInCloud == 0) {
                 Text(
                     text = stringResource(R.string.input_your_portal_address_in_a_format),
@@ -119,7 +122,7 @@ fun LoginPage(
         }
 
         AnimatedVisibility(
-            addressIsValid,
+            loginInputState.isPortalValidated == true,
             enter = slideInHorizontally(
 
                 initialOffsetX = { fullHeight -> -fullHeight },
@@ -131,72 +134,26 @@ fun LoginPage(
             )
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                TextField(
-                    value = emailAddress,
-                    onValueChange = { input ->
-                        viewModel.onChangeEmail(input)
-                    },
-                    label = { Text(stringResource(R.string.email)) },
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = MaterialTheme.colors.background,
-                        textColor = MaterialTheme.colors.onBackground
-                    ),
-                    isError = !emailIsValid,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = { focusRequesterPassword.requestFocus() }
-                    ),
-                    modifier = Modifier
-                        .defaultMinSize(minWidth = 300.dp)
-                        .padding(20.dp)
-                        .focusRequester(focusRequesterMail)
-                        .onKeyEvent {
-                            if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                                focusRequesterPassword.requestFocus()
-                            }
-                            false
-                        })
-                TextField(
-                    value = password,
-                    onValueChange = { input ->
+                LoginEmailTextField(
+                    emailAddressInput = emailAddress,
+                    onChange = { input -> viewModel.onChangeEmail(input) },
+                    isError = loginInputState.isEmailValidated  != true,
+                    focusRequester = focusRequesterPassword,
+                    passFocusTo = focusRequesterMail
+                )
+                LoginPasswordTextField(
+                    password = password,
+                    onChange = { input ->
                         viewModel.onChangePassword(input)
                     },
-                    visualTransformation = PasswordVisualTransformation(),
-                    singleLine = true,
-                    label = { Text("Password") },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Password
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = { focusRequesterPassword.requestFocus() }
-                    ),
-                    modifier = Modifier
-                        .defaultMinSize(minWidth = 300.dp)
-                        .padding(20.dp)
-                        .focusRequester(focusRequesterPassword)
-                        .onKeyEvent {
-                            if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                                viewModel.authenticate(onCompleteLogin = {
-                                    navController.navigate(
-                                        ProjectsScreens.Projects.name
-                                    )
-                                })
-                                true
-                            } else false
-                        },
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = MaterialTheme.colors.background,
-                        textColor = MaterialTheme.colors.onBackground
-                    ),
-                    isError = !passwordIsValid
+                    passFocusTo = focusRequesterPassword,
+                    isError = loginInputState.isPasswordValidated != true
                 )
 
-
-                if(twoFactorAuth) {
+                if (loginInputState.twoFactorAuth == true) {
                     Text("please input code from Google Authenticator for your Onlyoffice login")
                     TextField(
-                        value = tfaGoogleInput ?:"",
+                        value = tfaGoogleInput ?: "",
                         onValueChange = viewModel::setTfaGoogleInput
                     )
                 }

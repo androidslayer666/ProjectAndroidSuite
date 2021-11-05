@@ -2,10 +2,11 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Subtask
+import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
@@ -13,6 +14,7 @@ import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.utils.makeToast
 
 @Composable
 fun CreateSubtaskDialog(
@@ -26,22 +28,30 @@ fun CreateSubtaskDialog(
     viewModel.setTaskId(taskId)
     subtask?.let { viewModel.setSubtask(it) }
 
-    val taskUpdatingStatus by viewModel.subtaskUpdatingStatus.collectAsState()
-    val taskCreationStatus by viewModel.subtaskCreationStatus.collectAsState()
+    val context = LocalContext.current
+
     val userSearch by viewModel.userSearchQuery.collectAsState("")
     var showTeamPicker by remember { mutableStateOf(false) }
     val listUsersFlow by viewModel.users.collectAsState()
+    val subtaskInputState by viewModel.subtaskInputState.collectAsState()
 
-    if (taskCreationStatus is Success<String>) {
-        onSubtaskDeletedOrEdited((taskCreationStatus as Success<String>).value)
-        viewModel.clearInput()
-        closeDialog()
-    }
-
-    if (taskUpdatingStatus is Success<String>) {
-        onSubtaskDeletedOrEdited((taskUpdatingStatus as Success<String>).value)
-        viewModel.clearInput()
-        closeDialog()
+    when {
+        subtaskInputState.isTitleEmpty == true -> LaunchedEffect(key1 = subtaskInputState) {
+            makeToast("Please enter title", context )
+        }
+        subtaskInputState.isResponsibleEmpty == true -> LaunchedEffect(key1 = subtaskInputState) {
+            makeToast("Please choose responsible", context )
+        }
+        subtaskInputState.serverResponse is Success -> {
+            onSubtaskDeletedOrEdited((subtaskInputState.serverResponse as Success<String>).value)
+            closeDialog()
+            viewModel.clearInput()
+        }
+        subtaskInputState.serverResponse is Failure -> {
+            LaunchedEffect(key1 = subtaskInputState) {
+                makeToast( "Something went wrong with the server request", context )
+            }
+        }
     }
 
     CustomDialog(

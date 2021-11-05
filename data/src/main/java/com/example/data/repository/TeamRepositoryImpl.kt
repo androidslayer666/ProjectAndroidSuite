@@ -13,6 +13,7 @@ import com.example.domain.model.User
 import com.example.domain.repository.TeamRepository
 import com.example.domain.dto.UserDto
 import com.example.data.endpoints.TeamEndPoint
+import com.example.domain.entities.UserEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
 import javax.inject.Inject
@@ -25,23 +26,17 @@ class TeamRepositoryImpl @Inject constructor(
 ) : TeamRepository {
 
     override suspend fun populateAllPortalUsers(): Result<String, String> {
-        try {
+        return try {
             val users = teamEndPoint.getAllPortalUsers().ids
-            return if (users != null) {
-                val newList = mutableListOf<UserDto>()
-                for (user in users) {
-                    if (user.isVisitor != true) {
-                        newList.add(user)
-                    }
-                }
-                userDao.insertUsers(newList.toListUserEntity())
+            if (users != null) {
+                userDao.insertUsers(users.excludeVisitors().markSelf())
                 Success("Users are populated")
             } else {
                 Failure("Network/server problem")
             }
         } catch (e: Exception) {
             Log.e("TeamRepository", "caught an exception$e")
-            return Failure("Network/server problem")
+            Failure("Network/server problem")
         }
     }
 
@@ -49,7 +44,30 @@ class TeamRepositoryImpl @Inject constructor(
         return userDao.getAll().transform { emit(it.fromListUserEntitiesToListUsers()) }
     }
 
-    override suspend fun getSelfProfile(): User? {
-        return teamEndPoint.getSelfProfile().user?.toUserEntity()?.fromUserEntityToUser()
+    override suspend fun getSelfProfile(): Flow<User?> {
+        return userDao.getSelfProfile().transform {
+            emit(it?.fromUserEntityToUser())
+        }
+    }
+
+    private fun List<UserDto>.excludeVisitors()  :List<UserEntity> {
+        val newList = mutableListOf<UserEntity>()
+        for (user in this) {
+            if (user.isVisitor != true) {
+                val userEntity = user.toUserEntity()
+                newList.add(userEntity)
+            }
+        }
+        return newList
+    }
+
+    private suspend fun List<UserEntity>.markSelf()  :List<UserEntity> {
+        val self = teamEndPoint.getSelfProfile().user
+        for (user in this) {
+            if(user.id == self?.id) {
+                user.self = true
+            }
+        }
+        return this
     }
 }

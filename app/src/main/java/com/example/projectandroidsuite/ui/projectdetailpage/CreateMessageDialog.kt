@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Message
+import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.parts.RowTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
@@ -16,6 +18,7 @@ import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.utils.PickerType
+import com.example.projectandroidsuite.ui.utils.makeToast
 
 @Composable
 fun CreateMessageDialog(
@@ -30,12 +33,36 @@ fun CreateMessageDialog(
 
     if (message != null) viewModel.setMessage(message)
 
+    val context = LocalContext.current
+
     val messageUpdatingStatus by viewModel.updatingStatus.collectAsState()
     val messageCreationStatus by viewModel.creationStatus.collectAsState()
     val listUsersFlow by viewModel.users.collectAsState()
     var showTeamPicker by remember { mutableStateOf(false) }
     val userSearch by viewModel.userSearchQuery.collectAsState()
+    val messageInputState by viewModel.messageInputState.collectAsState()
 
+    when {
+        messageInputState.isTitleEmpty == true -> LaunchedEffect(key1 = messageInputState) {
+            makeToast("Please enter message title", context )
+        }
+        messageInputState.isTeamEmpty == true -> LaunchedEffect(key1 = messageInputState) {
+            makeToast("Please choose team", context )
+        }
+        messageInputState.isTextEmpty == true -> LaunchedEffect(key1 = messageInputState) {
+            makeToast( "Please enter task responsible", context )
+        }
+        messageInputState.serverResponse is Success -> {
+            onMessageDeletedOrEdited((messageInputState.serverResponse as Success<String>).value)
+            closeDialog()
+            viewModel.clearInput()
+        }
+        messageInputState.serverResponse is Failure -> {
+            LaunchedEffect(key1 = messageInputState) {
+                makeToast( "Something went wrong with the server request", context )
+            }
+        }
+    }
 
     if (messageCreationStatus is Success<String>) {
         onMessageDeletedOrEdited((messageCreationStatus as Success<String>).value)

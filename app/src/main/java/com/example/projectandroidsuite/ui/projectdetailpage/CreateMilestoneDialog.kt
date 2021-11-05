@@ -9,8 +9,10 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Milestone
+import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import com.example.projectandroidsuite.ui.utils.PickerType
@@ -20,6 +22,7 @@ import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.utils.makeToast
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,23 +38,33 @@ fun CreateMilestoneDialog(
     viewModel.setProjectId(projectId)
     if (milestone != null) viewModel.setMilestone(milestone)
 
+    val context = LocalContext.current
+
     var showResponsiblePicker by remember { mutableStateOf(false) }
-    val milestoneUpdatingStatus by viewModel.subtaskUpdatingStatus.collectAsState()
-    val milestoneCreationStatus by viewModel.subtaskCreationStatus.collectAsState()
     val listUsersFlow by viewModel.users.collectAsState()
     val userSearch by viewModel.userSearchQuery.collectAsState()
+    val milestoneInputState by viewModel.milestoneInputState.collectAsState()
 
-    if (milestoneCreationStatus is Success<String>) {
-        onMilestoneDeletedOrEdited((milestoneCreationStatus as Success<String>).value)
-        viewModel.clearInput()
-        closeDialog()
+
+    when {
+        milestoneInputState.isTitleEmpty == true -> LaunchedEffect(key1 = milestoneInputState) {
+            makeToast("Please enter title", context )
+        }
+        milestoneInputState.isResponsibleEmpty == true -> LaunchedEffect(key1 = milestoneInputState) {
+            makeToast("Please choose responsible", context )
+        }
+        milestoneInputState.serverResponse is Success -> {
+            onMilestoneDeletedOrEdited((milestoneInputState.serverResponse as Success<String>).value)
+            closeDialog()
+            viewModel.clearInput()
+        }
+        milestoneInputState.serverResponse is Failure -> {
+            LaunchedEffect(key1 = milestoneInputState) {
+                makeToast( "Something went wrong with the server request", context )
+            }
+        }
     }
 
-    if (milestoneUpdatingStatus is Success<String>) {
-        onMilestoneDeletedOrEdited((milestoneUpdatingStatus as Success<String>).value)
-        viewModel.clearInput()
-        closeDialog()
-    }
 
     Box {
         CustomDialog(

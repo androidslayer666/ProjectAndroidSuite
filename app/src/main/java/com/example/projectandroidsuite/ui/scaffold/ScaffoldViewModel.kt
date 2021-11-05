@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.scaffold
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -33,12 +35,8 @@ class ScaffoldViewModel @Inject constructor(
 
     private fun getSelf() {
         viewModelScope.launch {
-            val self = getSelfProfile()
-            //Log.d("ScaffoldViewModel", self.toString())
-            withContext(Main){
-                self?.let {
-                    _self.value = it
-                }
+            getSelfProfile().collectLatest {
+                _self.value = it
             }
         }
     }

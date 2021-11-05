@@ -12,6 +12,8 @@ import com.example.domain.model.User
 import com.example.domain.utils.getListUserIdsFromList
 
 import com.example.projectandroidsuite.ui.utils.getUserById
+import com.example.projectandroidsuite.ui.utils.validation.MessageInputState
+import com.example.projectandroidsuite.ui.utils.validation.ProjectInputState
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
@@ -54,6 +56,9 @@ class MessageCreateEditViewModel @Inject constructor(
 
     private var _users = MutableStateFlow<List<User>?>(null)
     val users: StateFlow<List<User>?> = _users
+
+    private var _messageInputState = MutableStateFlow(MessageInputState())
+    val messageInputState: StateFlow<MessageInputState> = _messageInputState
 
     init {
         viewModelScope.launch(IO) {
@@ -101,6 +106,7 @@ class MessageCreateEditViewModel @Inject constructor(
         _chosenUserList.value = mutableListOf()
         _creationStatus.value = null
         _updatingStatus.value = null
+        _messageInputState.value = MessageInputState()
     }
 
     fun setUserSearch(query: String) {
@@ -110,32 +116,43 @@ class MessageCreateEditViewModel @Inject constructor(
     }
 
     fun createMessage() {
-        viewModelScope.launch(IO) {
-            val response = createMessage(
-                projectId ?: 0,
-                Message(
-                    title = title.value ?: "",
-                    id = 0,
-                    description = content.value,
-                ),
-                chosenUserList.value
-            )
-            _creationStatus.value = response
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = createMessage(
+                    projectId ?: 0,
+                    Message(
+                        title = title.value,
+                        id = 0,
+                        description = content.value,
+                    ),
+                    chosenUserList.value
+                )
+                _messageInputState.value = MessageInputState(serverResponse = response)
+            }
         }
     }
 
     fun updateMessage() {
-        viewModelScope.launch(IO) {
-            val response = updateMessage(
-                projectId ?: 0,
-                Message(
-                    title = title.value ?: "",
-                    id = messageId ?: 0,
-                    description = content.value,
-                ),
-                chosenUserList.value
-            )
-            _creationStatus.value = response
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = updateMessage(
+                    projectId ?: 0,
+                    Message(
+                        title = title.value,
+                        id = messageId ?: 0,
+                        description = content.value,
+                    ),
+                    chosenUserList.value
+                )
+                _messageInputState.value = MessageInputState(serverResponse = response)            }
+        }
+    }
+    private fun validateInput (onSuccess: ()->Unit) {
+        when{
+            title.value.isEmpty() -> _messageInputState.value = _messageInputState.value.copy(isTitleEmpty = true)
+            chosenUserList.value.size < 1 -> _messageInputState.value = _messageInputState.value.copy(isTeamEmpty = true)
+            content.value.isEmpty() -> _messageInputState.value = _messageInputState.value.copy(isTextEmpty =  true)
+            else ->  onSuccess()
         }
     }
 }

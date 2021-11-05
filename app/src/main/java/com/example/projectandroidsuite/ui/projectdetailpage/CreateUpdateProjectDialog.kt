@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -40,6 +41,7 @@ fun CreateUpdateProjectDialog(
     val listUsersFlow by viewModel.users.collectAsState()
     val projectInputState by viewModel.projectInputState.collectAsState()
 
+    Log.d("CreateUpdateProject", projectInputState.toString())
 
     when {
         projectInputState.isTitleEmpty == true -> makeToast("Please enter project title", LocalContext.current)

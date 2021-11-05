@@ -11,6 +11,6 @@ interface TeamRepository {
 
     fun getAllPortalUsers() : Flow<List<User>>
 
-    suspend fun getSelfProfile(): User?
+    suspend fun getSelfProfile(): Flow<User?>
 
 }

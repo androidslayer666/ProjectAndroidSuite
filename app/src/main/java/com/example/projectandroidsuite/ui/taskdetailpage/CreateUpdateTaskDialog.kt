@@ -38,6 +38,8 @@ fun CreateUpdateTaskDialog(
         task?.let { viewModel.setTask(it) }
     }
 
+    val context = LocalContext.current
+
     var showTeamPicker by remember { mutableStateOf(false) }
     var showProjectPicker by remember { mutableStateOf(false) }
     var showMilestonePicker by remember { mutableStateOf(false) }
@@ -50,25 +52,33 @@ fun CreateUpdateTaskDialog(
     val taskInputState by viewModel.taskInputState.collectAsState()
 
     when {
-        taskInputState.isTitleEmpty == true -> makeToast("Please enter project title", LocalContext.current)
-        taskInputState.isTeamEmpty == true -> makeToast("Please choose project team", LocalContext.current)
-        taskInputState.isProjectEmpty == true -> makeToast("Please enter project responsible", LocalContext.current)
+        taskInputState.isTitleEmpty == true -> LaunchedEffect(key1 = taskInputState) {
+            makeToast("Please enter project title", context )
+        }
+        taskInputState.isTeamEmpty == true -> LaunchedEffect(key1 = taskInputState) {
+            makeToast("Please choose project", context )
+        }
+        taskInputState.isProjectEmpty == true -> LaunchedEffect(key1 = taskInputState) {
+            makeToast( "Please enter task responsible", context )
+        }
         taskInputState.serverResponse is Success -> {
             onTaskDeletedOrEdited((taskInputState.serverResponse as Success<String>).value)
             closeDialog()
             viewModel.clearInput()
         }
         taskInputState.serverResponse is Failure -> {
-            onTaskDeletedOrEdited((taskInputState.serverResponse as Failure<String>).reason)
+            LaunchedEffect(key1 = taskInputState) {
+                makeToast( "Something went wrong with the server request", context )
+            }
         }
-
     }
 
     CustomDialog(
         show = true,
-        hide = { closeDialog()
-               viewModel.clearInput()
-               },
+        hide = {
+            closeDialog()
+            viewModel.clearInput()
+        },
         text = if (task == null) stringResource(R.string.create_task) else "Update task",
         onSubmit = {
             if (task == null) {
@@ -106,14 +116,14 @@ fun CreateUpdateTaskDialog(
     if (showTeamPicker) {
         TeamPickerDialog(
             list = listUsersFlow!!,
-            onSubmit = { showTeamPicker = false},
+            onSubmit = { showTeamPicker = false },
             onClick = { user ->
-                    viewModel.addOrRemoveUser(user)
+                viewModel.addOrRemoveUser(user)
             },
             closeDialog = { showTeamPicker = false },
             pickerType = PickerType.MULTIPLE,
             searchString = userSearch,
-            onSearchChanged = { query -> viewModel.setUserSearch(query)}
+            onSearchChanged = { query -> viewModel.setUserSearch(query) }
         )
     }
 
@@ -131,8 +141,6 @@ fun CreateUpdateTaskDialog(
             )
         }
     }
-
-
 
 
 }
@@ -297,8 +305,6 @@ fun CreateTaskDialogInput(
                 DatePicker({ date -> viewModel.setDate(date) }, { showDatePicker = false })
             }
         }
-
-
 
 
     }

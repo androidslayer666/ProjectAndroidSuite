@@ -43,7 +43,8 @@ fun UserEntity.fromUserEntityToUser(): User {
         email = this.email,
         avatarSmall = this.avatarSmall,
         profileUrl = this.profileUrl,
-        avatarMedium = this.avatarMedium
+        avatarMedium = this.avatarMedium,
+        self = this.self
     )
 }
 
