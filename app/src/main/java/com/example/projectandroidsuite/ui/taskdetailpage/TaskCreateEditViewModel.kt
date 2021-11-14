@@ -3,6 +3,9 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.domain.filters.task.TaskStatus
+import com.example.domain.filters.user.UserFilter
+import com.example.domain.filters.user.filterUsersByFilter
 import com.example.domain.interactor.milestone.GetMilestoneById
 import com.example.domain.interactor.milestone.GetMilestonesForProject
 import com.example.domain.interactor.project.GetAllProjects
@@ -13,10 +16,6 @@ import com.example.domain.model.Milestone
 import com.example.domain.model.Project
 import com.example.domain.model.Task
 import com.example.domain.model.User
-import com.example.domain.utils.Result
-import com.example.domain.utils.TaskStatus
-import com.example.domain.utils.UserFilter
-import com.example.domain.utils.filterUsersByFilter
 import com.example.projectandroidsuite.ui.utils.getListIds
 import com.example.projectandroidsuite.ui.utils.getUserById
 import com.example.projectandroidsuite.ui.utils.validation.TaskInputState
@@ -51,7 +50,7 @@ class TaskCreateEditViewModel @Inject constructor(
     val priority: StateFlow<Int> = _priority
 
     private var _chosenUserList = MutableStateFlow<MutableList<User>>(mutableListOf())
-    val chosenUserList: StateFlow<MutableList<User>> = _chosenUserList
+    val chosenUserList: StateFlow<List<User>> = _chosenUserList
 
     private var _project = MutableStateFlow<Project?>(null)
     val project: StateFlow<Project?> = _project
@@ -69,12 +68,6 @@ class TaskCreateEditViewModel @Inject constructor(
 
     private var _projectSearchQuery = MutableStateFlow("")
     val projectSearchQuery: StateFlow<String> = _projectSearchQuery
-
-    private var _taskCreationStatus = MutableStateFlow<Result<String, String>?>(null)
-    val taskCreationStatus: StateFlow<Result<String, String>?> = _taskCreationStatus
-
-    private var _taskUpdatingStatus = MutableStateFlow<Result<String, String>?>(null)
-    val taskUpdatingStatus: StateFlow<Result<String, String>?> = _taskUpdatingStatus
 
     private var _endDate = MutableStateFlow(Date())
     val endDate: StateFlow<Date> = _endDate
@@ -187,8 +180,7 @@ class TaskCreateEditViewModel @Inject constructor(
         _chosenUserList.value = mutableListOf()
         _project.value = null
         _milestone.value = null
-        _taskCreationStatus.value = null
-        _taskUpdatingStatus.value = null
+        _taskInputState.value = TaskInputState()
     }
 
     fun addOrRemoveUser(user: User) {
@@ -219,7 +211,7 @@ class TaskCreateEditViewModel @Inject constructor(
                         deadline = endDate.value,
                         title = title.value,
                         projectOwner = project.value,
-                        responsibles = chosenUserList.value,
+                        responsibles = chosenUserList.value.toMutableList(),
                         priority = priority.value,
                         projectId = project.value?.id
                     )
@@ -240,7 +232,7 @@ class TaskCreateEditViewModel @Inject constructor(
                         deadline = endDate.value,
                         title = title.value,
                         projectOwner = project.value,
-                        responsibles = chosenUserList.value,
+                        responsibles = chosenUserList.value.toMutableList(),
                         priority = priority.value
                     ),
                     taskStatus.value

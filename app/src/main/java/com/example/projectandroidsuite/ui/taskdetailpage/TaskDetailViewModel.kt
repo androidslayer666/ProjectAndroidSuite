@@ -3,11 +3,10 @@ package com.example.projectandroidsuite.ui.taskdetailpage
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.domain.interactor.GetFilesByTaskId
 import com.example.domain.interactor.comment.DeleteComment
 import com.example.domain.interactor.comment.GetCommentByTaskId
 import com.example.domain.interactor.comment.PutCommentToTask
-import com.example.domain.interactor.milestone.GetMilestoneById
+import com.example.domain.interactor.file.GetFilesByTaskId
 import com.example.domain.interactor.task.DeleteTask
 import com.example.domain.interactor.task.GetTaskById
 import com.example.domain.interactor.task.UpdateTaskStatus
@@ -19,7 +18,9 @@ import com.example.domain.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,7 +31,6 @@ class TaskDetailViewModel @Inject constructor(
     private val updateTaskStatus: UpdateTaskStatus,
     private val getFilesByTaskId: GetFilesByTaskId,
     private val getCommentByTaskId: GetCommentByTaskId,
-    private val getMilestoneById: GetMilestoneById,
     private val putCommentToTask: PutCommentToTask,
     private val deleteComment: DeleteComment
 ) : ViewModel() {

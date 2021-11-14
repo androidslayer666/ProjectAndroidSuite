@@ -8,9 +8,7 @@ import com.example.domain.interactor.milestone.UpdateMilestone
 import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Milestone
 import com.example.domain.model.User
-import com.example.domain.utils.Result
 import com.example.projectandroidsuite.ui.utils.validation.MilestoneInputState
-import com.example.projectandroidsuite.ui.utils.validation.ProjectInputState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +22,6 @@ import javax.inject.Inject
 class MilestoneCreateEditViewModel @Inject constructor(
     private val getAllUsers: GetAllUsers,
     private val putMilestoneToProject: PutMilestoneToProject,
-
     private val updateMilestone: UpdateMilestone
 ) : ViewModel() {
 

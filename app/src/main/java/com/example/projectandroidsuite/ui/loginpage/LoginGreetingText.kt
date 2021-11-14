@@ -10,12 +10,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.projectandroidsuite.R
 
 
 @Composable
@@ -24,7 +26,7 @@ fun LoginTextGreeting() {
 
     val annotatedLinkString: AnnotatedString = buildAnnotatedString {
 
-        val str = "If you don't have one - get one!"
+        val str = stringResource(R.string.if_you_dont_have_one)
         val startIndex = str.indexOf("If")
         val endIndex = str.length
         append(str)
@@ -39,7 +41,7 @@ fun LoginTextGreeting() {
 
         addStringAnnotation(
             tag = "URL",
-            annotation = "https://www.onlyoffice.com/cloud-office.aspx",
+            annotation = stringResource(R.string.onlyoffice_address_for_creating_portal),
             start = startIndex,
             end = endIndex
         )
@@ -47,10 +49,8 @@ fun LoginTextGreeting() {
 
 
     Column {
-
-
         Text(
-            text = "Welcome!",
+            text = stringResource(R.string.welcome),
             style = MaterialTheme.typography.h5,
             color = MaterialTheme.colors.onPrimary,
             modifier = Modifier
@@ -59,7 +59,7 @@ fun LoginTextGreeting() {
         )
 
         Text(
-            text = "This app works only with ONLYOFFICE Groups portal.",
+            text = stringResource(R.string.this_app_works_only),
             color = MaterialTheme.colors.onPrimary,
             style = MaterialTheme.typography.body1,
             modifier = Modifier

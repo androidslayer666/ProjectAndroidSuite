@@ -3,8 +3,8 @@ package com.example.domain.mappers
 import com.example.domain.dto.ProjectDto
 import com.example.domain.dto.ProjectPost
 import com.example.domain.entities.ProjectEntity
+import com.example.domain.filters.project.ProjectStatus
 import com.example.domain.model.Project
-import com.example.domain.utils.ProjectStatus
 import java.util.*
 
 fun List<ProjectDto>.toListEntities(): MutableList<ProjectEntity> {

@@ -1,12 +1,13 @@
 package com.example.projectandroidsuite.ui.projectpage
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.domain.filters.task.TaskStatus
 import com.example.domain.interactor.task.GetAllTasks
 import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Task
 import com.example.domain.model.User
-import com.example.domain.utils.TaskSorting
-import com.example.domain.utils.TaskStatus
+import com.example.domain.sorting.TaskSorting
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TasksViewModel @Inject constructor(
     private val getAllTasks: GetAllTasks,
-    private val getAllUsers: GetAllUsers
+    private val getAllUsers: GetAllUsers,
 ) : ViewModel(){
 
     private var _stageFroFilteringTask = MutableStateFlow<TaskStatus?>(null)
@@ -52,7 +53,7 @@ class TasksViewModel @Inject constructor(
 
     fun setTaskSorting(sorting: TaskSorting) {
         _taskSorting.value = sorting
-            getAllTasks.setTaskSorting(sorting)
+        getAllTasks.setTaskSorting(sorting)
     }
 
     fun setUserForFilteringTask(user: User?) {
@@ -67,7 +68,7 @@ class TasksViewModel @Inject constructor(
 
     fun setUserSearch(query: String) {
         _userSearchQuery.value = query
-        getAllUsers.setFilter(query)
+        getAllTasks.setFilter(query)
     }
 
     fun clearFiltersTask() {

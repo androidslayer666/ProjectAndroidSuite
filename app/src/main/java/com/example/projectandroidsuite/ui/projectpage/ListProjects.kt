@@ -18,8 +18,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.domain.filters.project.ProjectStatus
 import com.example.domain.model.Project
-import com.example.domain.utils.ProjectStatus
 import com.example.projectandroidsuite.R
 
 

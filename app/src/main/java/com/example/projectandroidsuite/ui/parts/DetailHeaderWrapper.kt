@@ -1,20 +1,20 @@
 package com.example.projectandroidsuite.ui.parts
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.domain.filters.project.ProjectStatus
+import com.example.domain.filters.task.TaskStatus
 import com.example.domain.model.User
-import com.example.domain.utils.ProjectStatus
-import com.example.domain.utils.TaskStatus
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.TitleOverflowedText
 import java.text.SimpleDateFormat
@@ -127,12 +127,12 @@ fun DetailHeaderWrapper(
         Spacer(modifier = Modifier.size(6.dp))
         if (responsible != null)
             Row(Modifier.padding(top = 12.dp)) {
-                Text(text = "Responsible", Modifier.padding(end = 12.dp, start = 6.dp))
+                Text(text = stringResource(R.string.responsible), Modifier.padding(end = 12.dp, start = 6.dp))
                 CardTeamMember(responsible, viewModel = hiltViewModel())
             }
         Spacer(modifier = Modifier.size(6.dp))
         Row {
-            Text(text = "Team", Modifier.padding(end = 12.dp, top = 12.dp, start = 6.dp))
+            Text(text = stringResource(R.string.team), Modifier.padding(end = 12.dp, top = 12.dp, start = 6.dp))
             team?.let { RowTeamMember(it, Modifier.padding(bottom = 12.dp, top = 12.dp)) }
         }
         Spacer(modifier = Modifier.size(6.dp))
@@ -140,7 +140,7 @@ fun DetailHeaderWrapper(
         if (endDate != null)
             Row(Modifier.padding(vertical = 6.dp)) {
                 Text(
-                    text = "End date",
+                    text = stringResource(R.string.end_date),
                     Modifier.padding(end = 12.dp, start = 6.dp)
                 )
                 Text(
@@ -151,14 +151,14 @@ fun DetailHeaderWrapper(
         Spacer(modifier = Modifier.size(6.dp))
         if (project != null) {
             Row(Modifier.padding(vertical = 6.dp)) {
-                Text(text = "Project", Modifier.padding(end = 12.dp, start = 6.dp))
+                Text(text = stringResource(R.string.project), Modifier.padding(end = 12.dp, start = 6.dp))
                 Text(project)
             }
         }
         Spacer(modifier = Modifier.size(6.dp))
         if (milestone != null) {
             Row(Modifier.padding(vertical = 6.dp)) {
-                Text(text = "Milestone", Modifier.padding(end = 12.dp, start = 6.dp))
+                Text(text = stringResource(R.string.milestone), Modifier.padding(end = 12.dp, start = 6.dp))
                 Text(milestone)
             }
         }

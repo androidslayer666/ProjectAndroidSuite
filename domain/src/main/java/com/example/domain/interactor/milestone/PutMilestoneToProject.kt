@@ -1,25 +1,12 @@
 package com.example.domain.interactor.milestone
 
-import com.example.domain.utils.Failure
-import com.example.domain.utils.Result
 import com.example.domain.model.Milestone
-import com.example.domain.repository.MilestoneRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.domain.utils.Result
 
-class PutMilestoneToProject(
-    private val milestoneRepository: MilestoneRepository
-) {
+interface PutMilestoneToProject {
 
     suspend operator fun invoke(
         projectId: Int,
         milestone: Milestone
-    ): Result<String, String> {
-        CoroutineScope(Dispatchers.IO).launch {
-            milestoneRepository.populateMilestonesByProject(projectId)
-        }
-        return milestoneRepository.putMilestoneToProject(projectId, milestone)
-    }
-
+    ): Result<String, String>
 }

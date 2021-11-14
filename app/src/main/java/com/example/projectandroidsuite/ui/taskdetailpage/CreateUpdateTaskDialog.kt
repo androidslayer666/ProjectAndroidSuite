@@ -10,10 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.domain.filters.task.TaskStatus
 import com.example.domain.model.Task
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
-import com.example.domain.utils.TaskStatus
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers

@@ -3,5 +3,25 @@
     <string name="input_your_portal_address_in_a_format">Input your portal address in a format : xxxxxx.onlyoffice.com/sg/eu</string>
     <string name="email">Email</string>
     <string name="create_task">Create task</string>
+    <string name="cloud_portal">Cloud portal</string>
+    <string name="local_portal">Local portal</string>
+    <string name="connect">Connect</string>
+    <string name="please_input_code_from_google">please input code from Google Authenticator for your Onlyoffice login</string>
+    <string name="log_in">Log In</string>
+    <string name="if_you_dont_have_one">If you don\'t have one - get one!</string>
+    <string name="onlyoffice_address_for_creating_portal">https://www.onlyoffice.com/cloud-office.aspx</string>
+    <string name="welcome">Welcome!</string>
+    <string name="this_app_works_only">This app works only with ONLYOFFICE Groups portal.</string>
+    <string name="password">Password</string>
+    <string name="responsible">Responsible</string>
+    <string name="team">Team</string>
+    <string name="end_date">End date</string>
+    <string name="project">Project</string>
+    <string name="milestone">Milestone</string>
+    <string name="comfirm">Confirm</string>
+    <string name="choose_responsible">Choose responsible</string>
+    <string name="choose_team">Choose team</string>
+    <string name="comment_has_been_deleted">Comment has been deleted</string>
+    <string name="do_you_want_to_delete_the_comment">Do you want to delete the comment?</string>
 
 </resources>

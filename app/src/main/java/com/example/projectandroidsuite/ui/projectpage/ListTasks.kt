@@ -19,8 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.domain.filters.task.TaskStatus
 import com.example.domain.model.Task
-import com.example.domain.utils.TaskStatus
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import java.text.SimpleDateFormat

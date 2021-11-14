@@ -1,5 +1,8 @@
 package com.example.domain.utils
 
+import com.example.domain.filters.task.TaskFilter
+import com.example.domain.filters.task.TaskStatus
+import com.example.domain.filters.task.filterTaskByFilter
 import com.example.domain.model.Milestone
 import com.example.domain.model.Task
 
@@ -10,6 +13,7 @@ fun arrangeMilestonesAndTasks(
     val map = mutableMapOf<Milestone?, List<Task>>()
     val listTasksWithoutMilestone = mutableListOf<Task>()
     for (milestone in listMilestones) {
+
         val listTasksWithMilestone = mutableListOf<Task>()
         for (task in listTasks) {
             if (task.milestoneId == milestone.id) {

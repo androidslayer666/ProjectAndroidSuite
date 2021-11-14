@@ -1,6 +1,6 @@
 package com.example.domain.model
 
-import com.example.domain.utils.ProjectStatus
+import com.example.domain.filters.project.ProjectStatus
 import java.util.*
 
 

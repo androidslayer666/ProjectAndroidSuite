@@ -8,15 +8,17 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.example.domain.utils.ProjectSorting
-import com.example.domain.utils.ProjectStatus
-import com.example.projectandroidsuite.ui.utils.PickerType
+import com.example.domain.filters.project.ProjectStatus
+import com.example.domain.sorting.ProjectSorting
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
 import com.example.projectandroidsuite.ui.parts.customitems.CustomSortButton
+import com.example.projectandroidsuite.ui.utils.PickerType
 
 @Composable
 fun FilterProjects(
@@ -30,7 +32,9 @@ fun FilterProjects(
     val user by viewModel.userForFilteringProject.collectAsState()
     val sorting by viewModel.projectSorting.collectAsState()
 
-    Box {
+    Box(
+        Modifier.semantics { contentDescription = "FilterProjects" }
+    ) {
         Row {
             Row(Modifier.weight(3F)) {}
 
@@ -62,7 +66,6 @@ fun FilterProjects(
                         )
                         Spacer(Modifier.size(24.dp))
 
-
                         Column {
                             ButtonUsers(
                                 singleUser = true,
@@ -71,7 +74,6 @@ fun FilterProjects(
                             Spacer(Modifier.size(12.dp))
                             user?.let { user -> CardTeamMember(user = user) }
                         }
-
 
                         Spacer(Modifier.size(24.dp))
                         Surface(

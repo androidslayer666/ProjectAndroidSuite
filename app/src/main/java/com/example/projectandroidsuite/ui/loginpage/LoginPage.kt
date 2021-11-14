@@ -1,13 +1,9 @@
 package com.example.projectandroidsuite.ui.loginpage
 
-import android.util.Log
-import android.view.KeyEvent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,13 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
@@ -45,7 +36,7 @@ fun LoginPage(
     val loginInputState by viewModel.loginInputState.collectAsState()
 
     val (focusRequesterMail, focusRequesterPassword) = FocusRequester.createRefs()
-    val titles = listOf("Cloud portal", "Local portal")
+    val titles = listOf(stringResource(R.string.cloud_portal), stringResource(R.string.local_portal))
 
     loginInputState.serverResponseError?.let {
         makeToast(it, LocalContext.current)
@@ -75,7 +66,7 @@ fun LoginPage(
         Spacer(modifier = Modifier.size(12.dp))
         Row {
             TabRow(
-                selectedTabIndex = portalIsInCloud ?: 0,
+                selectedTabIndex = portalIsInCloud,
                 modifier = Modifier.size(width = 300.dp, height = 50.dp)
             ) {
                 titles.forEachIndexed { index, title ->
@@ -116,7 +107,7 @@ fun LoginPage(
                 )
             } else {
                 Button(onClick = { viewModel.tryIfPortalExists(portalAddress) }) {
-                    Text("Connect")
+                    Text(stringResource(R.string.connect))
                 }
             }
         }
@@ -151,9 +142,9 @@ fun LoginPage(
                 )
 
                 if (loginInputState.twoFactorAuth == true) {
-                    Text("please input code from Google Authenticator for your Onlyoffice login")
+                    Text(stringResource(R.string.please_input_code_from_google))
                     TextField(
-                        value = tfaGoogleInput ?: "",
+                        value = tfaGoogleInput,
                         onValueChange = viewModel::setTfaGoogleInput
                     )
                 }
@@ -166,7 +157,7 @@ fun LoginPage(
                     })
                     //Log.d("authenticated", viewModel.authenticated.value.toString())
                 }) {
-                    Text(text = "Log In")
+                    Text(text = stringResource(R.string.log_in))
                 }
             }
         }

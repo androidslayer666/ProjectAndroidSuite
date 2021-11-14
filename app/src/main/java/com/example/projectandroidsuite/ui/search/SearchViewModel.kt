@@ -1,10 +1,8 @@
 package com.example.projectandroidsuite.ui.search
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.domain.interactor.files.GetAllFiles
+import com.example.domain.interactor.file.GetAllFiles
 import com.example.domain.interactor.milestone.GetAllMilestones
 import com.example.domain.interactor.project.GetAllProjects
 import com.example.domain.interactor.task.GetAllTasks
@@ -28,7 +26,7 @@ class SearchViewModel @Inject constructor(
     private val getAllFiles: GetAllFiles,
 ) : ViewModel() {
 
-    private var _searchString = MutableStateFlow<String>("")
+    private var _searchString = MutableStateFlow("")
     val searchString: StateFlow<String> = _searchString
 
     private var _projects = MutableStateFlow<List<Project>>(listOf())

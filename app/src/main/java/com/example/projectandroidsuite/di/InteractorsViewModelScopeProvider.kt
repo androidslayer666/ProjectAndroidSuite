@@ -1,11 +1,17 @@
 package com.example.projectandroidsuite.di
 
-import com.example.domain.interactor.files.GetAllFiles
+import com.example.domain.interactor.file.GetAllFiles
 import com.example.domain.interactor.milestone.GetAllMilestones
 import com.example.domain.interactor.milestone.GetTaskAndMilestonesForProject
 import com.example.domain.interactor.project.GetAllProjects
 import com.example.domain.interactor.task.GetAllTasks
 import com.example.domain.interactor.user.GetAllUsers
+import com.example.domain.interactorimpl.file.GetAllFilesImpl
+import com.example.domain.interactorimpl.milestone.GetAllMilestonesImpl
+import com.example.domain.interactorimpl.milestone.GetTaskAndMilestonesForProjectImpl
+import com.example.domain.interactorimpl.project.GetAllProjectsImpl
+import com.example.domain.interactorimpl.task.GetAllTasksImpl
+import com.example.domain.interactorimpl.user.GetAllUsersImpl
 import com.example.domain.repository.*
 import dagger.Module
 import dagger.Provides
@@ -13,26 +19,28 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 
-@InstallIn(ViewModelComponent::class)
+
 @Module
+@InstallIn(ViewModelComponent::class)
 class InteractorsViewModelScopeProvider {
     @Provides
     @ViewModelScoped
     fun provideGetAllProjects(projectRepository: ProjectRepository): GetAllProjects {
-        return GetAllProjects(projectRepository)
+        return GetAllProjectsImpl(projectRepository)
     }
 
     @Provides
     @ViewModelScoped
     fun provideGetAllUsers(teamRepository: TeamRepository): GetAllUsers {
-        return GetAllUsers(teamRepository)
+        return GetAllUsersImpl(teamRepository)
     }
 
     @Provides
     @ViewModelScoped
     fun provideGetAllTasks(taskRepository: TaskRepository): GetAllTasks {
-        return GetAllTasks(taskRepository)
+        return GetAllTasksImpl(taskRepository)
     }
+
 
     @Provides
     @ViewModelScoped
@@ -40,7 +48,7 @@ class InteractorsViewModelScopeProvider {
         taskRepository: TaskRepository,
         milestoneRepository: MilestoneRepository,
     ): GetTaskAndMilestonesForProject {
-        return GetTaskAndMilestonesForProject(taskRepository, milestoneRepository)
+        return GetTaskAndMilestonesForProjectImpl(taskRepository, milestoneRepository)
     }
 
     @Provides
@@ -49,7 +57,7 @@ class InteractorsViewModelScopeProvider {
         projectRepository: ProjectRepository,
         milestoneRepository: MilestoneRepository,
     ): GetAllMilestones {
-        return GetAllMilestones(projectRepository, milestoneRepository)
+        return GetAllMilestonesImpl(projectRepository, milestoneRepository)
     }
 
 
@@ -59,7 +67,7 @@ class InteractorsViewModelScopeProvider {
         fileRepository: FileRepository,
         projectRepository: ProjectRepository
     ): GetAllFiles {
-        return GetAllFiles(fileRepository, projectRepository)
+        return GetAllFilesImpl(fileRepository, projectRepository)
     }
 
 

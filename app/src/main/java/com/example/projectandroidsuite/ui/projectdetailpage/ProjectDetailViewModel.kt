@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.interactor.comment.DeleteComment
 import com.example.domain.interactor.comment.PutCommentToMessage
-import com.example.domain.interactor.files.GetFilesByProjectId
+import com.example.domain.interactor.file.GetFilesByProjectId
 import com.example.domain.interactor.message.DeleteMessage
 import com.example.domain.interactor.message.GetMessageByProjectId
 import com.example.domain.interactor.milestone.DeleteMilestone

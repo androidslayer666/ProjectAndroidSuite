@@ -50,7 +50,7 @@ fun CreateMessageDialog(
             makeToast("Please choose team", context )
         }
         messageInputState.isTextEmpty == true -> LaunchedEffect(key1 = messageInputState) {
-            makeToast( "Please enter task responsible", context )
+            makeToast( "Please choose task responsible", context )
         }
         messageInputState.serverResponse is Success -> {
             onMessageDeletedOrEdited((messageInputState.serverResponse as Success<String>).value)
@@ -89,7 +89,7 @@ fun CreateMessageDialog(
         onDeleteClick = onDeleteClick
 
     ) {
-        CreateMessageDialogInput(viewModel, { showTeamPicker = true })
+        CreateMessageDialogInput(viewModel) { showTeamPicker = true }
     }
 
     listUsersFlow?.let {

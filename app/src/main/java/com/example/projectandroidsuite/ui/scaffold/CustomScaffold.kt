@@ -84,7 +84,7 @@ fun CustomScaffold(
                     if (onFilterClick != null) {
                         Image(
                             painterResource(R.drawable.ic_baseline_filter_alt_24),
-                            "",
+                            "Filter Toggler",
                             modifier = Modifier
                                 .clickable { onFilterClick() }
                                 .height(50.dp)

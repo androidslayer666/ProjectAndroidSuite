@@ -8,9 +8,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.domain.filters.project.ProjectStatus
 import com.example.domain.model.Project
 import com.example.domain.utils.Failure
-import com.example.domain.utils.ProjectStatus
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.RowTeamMember

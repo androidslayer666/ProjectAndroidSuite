@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.loginpage
 
-import android.view.KeyEvent
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -13,12 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.projectandroidsuite.ui.ProjectsScreens
+import com.example.projectandroidsuite.R
 
 @Composable
 fun LoginPasswordTextField(
@@ -35,7 +34,7 @@ fun LoginPasswordTextField(
         },
         visualTransformation = PasswordVisualTransformation(),
         singleLine = true,
-        label = { Text("Password") },
+        label = { Text(stringResource(R.string.password)) },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password

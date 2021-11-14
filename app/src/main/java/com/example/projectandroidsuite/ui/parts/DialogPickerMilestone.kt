@@ -9,8 +9,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Milestone
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 
 @Composable
@@ -22,7 +24,7 @@ fun DialogPickerMilestone(
     CustomDialog(
         show = true,
         hide = { closeDialog() },
-        text = "Milestones",
+        text = stringResource(R.string.milestone),
         onSubmit = { closeDialog() },
         showButtons = false,
         ) {

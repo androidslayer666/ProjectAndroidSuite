@@ -4,8 +4,8 @@ import com.example.domain.Constants.FORMAT_API_DATE
 import com.example.domain.dto.TaskDto
 import com.example.domain.dto.TaskPost
 import com.example.domain.entities.TaskEntity
+import com.example.domain.filters.task.TaskStatus
 import com.example.domain.model.Task
-import com.example.domain.utils.TaskStatus
 import java.text.SimpleDateFormat
 import java.util.*
 

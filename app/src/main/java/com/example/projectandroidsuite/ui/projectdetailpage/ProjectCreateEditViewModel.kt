@@ -2,12 +2,12 @@ package com.example.projectandroidsuite.ui.projectdetailpage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.domain.filters.project.ProjectStatus
 import com.example.domain.interactor.project.CreateProject
 import com.example.domain.interactor.project.UpdateProject
 import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Project
 import com.example.domain.model.User
-import com.example.domain.utils.ProjectStatus
 import com.example.domain.utils.getListUserIdsFromList
 import com.example.projectandroidsuite.ui.utils.getUserById
 import com.example.projectandroidsuite.ui.utils.validation.ProjectInputState
@@ -38,8 +38,8 @@ class ProjectCreateEditViewModel @Inject constructor(
     private var _responsible = MutableStateFlow<User?>(null)
     val responsible: StateFlow<User?> = _responsible
 
-    private var _userSearchQuery = MutableStateFlow<String?>(null)
-    val userSearchQuery: StateFlow<String?> = _userSearchQuery
+    private var _userSearchQuery = MutableStateFlow<String>("")
+    val userSearchQuery: StateFlow<String> = _userSearchQuery
 
     private var _projectStatus = MutableStateFlow<ProjectStatus?>(null)
     val projectStatus: StateFlow<ProjectStatus?> = _projectStatus
@@ -48,7 +48,7 @@ class ProjectCreateEditViewModel @Inject constructor(
     val users: StateFlow<List<User>?> = _users
 
     private var _chosenUserList = MutableStateFlow<MutableList<User>>(mutableListOf())
-    val chosenUserList: StateFlow<MutableList<User>> = _chosenUserList
+    val chosenUserList: StateFlow<List<User>> = _chosenUserList
 
     private var _projectInputState = MutableStateFlow(ProjectInputState())
     val projectInputState: StateFlow<ProjectInputState> = _projectInputState
@@ -128,7 +128,7 @@ class ProjectCreateEditViewModel @Inject constructor(
                         id = 0,
                         title = title.value,
                         description = description.value,
-                        team = chosenUserList.value,
+                        team = chosenUserList.value.toMutableList(),
                         responsible = responsible.value
                     )
                 )
@@ -146,7 +146,7 @@ class ProjectCreateEditViewModel @Inject constructor(
                         id = 0,
                         title = title.value,
                         description = description.value,
-                        team = chosenUserList.value,
+                        team = chosenUserList.value.toMutableList(),
                         responsible = responsible.value
                     ),
                     projectStatus.value

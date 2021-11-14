@@ -1,6 +1,6 @@
 package com.example.domain.model
 
-import com.example.domain.utils.TaskStatus
+import com.example.domain.filters.task.TaskStatus
 import java.util.*
 
 

@@ -1,20 +1,17 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
-import androidx.lifecycle.*
-import com.example.domain.utils.Result
-import com.example.domain.utils.UserFilter
-
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.domain.filters.user.UserFilter
 import com.example.domain.interactor.message.CreateMessage
 import com.example.domain.interactor.message.UpdateMessage
 import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Message
 import com.example.domain.model.User
+import com.example.domain.utils.Result
 import com.example.domain.utils.getListUserIdsFromList
-
 import com.example.projectandroidsuite.ui.utils.getUserById
 import com.example.projectandroidsuite.ui.utils.validation.MessageInputState
-import com.example.projectandroidsuite.ui.utils.validation.ProjectInputState
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +38,7 @@ class MessageCreateEditViewModel @Inject constructor(
     val content: StateFlow<String> = _content
 
     private var _chosenUserList = MutableStateFlow<MutableList<User>>(mutableListOf())
-    val chosenUserList: StateFlow<MutableList<User>> = _chosenUserList
+    val chosenUserList: StateFlow<List<User>> = _chosenUserList
 
     private var userSearch = MutableStateFlow<UserFilter?>(null)
 

@@ -7,10 +7,11 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.AlertDialog
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialogButton
+import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,7 +38,7 @@ fun DatePicker(onDateSelected: (Date) -> Unit, onDismissRequest: () -> Unit) {
                             onDateSelected(selDate)
                             onDismissRequest()
                         },
-                        text = "Confirm",
+                        text = stringResource(R.string.comfirm),
                         typeConfirm = true
                     )
                 }

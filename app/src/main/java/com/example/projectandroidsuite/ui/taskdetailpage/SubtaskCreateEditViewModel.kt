@@ -1,12 +1,11 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.domain.interactor.task.CreateSubtask
+import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Subtask
 import com.example.domain.model.User
-import com.example.domain.utils.Result
-import com.example.domain.interactor.CreateSubtask
-import com.example.domain.interactor.user.GetAllUsers
-import com.example.projectandroidsuite.ui.utils.validation.MilestoneInputState
 import com.example.projectandroidsuite.ui.utils.validation.SubtaskInputState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO

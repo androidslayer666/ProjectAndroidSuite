@@ -1,33 +1,45 @@
 package com.example.projectandroidsuite.di
 
-import com.example.domain.interactor.CreateSubtask
-import com.example.domain.interactor.GetFilesByTaskId
 import com.example.domain.interactor.comment.DeleteComment
 import com.example.domain.interactor.comment.GetCommentByTaskId
 import com.example.domain.interactor.comment.PutCommentToMessage
 import com.example.domain.interactor.comment.PutCommentToTask
-import com.example.domain.interactor.files.GetAllFiles
-import com.example.domain.interactor.files.GetFilesByProjectId
+import com.example.domain.interactor.file.GetFilesByProjectId
+import com.example.domain.interactor.file.GetFilesByTaskId
 import com.example.domain.interactor.login.*
 import com.example.domain.interactor.message.CreateMessage
 import com.example.domain.interactor.message.DeleteMessage
 import com.example.domain.interactor.message.GetMessageByProjectId
 import com.example.domain.interactor.message.UpdateMessage
 import com.example.domain.interactor.milestone.*
-import com.example.domain.interactor.project.*
+import com.example.domain.interactor.project.CreateProject
+import com.example.domain.interactor.project.DeleteProject
+import com.example.domain.interactor.project.GetProjectById
+import com.example.domain.interactor.project.UpdateProject
 import com.example.domain.interactor.task.*
-import com.example.domain.interactor.user.GetAllUsers
+import com.example.domain.interactorimpl.comment.DeleteCommentImpl
+import com.example.domain.interactorimpl.comment.GetCommentByTaskIdImpl
+import com.example.domain.interactorimpl.comment.PutCommentToMessageImpl
+import com.example.domain.interactorimpl.comment.PutCommentToTaskImpl
+import com.example.domain.interactorimpl.file.GetFilesByProjectIdImpl
+import com.example.domain.interactorimpl.file.GetFilesByTaskIdImpl
+import com.example.domain.interactorimpl.login.*
+import com.example.domain.interactorimpl.message.CreateMessageImpl
+import com.example.domain.interactorimpl.message.DeleteMessageImpl
+import com.example.domain.interactorimpl.message.GetMessageByProjectIdImpl
+import com.example.domain.interactorimpl.message.UpdateMessageImpl
+import com.example.domain.interactorimpl.milestone.*
+import com.example.domain.interactorimpl.project.CreateProjectImpl
+import com.example.domain.interactorimpl.project.DeleteProjectImpl
+import com.example.domain.interactorimpl.project.GetProjectByIdImpl
+import com.example.domain.interactorimpl.project.UpdateProjectImpl
+import com.example.domain.interactorimpl.task.*
 import com.example.domain.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-
-
-
 
 
 @InstallIn(SingletonComponent::class)
@@ -37,13 +49,13 @@ class InteractorsSingletonProvider {
     @Provides
     @Singleton
     fun provideGetProjectById(projectRepository: ProjectRepository): GetProjectById {
-        return GetProjectById(projectRepository)
+        return GetProjectByIdImpl(projectRepository)
     }
 
     @Provides
     @Singleton
     fun provideDeleteProject(projectRepository: ProjectRepository): DeleteProject {
-        return DeleteProject(projectRepository)
+        return DeleteProjectImpl(projectRepository)
     }
 
 
@@ -51,13 +63,13 @@ class InteractorsSingletonProvider {
     @Provides
     @Singleton
     fun provideCreateProject(projectRepository: ProjectRepository): CreateProject {
-        return CreateProject(projectRepository)
+        return CreateProjectImpl(projectRepository)
     }
 
     @Provides
     @Singleton
     fun provideUpdateProject(projectRepository: ProjectRepository): UpdateProject {
-        return UpdateProject(projectRepository)
+        return UpdateProjectImpl(projectRepository)
     }
 
 
@@ -66,19 +78,19 @@ class InteractorsSingletonProvider {
     @Provides
     @Singleton
     fun provideDeleteTask(taskRepository: TaskRepository): DeleteTask {
-        return DeleteTask(taskRepository)
+        return DeleteTaskImpl(taskRepository)
     }
 
     @Provides
     @Singleton
     fun provideGetTaskById(taskRepository: TaskRepository): GetTaskById {
-        return GetTaskById(taskRepository)
+        return GetTaskByIdImpl(taskRepository)
     }
 
     @Provides
     @Singleton
     fun provideUpdateTaskStatus(taskRepository: TaskRepository): UpdateTaskStatus {
-        return UpdateTaskStatus(taskRepository)
+        return UpdateTaskStatusImpl(taskRepository)
     }
 
 
@@ -86,67 +98,67 @@ class InteractorsSingletonProvider {
     @Provides
     @Singleton
     fun provideGetMilestoneById(milestoneRepository: MilestoneRepository): GetMilestoneById {
-        return GetMilestoneById(milestoneRepository)
+        return GetMilestoneByIdImpl(milestoneRepository)
     }
 
     @Provides
     @Singleton
     fun providePutMilestoneToProject(milestoneRepository: MilestoneRepository): PutMilestoneToProject {
-        return PutMilestoneToProject(milestoneRepository)
+        return PutMilestoneToProjectImpl(milestoneRepository)
     }
 
     @Provides
     @Singleton
     fun provideUpdateMilestone(milestoneRepository: MilestoneRepository): UpdateMilestone {
-        return UpdateMilestone(milestoneRepository)
+        return UpdateMilestoneImpl(milestoneRepository)
     }
 
     @Provides
     @Singleton
     fun provideGetMilestonesForProject(milestoneRepository: MilestoneRepository): GetMilestonesForProject {
-        return GetMilestonesForProject(milestoneRepository)
+        return GetMilestonesForProjectImpl(milestoneRepository)
     }
 
     @Provides
     @Singleton
     fun provideDeleteMilestone(milestoneRepository: MilestoneRepository): DeleteMilestone {
-        return DeleteMilestone(milestoneRepository)
+        return DeleteMilestoneImpl(milestoneRepository)
     }
 
     @Provides
     @Singleton
     fun provideGetMessageByProjectId(messageRepository: MessageRepository): GetMessageByProjectId {
-        return GetMessageByProjectId(messageRepository)
+        return GetMessageByProjectIdImpl(messageRepository)
     }
 
     @Provides
     @Singleton
     fun provideDeleteMessage(messageRepository: MessageRepository): DeleteMessage {
-        return DeleteMessage(messageRepository)
+        return DeleteMessageImpl(messageRepository)
     }
 
     @Provides
     @Singleton
     fun provideCreateMessage(messageRepository: MessageRepository): CreateMessage {
-        return CreateMessage(messageRepository)
+        return CreateMessageImpl(messageRepository)
     }
 
     @Provides
     @Singleton
     fun provideUpdateMessage(messageRepository: MessageRepository): UpdateMessage {
-        return UpdateMessage(messageRepository)
+        return UpdateMessageImpl(messageRepository)
     }
 
     @Provides
     @Singleton
     fun provideGetCommentByTaskId(commentRepository: CommentRepository): GetCommentByTaskId {
-        return GetCommentByTaskId(commentRepository)
+        return GetCommentByTaskIdImpl(commentRepository)
     }
 
     @Provides
     @Singleton
     fun providePutCommentToTask(commentRepository: CommentRepository): PutCommentToTask {
-        return PutCommentToTask(commentRepository)
+        return PutCommentToTaskImpl(commentRepository)
     }
 
     @Provides
@@ -155,31 +167,31 @@ class InteractorsSingletonProvider {
         commentRepository: CommentRepository,
         messageRepository: MessageRepository
     ): PutCommentToMessage {
-        return PutCommentToMessage(commentRepository, messageRepository)
+        return PutCommentToMessageImpl(commentRepository, messageRepository)
     }
 
     @Provides
     @Singleton
     fun provideDeleteComment(commentRepository: CommentRepository): DeleteComment {
-        return DeleteComment(commentRepository)
+        return DeleteCommentImpl(commentRepository)
     }
 
     @Provides
     @Singleton
     fun provideCreateTask(taskRepository: TaskRepository): CreateTask {
-        return CreateTask(taskRepository)
+        return CreateTaskImpl(taskRepository)
     }
 
     @Provides
     @Singleton
     fun provideUpdateTask(taskRepository: TaskRepository): UpdateTask {
-        return UpdateTask(taskRepository)
+        return UpdateTaskImpl(taskRepository)
     }
 
     @Provides
     @Singleton
     fun provideCreateSubtask(taskRepository: TaskRepository): CreateSubtask {
-        return CreateSubtask(taskRepository)
+        return CreateSubtaskImpl(taskRepository)
     }
 
 
@@ -189,50 +201,50 @@ class InteractorsSingletonProvider {
     fun provideGetFilesByProjectId(
         fileRepository: FileRepository
     ): GetFilesByProjectId {
-        return GetFilesByProjectId(fileRepository)
+        return GetFilesByProjectIdImpl(fileRepository)
     }
 
     @Provides
     @Singleton
     fun provideGetFilesByTaskId(fileRepository: FileRepository): GetFilesByTaskId {
-        return GetFilesByTaskId(fileRepository)
+        return GetFilesByTaskIdImpl(fileRepository)
     }
 
 
     @Provides
     @Singleton
     fun provideLogout(authRepository: AuthRepository): Logout {
-        return Logout(authRepository)
+        return LogoutImpl(authRepository)
     }
 
     @Provides
     @Singleton
     fun provideGetSelfProfile(teamRepository: TeamRepository): GetSelfProfile {
-        return GetSelfProfile(teamRepository)
+        return GetSelfProfileImpl(teamRepository)
     }
 
     @Provides
     @Singleton
     fun provideCheckIfAuthenticated(authRepository: AuthRepository): CheckIfAuthenticated {
-        return CheckIfAuthenticated(authRepository)
+        return CheckIfAuthenticatedImpl(authRepository)
     }
 
     @Provides
     @Singleton
     fun provideRememberPortalAddress(authRepository: AuthRepository): RememberPortalAddress {
-        return RememberPortalAddress(authRepository)
+        return RememberPortalAddressImpl(authRepository)
     }
 
     @Provides
     @Singleton
     fun provideCheckPortalPossibilities(authRepository: AuthRepository): CheckPortalPossibilities {
-        return CheckPortalPossibilities(authRepository)
+        return CheckPortalPossibilitiesImpl(authRepository)
     }
 
     @Provides
     @Singleton
     fun provideLogin(authRepository: AuthRepository): Login {
-        return Login(authRepository)
+        return LoginImpl(authRepository)
     }
 
 
