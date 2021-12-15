@@ -2,13 +2,11 @@ package com.example.data.repository
 
 import android.util.Log
 import com.example.data.dao.MilestoneDao
-import com.example.domain.utils.Failure
-import com.example.domain.utils.Result
-import com.example.domain.utils.Success
+import com.example.data.endpoints.MilestoneEndPoint
 import com.example.domain.mappers.*
 import com.example.domain.model.Milestone
 import com.example.domain.repository.MilestoneRepository
-import com.example.data.endpoints.MilestoneEndPoint
+import com.example.domain.utils.Result
 import com.example.domain.utils.networkCaller
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
@@ -96,7 +94,7 @@ class MilestoneRepositoryImpl @Inject constructor(
                 }
             },
             onSuccessString = "Milestone deleted successfully",
-            onFailureString = "Having problem while creating the milestone, please check the network connection"
+            onFailureString = "Having problem while deleting the milestone, please check the network connection"
         )
     }
 

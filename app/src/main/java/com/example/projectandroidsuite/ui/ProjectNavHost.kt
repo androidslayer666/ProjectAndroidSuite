@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -10,13 +9,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.projectandroidsuite.ui.loginpage.LoginPage
 import com.example.projectandroidsuite.ui.loginpage.LoginViewModel
+import com.example.projectandroidsuite.ui.projectdetailpage.ProjectDetailPage
 import com.example.projectandroidsuite.ui.projectpage.ProjectsPage
 import com.example.projectandroidsuite.ui.taskdetailpage.TaskDetailPage
-import com.example.projectandroidsuite.ui.projectdetailpage.ProjectDetailPage
 
 
 enum class ProjectsScreens() {
-    Projects, Login, Project, Task
+    Projects, Login, Project, Task, CreateEditMilestone
 }
 
 @Composable
@@ -67,6 +66,22 @@ fun ProjectNavHost(
                 navController = navController
             )
         }
+
+        composable(
+            route = ProjectsScreens.CreateEditMilestone.name + "?milestoneId={milestoneId}",
+            arguments = listOf(
+                navArgument("milestoneId") {
+                    type = NavType.IntType
+                }
+            ),
+        ) { entry ->
+            TaskDetailPage(
+                taskId = entry.arguments?.getInt("id"),
+                viewModel = hiltViewModel(),
+                navController = navController
+            )
+        }
+
     }
 }
 

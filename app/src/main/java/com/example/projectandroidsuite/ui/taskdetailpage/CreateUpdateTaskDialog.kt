@@ -12,14 +12,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.domain.filters.task.TaskStatus
 import com.example.domain.model.Task
+import com.example.domain.model.TaskPriority
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.*
-import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
-import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
-import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
-import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.parts.customitems.*
 import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
@@ -168,21 +166,13 @@ fun CreateTaskDialogInput(
     val priority by viewModel.priority.collectAsState()
 
     Column(Modifier.defaultMinSize(minHeight = 350.dp)) {
-        Row {
-            CustomTextField(
-                label = "Title",
-                value = title,
-                onValueChange = { text -> viewModel.setTitle(text) })
-        }
-        Row(Modifier.height(100.dp)) {
-            CustomTextField(
-                label = "Description",
-                numberOfLines = 3,
-                height = 100,
-                value = description,
-                onValueChange = { text -> viewModel.setDescription(text) }
-            )
-        }
+        TitleInput(
+            text = title,
+            onInputChange = { text -> viewModel.setTitle(text) })
+
+        DescriptionInput(
+            text = description,
+            onInputChange = { text -> viewModel.setDescription(text) })
 
 
         Row(Modifier.padding(vertical = 12.dp)) {
@@ -202,8 +192,8 @@ fun CreateTaskDialogInput(
             Text(text = "Priority", modifier = Modifier.weight(2F))
             Checkbox(
                 modifier = Modifier.weight(4F),
-                checked = priority == 1,
-                onCheckedChange = { viewModel.setPriority(if (it) 1 else 0) }
+                checked = priority == TaskPriority.HIGH,
+                onCheckedChange = { viewModel.setPriority(if (it) TaskPriority.HIGH else TaskPriority.NORMAL) }
             )
         }
 

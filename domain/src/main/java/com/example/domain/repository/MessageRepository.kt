@@ -25,6 +25,9 @@ interface MessageRepository {
         participants: List<User>
     ): Result<String, String>
 
+    fun getMessageById(messageId: Int): Flow<Message?>
+
+    suspend fun clearTable()
 
     suspend fun deleteMessage( messageId: Int, projectId: Int?): Result<String, String>
 }

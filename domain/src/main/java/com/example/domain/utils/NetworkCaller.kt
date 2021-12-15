@@ -1,5 +1,7 @@
 package com.example.domain.utils
 
+import android.util.Log
+
 suspend fun <T> networkCaller(
     call: suspend () -> T,
     onSuccess: suspend (T) -> Unit,
@@ -12,6 +14,7 @@ suspend fun <T> networkCaller(
             onSuccess(result)
             Success(onSuccessString)
         } else {
+            Log.d("networkCaller", "failure" + result.toString())
             Failure(onFailureString)
         }
     } catch (e: Exception) {

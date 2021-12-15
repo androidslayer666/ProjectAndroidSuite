@@ -1,22 +1,12 @@
 package com.example.projectandroidsuite.ui.projectdetailpage
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.example.domain.model.Message
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
-import com.example.projectandroidsuite.ui.parts.RowTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
-import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
-import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 
@@ -122,31 +112,31 @@ fun CreateMessageDialogInput(
     val description by viewModel.content.collectAsState("")
     val chosenUserList by viewModel.chosenUserList.collectAsState()
 
-    Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
-        Row(Modifier.padding(vertical = 12.dp)) {
-            CustomTextField(
-                value = title,
-                label = "Title",
-                onValueChange = { text -> viewModel.setTitle(text) })
-        }
-
-        Row(Modifier.padding(vertical = 12.dp)) {
-            CustomTextField(
-                label = "Content",
-                numberOfLines = 3,
-                height = 100,
-                value = description,
-                onValueChange = { text ->
-                    viewModel.setContent(text)
-                })
-        }
-        Row(Modifier.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            ButtonUsers(
-                singleUser = false,
-                onClicked = { showTeamPicker() }
-            )
-            chosenUserList?.let { it -> RowTeamMember(it, modifier = Modifier.weight(4F)) }
-        }
-
-    }
+//    Column(Modifier.defaultMinSize(minHeight = 250.dp)) {
+//        Row(Modifier.padding(vertical = 12.dp)) {
+//            CustomTextField(
+//                value = title,
+//                label = "Title",
+//                onValueChange = { text -> viewModel.setTitle(text) })
+//        }
+//
+//        Row(Modifier.padding(vertical = 12.dp)) {
+//            CustomTextField(
+//                label = "Content",
+//                numberOfLines = 3,
+//                height = 100,
+//                value = description,
+//                onValueChange = { text ->
+//                    viewModel.setContent(text)
+//                })
+//        }
+//        Row(Modifier.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+//            ButtonUsers(
+//                singleUser = false,
+//                onClicked = { showTeamPicker() }
+//            )
+//            chosenUserList?.let { it -> RowTeamMember(it, modifier = Modifier.weight(4F)) }
+//        }
+//
+//    }
 }

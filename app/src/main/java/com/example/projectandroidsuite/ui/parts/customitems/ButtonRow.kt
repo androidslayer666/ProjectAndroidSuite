@@ -12,13 +12,13 @@ import androidx.compose.ui.unit.dp
 import com.example.projectandroidsuite.R
 
 @Composable
-fun DialogButtonRow(
+fun ButtonRow(
     onSubmit: () -> Unit,
-    closeDialog: () -> Unit,
-    onDeleteClick: (() -> Unit)? = null
+    onDismiss: () -> Unit,
+    onDelete: (() -> Unit)? = null
 ){
     Row {
-        if (onDeleteClick != null) {
+        if (onDelete != null) {
             Image(
                 painterResource(
                     R.drawable.ic_baseline_delete_36_red
@@ -26,13 +26,13 @@ fun DialogButtonRow(
                 contentDescription = "",
                 modifier = Modifier
                     .weight(0.7F)
-                    .clickable { onDeleteClick() }
+                    .clickable { onDelete() }
             )
         }
         Spacer(Modifier.size(12.dp))
         Row(modifier = Modifier.weight(1F)) {
             CustomDialogButton(
-                onClick = { closeDialog() },
+                onClick = { onDismiss() },
                 text = "Dismiss",
                 typeConfirm = false
             )

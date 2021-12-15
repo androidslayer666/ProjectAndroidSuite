@@ -8,7 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import com.example.domain.di.DatabaseProvider
 import com.example.projectandroidsuite.MainActivity
-import com.example.projectandroidsuite.ui.ProjectTheme
+import com.example.projectandroidsuite.newui.ProjectTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules

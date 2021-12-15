@@ -63,10 +63,10 @@ fun CustomDialog(
                 ) {
                     content()
                     if(showButtons)
-                    DialogButtonRow(
+                    ButtonRow(
                         onSubmit = onSubmit,
-                        closeDialog = hide,
-                        onDeleteClick = onDeleteClick
+                        onDismiss = hide,
+                        onDelete = onDeleteClick
                     )
                 }
             }

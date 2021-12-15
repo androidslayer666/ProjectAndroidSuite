@@ -39,7 +39,7 @@ fun MessageDto.toEntity(projectId: Int): MessageEntity {
 fun Message.toMessagePost(projectId: Int? = 0,participants: List<User>): MessagePost {
     return MessagePost(
         title = this.title,
-        content = this.description,
+        content = this.text,
         projectId = projectId,
         participants = participants.toStringIds()
     )
@@ -47,9 +47,9 @@ fun Message.toMessagePost(projectId: Int? = 0,participants: List<User>): Message
 
 
 fun List<MessageEntity>.fromListMessageEntitiesToListMessages(): MutableList<Message> {
-    val listFiles = mutableListOf<Message>()
-    listFiles.addAll(this.map { it.fromMessageEntityToMessage() })
-    return listFiles
+    val listMessages = mutableListOf<Message>()
+    listMessages.addAll(this.map { it.fromMessageEntityToMessage() })
+    return listMessages
 }
 
 
@@ -68,7 +68,8 @@ fun MessageEntity.fromMessageEntityToMessage() : Message {
         projectOwner = this.projectOwner?.fromUserEntityToUser(),
         status = this.status,
         title = this.title,
-        updatedBy = this.updatedBy?.fromUserEntityToUser()
+        updatedBy = this.updatedBy?.fromUserEntityToUser(),
+        listMessages = this.listComments?.fromListCommentEntitiesToListComments()
     )
 }
 

@@ -1,19 +1,18 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.example.domain.model.Subtask
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
-import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
-import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
-import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.parts.customitems.TitleInput
+import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 
 @Composable
@@ -94,18 +93,9 @@ fun CreateSubtaskDialogInput(
     val responsible by viewModel.responsible.collectAsState()
 
     Column {
-        Row(Modifier.padding(vertical = 12.dp)) {
-            CustomTextField(
-                label = "Title",
-                value = title,
-                onValueChange = { text -> viewModel.setTitle(text) })
-        }
-
-        Row(Modifier.padding(vertical = 12.dp)) {
-            ButtonUsers(
-                singleUser = true,
-                onClicked = { showTeamPicker() }
-            )
+        TitleInput(
+            text = title,
+            onInputChange = { text -> viewModel.setTitle(text) })
 
             responsible?.let { user ->
                 Row(
@@ -114,5 +104,5 @@ fun CreateSubtaskDialogInput(
                 ) { CardTeamMember(user = user, showFullName = true) }
             }
         }
-    }
+
 }

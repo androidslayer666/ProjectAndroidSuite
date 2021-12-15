@@ -81,6 +81,17 @@ class MessageRepositoryImpl @Inject constructor(
             .transform { emit(it.fromListMessageEntitiesToListMessages()) }
     }
 
+    override fun getMessageById(messageId: Int): Flow<Message?> {
+        return messageDao.getMessageByMessageId(messageId)
+            .transform {
+                Log.d("getMessageById", it.toString())
+                emit(it?.fromMessageEntityToMessage()) }
+    }
+
+    override suspend fun clearTable() {
+
+    }
+
 
     override suspend fun putMessageToProject(
         projectId: Int,

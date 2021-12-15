@@ -3,6 +3,9 @@ package com.example.domain.model
 import com.example.domain.filters.task.TaskStatus
 import java.util.*
 
+enum class TaskPriority {
+    HIGH, NORMAL
+}
 
 data class Task(
     val canEdit: Boolean? = null,
@@ -14,7 +17,7 @@ data class Task(
     var title: String = "",
     var description: String = "",
     var deadline: Date = Date(),
-    val priority: Int? = null,
+    val priority: TaskPriority? = null,
     val milestoneId: Int? = null,
     var projectOwner: Project? = null,
     val status: TaskStatus? = null,

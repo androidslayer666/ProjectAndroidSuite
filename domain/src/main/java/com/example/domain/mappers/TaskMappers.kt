@@ -6,6 +6,7 @@ import com.example.domain.dto.TaskPost
 import com.example.domain.entities.TaskEntity
 import com.example.domain.filters.task.TaskStatus
 import com.example.domain.model.Task
+import com.example.domain.model.TaskPriority
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -56,11 +57,18 @@ fun Task.fromTaskEntityToPost(milestoneId: Int? = 0): TaskPost {
 }
 
 
-fun Int.priorityToString(): String {
+fun TaskPriority.priorityToString(): String {
     return when (this) {
-        0 -> "normal"
-        1 -> "high"
-        else -> "normal"
+        TaskPriority.NORMAL -> "normal"
+        TaskPriority.HIGH -> "high"
+    }
+}
+
+fun Int.fromIntToTaskPriority(): TaskPriority {
+    return when (this) {
+        0 -> TaskPriority.NORMAL
+        1 -> TaskPriority.HIGH
+        else -> TaskPriority.NORMAL
     }
 }
 
@@ -78,7 +86,7 @@ fun TaskEntity.fromTaskEntityToTask(): Task {
         id = this.id,
         title = this.title,
         description = this.description,
-        priority = this.priority,
+        priority = this.priority?.fromIntToTaskPriority(),
         status = this.status?.fromIntToTaskStatus(),
         responsible = this.responsible?.fromUserEntityToUser(),
         updatedBy = this.updatedBy?.fromUserEntityToUser(),

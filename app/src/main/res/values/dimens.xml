@@ -1,23 +1,5 @@
 <resources>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="min_project_status_width">30dp</dimen>
-    <dimen name="item_padding">15dp</dimen>
-    <dimen name="button_project_detail_width">30dp</dimen>
-    <dimen name="item_height">70dp</dimen>
-    <dimen name="project_title_text_size">16sp</dimen>
-    <dimen name="min_width_for_task_status">50dp</dimen>
-    <dimen name="small_text_item">11sp</dimen>
-    <dimen name="normal_text_item">15sp</dimen>
-    <dimen name="large_text_item">18sp</dimen>
-    <dimen name="large_item_margin">150dp</dimen>
-    <dimen name="small_item_margin">20dp</dimen>
-    <dimen name="mid_item_margin">50dp</dimen>
-    <dimen name="width_confirmation_dialog">300dp</dimen>
-    <dimen name="height_confirmation_dialog">150dp</dimen>
-    <dimen name="layout_padding">6dp</dimen>
-    <dimen name="cardRadius">30dp</dimen>
-    <dimen name="card_image_size">40dp</dimen>
-    <dimen name="card_size">56dp</dimen>
-    cardRadius
+    <dimen name="smallPadding">4dp</dimen>
+
 
 </resources>

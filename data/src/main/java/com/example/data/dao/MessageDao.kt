@@ -17,14 +17,13 @@ interface MessageDao {
     fun getMessageByProjectIdFlow(projectId: Int): Flow<List<MessageEntity>>
 
     @Query("SELECT * FROM message WHERE id = :messageId")
-    suspend fun getMessageByMessageId(messageId: Int): MessageEntity
+    fun getMessageByMessageId(messageId: Int): Flow<MessageEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessages(messageList: List<MessageEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessage(message: MessageEntity)
-
 
     @Query("DELETE FROM message WHERE id = :messageId")
     suspend fun deleteMessage(messageId: Int)

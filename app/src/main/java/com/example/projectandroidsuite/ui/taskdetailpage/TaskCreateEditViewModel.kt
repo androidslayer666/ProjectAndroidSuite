@@ -12,10 +12,7 @@ import com.example.domain.interactor.project.GetAllProjects
 import com.example.domain.interactor.project.GetProjectById
 import com.example.domain.interactor.task.CreateTask
 import com.example.domain.interactor.task.UpdateTask
-import com.example.domain.model.Milestone
-import com.example.domain.model.Project
-import com.example.domain.model.Task
-import com.example.domain.model.User
+import com.example.domain.model.*
 import com.example.projectandroidsuite.ui.utils.getListIds
 import com.example.projectandroidsuite.ui.utils.getUserById
 import com.example.projectandroidsuite.ui.utils.validation.TaskInputState
@@ -46,8 +43,8 @@ class TaskCreateEditViewModel @Inject constructor(
     private var _description = MutableStateFlow("")
     val description: StateFlow<String> = _description
 
-    private var _priority = MutableStateFlow(0)
-    val priority: StateFlow<Int> = _priority
+    private var _priority = MutableStateFlow(TaskPriority.NORMAL)
+    val priority: StateFlow<TaskPriority> = _priority
 
     private var _chosenUserList = MutableStateFlow<MutableList<User>>(mutableListOf())
     val chosenUserList: StateFlow<List<User>> = _chosenUserList
@@ -108,7 +105,7 @@ class TaskCreateEditViewModel @Inject constructor(
         _description.value = task.description
         _chosenUserList.value = task.responsibles.toMutableList()
         _endDate.value = task.deadline
-        _priority.value = task.priority ?: 0
+        _priority.value = task.priority ?: TaskPriority.NORMAL
         task.projectOwner?.let { projectOwner ->
             setProject(projectOwner)
         }
@@ -132,7 +129,7 @@ class TaskCreateEditViewModel @Inject constructor(
         _description.value = string
     }
 
-    fun setPriority(value: Int) {
+    fun setPriority(value: TaskPriority) {
         Log.d("setPriority", value.toString())
         _priority.value = value
     }
@@ -176,7 +173,7 @@ class TaskCreateEditViewModel @Inject constructor(
     fun clearInput() {
         _title.value = ""
         _description.value = ""
-        _priority.value = 0
+        _priority.value = TaskPriority.NORMAL
         _chosenUserList.value = mutableListOf()
         _project.value = null
         _milestone.value = null

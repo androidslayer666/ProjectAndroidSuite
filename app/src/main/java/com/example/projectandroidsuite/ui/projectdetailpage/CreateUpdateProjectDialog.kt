@@ -15,10 +15,7 @@ import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.RowTeamMember
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
-import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
-import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
-import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
-import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.parts.customitems.*
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 
@@ -142,20 +139,13 @@ fun CreateProjectDialogInput(
 
         Box {
             Column {
-                CustomTextField(
-                    label = "Title",
-                    value = title,
-                    onValueChange = { text ->
-                        viewModel.setTitle(text)
-                    })
-                CustomTextField(
-                    label = "Description",
-                    numberOfLines = 3,
-                    height = 100,
-                    value = description,
-                    onValueChange = { text ->
-                        viewModel.setDescription(text)
-                    })
+                TitleInput(
+                    text = title,
+                    onInputChange = { text -> viewModel.setTitle(text) })
+
+                DescriptionInput(
+                    text = description,
+                    onInputChange = { text -> viewModel.setDescription(text) })
 
 
                 if (modeCreate)

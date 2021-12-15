@@ -48,6 +48,8 @@ fun TaskDetailPage(
     var showCreateSubtaskDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showUpdateStatusDialog by remember { mutableStateOf(false) }
+    var showUpdateTaskDialog by remember { mutableStateOf(false) }
+    var showCreateSubtaskDialog by remember { mutableStateOf(false) }
 
     val task by viewModel.currentTask.collectAsState()
     val comments by viewModel.listComments.collectAsState()

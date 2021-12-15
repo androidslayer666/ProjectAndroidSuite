@@ -14,14 +14,15 @@ import androidx.compose.ui.unit.dp
 import com.example.domain.model.Milestone
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
-import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
-import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.DatePicker
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
-import com.example.projectandroidsuite.ui.parts.customitems.CustomTextField
+import com.example.projectandroidsuite.ui.parts.customitems.DescriptionInput
+import com.example.projectandroidsuite.ui.parts.customitems.TitleInput
+import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
+import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,10 +49,10 @@ fun CreateMilestoneDialog(
 
     when {
         milestoneInputState.isTitleEmpty == true -> LaunchedEffect(key1 = milestoneInputState) {
-            makeToast("Please enter title", context )
+            makeToast("Please enter title", context)
         }
         milestoneInputState.isResponsibleEmpty == true -> LaunchedEffect(key1 = milestoneInputState) {
-            makeToast("Please choose responsible", context )
+            makeToast("Please choose responsible", context)
         }
         milestoneInputState.serverResponse is Success -> {
             onMilestoneDeletedOrEdited((milestoneInputState.serverResponse as Success<String>).value)
@@ -60,7 +61,7 @@ fun CreateMilestoneDialog(
         }
         milestoneInputState.serverResponse is Failure -> {
             LaunchedEffect(key1 = milestoneInputState) {
-                makeToast( "Something went wrong with the server request", context )
+                makeToast("Something went wrong with the server request", context)
             }
         }
     }
@@ -108,7 +109,7 @@ fun CreateMilestoneDialog(
 @Composable
 fun CreateMilestoneDialogInput(
     viewModel: MilestoneCreateEditViewModel,
-    showResponsiblePicker: ()-> Unit
+    showResponsiblePicker: () -> Unit
 
 ) {
 
@@ -119,29 +120,21 @@ fun CreateMilestoneDialogInput(
     val endDate by viewModel.endDate.collectAsState(Date())
     val priority by viewModel.priority.collectAsState()
 
-    Column{
-        Row {
-            CustomTextField(
-                value = title,
-                label = "Title",
-                onValueChange = { text -> viewModel.setTitle(text) })
-        }
+    Column {
 
-        Row {
-            CustomTextField(
-                label = "Description",
-                numberOfLines = 3,
-                height = 100,
-                value = description,
-                onValueChange = { text ->
-                    viewModel.setDescription(text)
-                })
-        }
+        TitleInput(
+            text = title,
+            onInputChange = { text -> viewModel.setTitle(text) })
 
-        Row (
+        DescriptionInput(
+            text = description,
+            onInputChange = { text -> viewModel.setDescription(text) })
+
+
+        Row(
             Modifier
                 .padding(vertical = 12.dp)
-                ) {
+        ) {
             Text(text = "Key milestone", modifier = Modifier.weight(2F))
             Checkbox(
                 modifier = Modifier.weight(4F),
@@ -156,7 +149,7 @@ fun CreateMilestoneDialogInput(
                 .clickable { showResponsiblePicker() }) {
             ButtonUsers(
                 singleUser = true,
-                onClicked = {showResponsiblePicker()}
+                onClicked = { showResponsiblePicker() }
             )
             responsible?.let { user ->
                 Row(
