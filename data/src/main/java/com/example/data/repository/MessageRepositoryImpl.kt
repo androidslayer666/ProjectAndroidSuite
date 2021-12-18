@@ -84,7 +84,7 @@ class MessageRepositoryImpl @Inject constructor(
     override fun getMessageById(messageId: Int): Flow<Message?> {
         return messageDao.getMessageByMessageId(messageId)
             .transform {
-                Log.d("getMessageById", it.toString())
+                //Log.d("getMessageById", it.toString())
                 emit(it?.fromMessageEntityToMessage()) }
     }
 

@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.projectpage
+package com.example.projectandroidsuite.ui.mainscreen
 
 
 import androidx.compose.foundation.Image
@@ -28,11 +28,8 @@ fun FilterTasks(
 ) {
     var showUserPicker by remember { mutableStateOf(false) }
 
-    val listUsersFlow by viewModel.users.collectAsState()
-    val userSearch by viewModel.userSearchProject.collectAsState()
-    val stage by viewModel.stageForFilteringTask.collectAsState()
-    val user by viewModel.userForFilteringTask.collectAsState()
-    val sorting by viewModel.taskSorting.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+
     Box {
         Row {
 
@@ -52,12 +49,12 @@ fun FilterTasks(
                     ) {
                         CustomButton(
                             text = "Active",
-                            clicked = (stage == TaskStatus.ACTIVE),
+                            clicked = (uiState.stageForFilteringTask == TaskStatus.ACTIVE),
                             onClick = { viewModel.setStatusForFilteringTask(TaskStatus.ACTIVE) })
                         Spacer(Modifier.size(12.dp))
                         CustomButton(
                             text = "Complete",
-                            clicked = (stage == TaskStatus.COMPLETE),
+                            clicked = (uiState.stageForFilteringTask == TaskStatus.COMPLETE),
                             onClick = { viewModel.setStatusForFilteringTask(TaskStatus.COMPLETE) })
                         Spacer(Modifier.size(24.dp))
                         Column(modifier = Modifier.padding(vertical = 12.dp)) {
@@ -66,7 +63,7 @@ fun FilterTasks(
                                 onClicked = { showUserPicker = true }
                             )
                             Spacer(Modifier.size(12.dp))
-                            user?.let { it1 -> CardTeamMember(user = it1) }
+                            uiState.userForFilteringTask?.let { it1 -> CardTeamMember(user = it1) }
                         }
 
                         Spacer(Modifier.size(12.dp))
@@ -100,12 +97,12 @@ fun FilterTasks(
                             Row() {
                                 CustomSortButton(
                                     ascending = true,
-                                    clicked = (sorting == TaskSorting.DEADLINE_ASC)
+                                    clicked = (uiState.taskSorting == TaskSorting.DEADLINE_ASC)
                                 ) { viewModel.setTaskSorting(TaskSorting.DEADLINE_ASC) }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 CustomSortButton(
                                     ascending = false,
-                                    clicked = (sorting == TaskSorting.DEADLINE_DESC)
+                                    clicked = (uiState.taskSorting == TaskSorting.DEADLINE_DESC)
                                 ) { viewModel.setTaskSorting(TaskSorting.DEADLINE_DESC) }
                             }
                         }
@@ -118,11 +115,11 @@ fun FilterTasks(
                             }
                             Row() {
                                 CustomSortButton(
-                                    ascending = true, clicked = (sorting == TaskSorting.STAGE_ASC)
+                                    ascending = true, clicked = (uiState.taskSorting == TaskSorting.STAGE_ASC)
                                 ) { viewModel.setTaskSorting(TaskSorting.STAGE_ASC) }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 CustomSortButton(
-                                    ascending = false, clicked = (sorting == TaskSorting.STAGE_DESC)
+                                    ascending = false, clicked = (uiState.taskSorting == TaskSorting.STAGE_DESC)
                                 ) { viewModel.setTaskSorting(TaskSorting.STAGE_DESC) }
                             }
                         }
@@ -136,12 +133,12 @@ fun FilterTasks(
                             Row() {
                                 CustomSortButton(
                                     ascending = true,
-                                    clicked = (sorting == TaskSorting.IMPORTANT_ASC)
+                                    clicked = (uiState.taskSorting == TaskSorting.IMPORTANT_ASC)
                                 ) { viewModel.setTaskSorting(TaskSorting.IMPORTANT_ASC) }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 CustomSortButton(
                                     ascending = false,
-                                    clicked = (sorting == TaskSorting.IMPORTANT_DESC)
+                                    clicked = (uiState.taskSorting == TaskSorting.IMPORTANT_DESC)
                                 ) { viewModel.setTaskSorting(TaskSorting.IMPORTANT_DESC) }
                             }
                         }
@@ -152,13 +149,13 @@ fun FilterTasks(
         }
         if (showUserPicker) {
             TeamPickerDialog(
-                list = listUsersFlow,
+                list = uiState.users,
                 onSubmit = { },
                 onClick = { user -> viewModel.setUserForFilteringTask(user) },
                 closeDialog = { showUserPicker = false },
                 pickerType = PickerType.SINGLE,
-                userSearch,
-                { query -> viewModel.setUserSearch(query) }
+                searchString = uiState.userSearchQuery,
+                onSearchChanged = { query -> viewModel.setUserSearch(query) }
             )
         }
     }

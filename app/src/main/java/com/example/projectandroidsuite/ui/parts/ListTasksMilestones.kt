@@ -14,20 +14,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.example.domain.model.Milestone
 import com.example.domain.model.Task
 import com.example.projectandroidsuite.R
+import com.example.projectandroidsuite.ui.mainscreen.TaskItem
 import com.example.projectandroidsuite.ui.parts.customitems.DrawSideLine
-import com.example.projectandroidsuite.ui.projectdetailpage.CreateMilestoneDialog
-import com.example.projectandroidsuite.ui.projectpage.TaskItem
 
 
 @Composable
 fun ListTasksMilestones(
     listTasksAndMilestones: Map<Milestone?, List<Task>>?,
-    navController: NavHostController,
+    navigateToTaskId: (Int) -> Unit,
     onEditMilestone: (milestone: Milestone?) -> Unit = {},
 ) {
     listTasksAndMilestones?.let {
@@ -82,18 +79,9 @@ fun ListTasksMilestones(
                     for (task in listTasksAndMilestones[milestone]!!) {
                         TaskItem(
                             task = task,
-                            onClick = { navController.navigate("task/${task.id}") })
+                            onClick = { navigateToTaskId(task.id) })
                     }
 
-                    if (showEditDialog) {
-                        CreateMilestoneDialog(
-                            milestone = milestone,
-                            projectId = milestone?.projectId ?: 0,
-                            viewModel = hiltViewModel(),
-                            closeDialog = { showEditDialog = false },
-                            onDeleteClick = { }
-                        )
-                    }
                 }
             }
         }

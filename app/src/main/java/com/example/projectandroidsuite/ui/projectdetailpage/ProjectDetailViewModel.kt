@@ -16,11 +16,22 @@ import com.example.domain.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class ProjectDetailScreenState(
+    val projectId: Int? = null,
+    val currentProject: Project? = null,
+    val messages: List<Message>? = null,
+    val userSearchProject: String = "",
+    val taskAndMilestones: Map<Milestone?, List<Task>>? = emptyMap(),
+    val listFiles: List<File>? = emptyList(),
+    val projectDeletionStatus: Result<String, String>? = null,
+    val messageDeletionStatus: Result<String, String>? = null,
+    val commentDeletionStatus: Result<String, String>? = null,
+    val milestoneDeletionStatus: Result<String, String>? = null,
+)
 
 @HiltViewModel
 class ProjectDetailViewModel @Inject constructor(
@@ -35,93 +46,73 @@ class ProjectDetailViewModel @Inject constructor(
     private val putCommentToMessage: PutCommentToMessage
 ) : ViewModel() {
 
-    private var _projectId = MutableStateFlow<Int?>(null)
-    val projectId: StateFlow<Int?> = _projectId
-
-    private var _currentProject = MutableStateFlow<Project?>(null)
-    val currentProject: StateFlow<Project?> = _currentProject
-
-    private var _listDiscussions = MutableStateFlow<List<Message>?>(null)
-    val listDiscussions: StateFlow<List<Message>?> = _listDiscussions
-
-    private var _taskAndMilestones = MutableStateFlow<Map<Milestone?, List<Task>>?>(null)
-    val taskAndMilestones: StateFlow<Map<Milestone?, List<Task>>?> = _taskAndMilestones
-
-    private var _listFiles = MutableStateFlow<List<File>?>(null)
-    val listFiles: StateFlow<List<File>?> = _listFiles
-
-    private var _projectDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
-    val projectDeletionStatus: StateFlow<Result<String, String>?> = _projectDeletionStatus
-
-    private var _messageDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
-    val messageDeletionStatus: StateFlow<Result<String, String>?> = _messageDeletionStatus
-
-    private var _commentDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
-    val commentDeletionStatus: StateFlow<Result<String, String>?> = _commentDeletionStatus
-
-    private var _milestoneDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
-    val milestoneDeletionStatus: StateFlow<Result<String, String>?> = _milestoneDeletionStatus
+    private val _uiState = MutableStateFlow(ProjectDetailScreenState())
+    val uiState: StateFlow<ProjectDetailScreenState> = _uiState.asStateFlow()
 
     fun setProject(projectId: Int) {
-        _projectId.value = projectId
+        _uiState.update { it.copy(projectId = projectId) }
         viewModelScope.launch {
-            getProjectById(projectId).collectLatest {
-                _currentProject.value = it
+            getProjectById(projectId).collectLatest { project ->
+                _uiState.update { it.copy(currentProject = project) }
             }
         }
         viewModelScope.launch {
-            getMessageByProjectId(projectId).collectLatest {
+            getMessageByProjectId(projectId).collectLatest { list ->
                 //Log.d("getMessageByProjectId", it.toString())
-                _listDiscussions.value = it
+                _uiState.update { it.copy(messages = list) }
             }
         }
         viewModelScope.launch {
-            getTaskAndMilestonesForProject(projectId).collectLatest {
+            getTaskAndMilestonesForProject(projectId).collectLatest { taskAndMilestones ->
                 //Log.d("getTaskAndMilestones", it.toString())
-                _taskAndMilestones.value = it
+                _uiState.update { it.copy(taskAndMilestones = taskAndMilestones) }
             }
         }
         viewModelScope.launch {
-            getFilesByProjectId(projectId).collectLatest {
+            getFilesByProjectId(projectId).collectLatest { files ->
                 //Log.d("getFilesByProjectId", it.toString())
-                _listFiles.value = it
+                _uiState.update { it.copy(listFiles = files) }
             }
         }
     }
 
     fun deleteProject() {
-        if (projectId.value != null) {
+        uiState.value.projectId?.let{
             CoroutineScope(IO).launch {
-                _projectDeletionStatus.value = deleteProject(projectId.value!!)
+                val response = deleteProject(uiState.value.projectId!!)
+                _uiState.update { it.copy(projectDeletionStatus = response) }
             }
         }
     }
 
     fun addCommentToMessage(comment: Comment) {
         CoroutineScope(IO).launch {
-            putCommentToMessage(comment.messageId, comment, projectId.value)
+            putCommentToMessage(comment.messageId, comment, uiState.value.projectId)
         }
     }
 
     fun deleteMilestone(milestoneEntity: Milestone?) {
         CoroutineScope(IO).launch {
-            _milestoneDeletionStatus.value = deleteMilestone(milestoneEntity?.id, projectId.value)
+            val response = deleteMilestone(milestoneEntity?.id, uiState.value.projectId)
+            _uiState.update { it.copy(projectDeletionStatus = response) }
         }
     }
 
     fun resetState() {
-        _projectDeletionStatus.value = null
+        _uiState.value = ProjectDetailScreenState()
     }
 
     fun deleteComment(commentEntity: Comment) {
         CoroutineScope(IO).launch {
-            _commentDeletionStatus.value = deleteComment(commentEntity.id)
+            val response = deleteComment(commentEntity.id)
+            _uiState.update { it.copy(projectDeletionStatus = response) }
         }
     }
 
     fun deleteMessage(message: Message) {
         CoroutineScope(IO).launch {
-            _messageDeletionStatus.value = deleteMessage(message.id, projectId.value)
+            val status = deleteMessage(message.id, uiState.value.projectId)
+            _uiState.update { it.copy(projectDeletionStatus = status) }
         }
     }
 }

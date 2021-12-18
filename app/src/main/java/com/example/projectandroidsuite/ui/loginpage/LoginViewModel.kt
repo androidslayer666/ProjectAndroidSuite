@@ -14,8 +14,20 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class LoginScreenState(
+    val portalAddress: String = "",
+    val emailInput: String = "",
+    val passwordInput: String = "",
+    val portalIsInCloud: Boolean = true,
+    val tfaGoogleInput: Int? = null,
+    val loginInputState: LoginInputState = LoginInputState()
+)
+
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -25,76 +37,96 @@ class LoginViewModel @Inject constructor(
     private val checkIfAuthenticated: CheckIfAuthenticated
 ) : ViewModel() {
 
-    private var _portalAddress = MutableStateFlow("")
-    val portalAddress: StateFlow<String> = _portalAddress
-
-    private var _emailInput = MutableStateFlow("")
-    val emailInput: StateFlow<String> = _emailInput
-
-    private var _passwordInput = MutableStateFlow("")
-    val passwordInput: StateFlow<String> = _passwordInput
-
-    private var _portalIsInCloud = MutableStateFlow(0)
-    val portalIsInCloud: StateFlow<Int> = _portalIsInCloud
-
-    private var _tfaGoogleInput = MutableStateFlow("")
-    val tfaGoogleInput: StateFlow<String> = _tfaGoogleInput
-
-    private var _loginInputState = MutableStateFlow(LoginInputState())
-    val loginInputState: StateFlow<LoginInputState> = _loginInputState
+    private val _uiState = MutableStateFlow(LoginScreenState())
+    val uiState: StateFlow<LoginScreenState> = _uiState.asStateFlow()
 
     fun checkAuthentication(): Boolean {
         return checkIfAuthenticated()
     }
 
     fun onChangePortalAddress(sequence: CharSequence) {
-        _portalAddress.value = sequence.toString()
-        val isValidated = validatePortalNameInput(sequence.toString()) || portalIsInCloud.value == 1
-        _loginInputState.value = _loginInputState.value.copy(isPortalValidated = isValidated)
-        if (_loginInputState.value.canConnectToPortal == true) {
-            _loginInputState.value = _loginInputState.value.copy(canConnectToPortal = false)
+        _uiState.update { it.copy(portalAddress = sequence.toString()) }
+        val isValidated =
+            validatePortalNameInput(sequence.toString()) || !uiState.value.portalIsInCloud
+
+        _uiState.update { it.copy(loginInputState = LoginInputState(isPortalValidated = isValidated)) }
+        if (uiState.value.loginInputState.canConnectToPortal == true) {
+            _uiState.update { it.copy(loginInputState = LoginInputState(canConnectToPortal = false)) }
         }
         if (isValidated) {
-            tryIfPortalExists(portalAddress.value)
+            tryIfPortalExists(sequence.toString())
         }
     }
 
-    fun setPortalIsInCloud(value: Int) {
-        _portalIsInCloud.value = value
+    fun setPortalIsInCloud(value: Boolean) {
+        _uiState.update { it.copy(portalIsInCloud = value) }
     }
 
     fun onChangeEmail(sequence: CharSequence) {
-        _loginInputState.value =
-            _loginInputState.value.copy(isEmailValidated = validateEmail(sequence.toString()))
-        _emailInput.value = sequence.toString()
+        _uiState.update {
+            it.copy(
+                loginInputState = it.loginInputState.copy(
+                    isEmailValidated = validateEmail(
+                        sequence.toString()
+                    )
+                )
+            )
+        }
+        _uiState.update { it.copy(emailInput = sequence.toString()) }
     }
 
     fun onChangePassword(sequence: CharSequence) {
-        _loginInputState.value =
-            _loginInputState.value.copy(isPasswordValidated = validatePassword(sequence.toString()))
-        _passwordInput.value = sequence.toString()
+        _uiState.update {
+            it.copy(
+                loginInputState = it.loginInputState.copy(
+                    isPasswordValidated = validatePassword(
+                        sequence.toString()
+                    )
+                )
+            )
+        }
+        _uiState.update { it.copy(passwordInput = sequence.toString()) }
+
     }
 
     fun setTfaGoogleInput(value: String) {
-        _tfaGoogleInput.value = value
-        _loginInputState.value = _loginInputState.value.copy(isCodeValidated = validateCode(value))
+        _uiState.update {
+            it.copy(
+                loginInputState = it.loginInputState.copy(
+                    isCodeValidated = validateCode(
+                        value
+                    )
+                )
+            )
+        }
+        _uiState.update { it.copy(tfaGoogleInput = value.toIntOrNull()) }
     }
 
     fun tryIfPortalExists(address: String) {
         rememberPortalAddress(address)
         viewModelScope.launch(IO) {
-            Log.d("authRepository", address)
+            //Log.d("authRepository", address)
             val response = checkPortalPossibilities(address)
             when (response) {
                 is Success -> {
-                    Log.d("authRepository", "success")
-                    _loginInputState.value =
-                        _loginInputState.value.copy(canConnectToPortal = true)
+                    Log.d("tryIfPortalExists", "success")
+                    _uiState.update {
+                        it.copy(
+                            loginInputState = it.loginInputState.copy(
+                                canConnectToPortal = true
+                            )
+                        )
+                    }
                 }
                 is Failure -> {
-                    Log.d("authRepository", "failure")
-                    _loginInputState.value =
-                        _loginInputState.value.copy(serverResponseError = response.reason)
+                    Log.d("tryIfPortalExists", "failure")
+                    _uiState.update {
+                        it.copy(
+                            loginInputState = it.loginInputState.copy(
+                                serverResponseError = response.reason
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -103,14 +135,14 @@ class LoginViewModel @Inject constructor(
     fun authenticate(
         onCompleteLogin: () -> Unit
     ) {
-        if (loginInputState.value.readyToTryAuth()) {
+        if (uiState.value.loginInputState.readyToTryAuth()) {
             viewModelScope.launch {
-                rememberPortalAddress(portalAddress.value)
+                rememberPortalAddress(uiState.value.portalAddress)
                 val response = login(
-                    portalAddress.value,
-                    emailInput.value,
-                    passwordInput.value,
-                    tfaGoogleInput.value.toInt()
+                    uiState.value.portalAddress,
+                    uiState.value.emailInput,
+                    uiState.value.passwordInput,
+                    uiState.value.tfaGoogleInput
                 )
                 when (response) {
                     is Success -> {
@@ -119,8 +151,13 @@ class LoginViewModel @Inject constructor(
                         }
                     }
                     is Failure -> {
-                        _loginInputState.value =
-                            _loginInputState.value.copy(serverResponseError = response.reason)
+                        _uiState.update {
+                            it.copy(
+                                loginInputState = it.loginInputState.copy(
+                                    serverResponseError = response.reason
+                                )
+                            )
+                        }
                     }
                 }
             }

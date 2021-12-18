@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.projectpage
+package com.example.projectandroidsuite.ui.mainscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,11 +10,18 @@ import com.example.domain.model.User
 import com.example.domain.sorting.TaskSorting
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class TaskScreenState(
+    val stageForFilteringTask: TaskStatus? = null,
+    val userForFilteringTask: User? = null,
+    val userSearchQuery: String = "",
+    val taskSorting: TaskSorting = TaskSorting.STAGE_ASC,
+    val tasks: List<Task> = emptyList(),
+    val users: List<User> = emptyList()
+)
 
 @HiltViewModel
 class TasksViewModel @Inject constructor(
@@ -22,52 +29,39 @@ class TasksViewModel @Inject constructor(
     private val getAllUsers: GetAllUsers,
 ) : ViewModel(){
 
-    private var _stageFroFilteringTask = MutableStateFlow<TaskStatus?>(null)
-    val stageForFilteringTask: StateFlow<TaskStatus?> = _stageFroFilteringTask
-
-    private var _userForFilteringTask = MutableStateFlow<User?>(null)
-    val userForFilteringTask: StateFlow<User?> = _userForFilteringTask
-
-    private var _taskSorting = MutableStateFlow(TaskSorting.DEADLINE_ASC)
-    val taskSorting: StateFlow<TaskSorting> = _taskSorting
-
-    private var _tasks = MutableStateFlow<List<Task>>(listOf())
-    val tasks: StateFlow<List<Task>> = _tasks
-
-    private var _userSearchQuery = MutableStateFlow<String>("")
-    val userSearchProject: StateFlow<String> = _userSearchQuery
-
-    private var _users = MutableStateFlow<List<User>>(listOf())
-    val users: StateFlow<List<User>> = _users
+    private val _uiState = MutableStateFlow(TaskScreenState())
+    val uiState: StateFlow<TaskScreenState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             getAllTasks().collectLatest {
-                _tasks.value = it
+                    list -> _uiState.update { it.copy(tasks = list) }
             }
         }
         viewModelScope.launch(Dispatchers.IO) {
-            getAllUsers().collectLatest { _users.value = it }
+            getAllUsers().collectLatest {
+                    list -> _uiState.update { it.copy(users = list) }
+            }
         }
     }
 
     fun setTaskSorting(sorting: TaskSorting) {
-        _taskSorting.value = sorting
+        _uiState.update { it.copy(taskSorting = sorting) }
         getAllTasks.setTaskSorting(sorting)
     }
 
     fun setUserForFilteringTask(user: User?) {
-        _userForFilteringTask.value = user
+        _uiState.update { it.copy(userForFilteringTask = user) }
         getAllTasks.setFilter(user = user)
     }
 
     fun setStatusForFilteringTask(status: TaskStatus?) {
-        _stageFroFilteringTask.value = status
+        _uiState.update { it.copy(stageForFilteringTask = status) }
         getAllTasks.setFilter(status = status)
     }
 
     fun setUserSearch(query: String) {
-        _userSearchQuery.value = query
+        _uiState.update { it.copy(userSearchQuery = query) }
         getAllTasks.setFilter(query)
     }
 

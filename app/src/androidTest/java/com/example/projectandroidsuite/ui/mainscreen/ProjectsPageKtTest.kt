@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.projectpage
+package com.example.projectandroidsuite.ui.mainscreen
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule

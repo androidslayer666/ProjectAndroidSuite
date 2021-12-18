@@ -23,5 +23,6 @@
     <string name="choose_team">Choose team</string>
     <string name="comment_has_been_deleted">Comment has been deleted</string>
     <string name="do_you_want_to_delete_the_comment">Do you want to delete the comment?</string>
+    <string name="do_you_want_to_delete_the_project">Do you want to delete the project?</string>
 
 </resources>

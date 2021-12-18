@@ -18,17 +18,17 @@ class ScaffoldViewModel @Inject constructor(
     private val getSelfProfile: GetSelfProfile
 ) :ViewModel(){
 
-    private var _self = MutableStateFlow<User?>(null)
-    val self: StateFlow<User?> = _self
+    private var _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user
 
     init{
-        getSelf()
+        //getUser()
     }
 
-    private fun getSelf() {
+    fun getUser() {
         viewModelScope.launch {
             getSelfProfile().collectLatest {
-                _self.value = it
+                _user.value = it
             }
         }
     }

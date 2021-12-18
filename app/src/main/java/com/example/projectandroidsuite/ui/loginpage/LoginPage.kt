@@ -27,18 +27,15 @@ fun LoginPage(
     viewModel: LoginViewModel,
     navController: NavHostController
 ) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    val portalAddress by viewModel.portalAddress.collectAsState()
-    val emailAddress by viewModel.emailInput.collectAsState()
-    val password by viewModel.passwordInput.collectAsState()
-    val tfaGoogleInput by viewModel.tfaGoogleInput.collectAsState()
-    val portalIsInCloud by viewModel.portalIsInCloud.collectAsState()
-    val loginInputState by viewModel.loginInputState.collectAsState()
+    //Log.d("LoginPage", uiState.toString())
 
     val (focusRequesterMail, focusRequesterPassword) = FocusRequester.createRefs()
-    val titles = listOf(stringResource(R.string.cloud_portal), stringResource(R.string.local_portal))
+    val titles =
+        listOf(stringResource(R.string.cloud_portal), stringResource(R.string.local_portal))
 
-    loginInputState.serverResponseError?.let {
+    uiState.loginInputState.serverResponseError?.let {
         makeToast(it, LocalContext.current)
     }
 
@@ -49,7 +46,7 @@ fun LoginPage(
             .background(MaterialTheme.colors.primary)
     ) {
         AnimatedVisibility(
-            loginInputState.isPortalValidated != true,
+            uiState.loginInputState.isPortalValidated != true,
             enter = slideInVertically(
 
                 initialOffsetY = { fullHeight -> -fullHeight },
@@ -66,14 +63,14 @@ fun LoginPage(
         Spacer(modifier = Modifier.size(12.dp))
         Row {
             TabRow(
-                selectedTabIndex = portalIsInCloud,
+                selectedTabIndex = if (uiState.portalIsInCloud) 0 else 1,
                 modifier = Modifier.size(width = 300.dp, height = 50.dp)
             ) {
                 titles.forEachIndexed { index, title ->
                     Tab(
                         text = { Text(title) },
-                        selected = portalIsInCloud == index,
-                        onClick = { viewModel.setPortalIsInCloud(index) }
+                        selected = if (index == 0) uiState.portalIsInCloud else !uiState.portalIsInCloud,
+                        onClick = { viewModel.setPortalIsInCloud(if (index == 0) uiState.portalIsInCloud else !uiState.portalIsInCloud) }
                     )
                 }
             }
@@ -81,7 +78,7 @@ fun LoginPage(
         Spacer(modifier = Modifier.size(12.dp))
 
         TextField(
-            value = portalAddress,
+            value = uiState.portalAddress,
             onValueChange = { input ->
                 viewModel.onChangePortalAddress(input)
             },
@@ -93,10 +90,10 @@ fun LoginPage(
                 backgroundColor = MaterialTheme.colors.background,
                 textColor = MaterialTheme.colors.onBackground
             ),
-            isError = loginInputState.isPortalValidated != true && portalAddress.isNotEmpty()
+            isError = uiState.loginInputState.isPortalValidated != true && uiState.portalAddress.isNotEmpty()
         )
-        if (loginInputState.isPortalValidated != true) {
-            if (portalIsInCloud == 0) {
+        if (uiState.loginInputState.isPortalValidated != true) {
+            if (uiState.portalIsInCloud) {
                 Text(
                     text = stringResource(R.string.input_your_portal_address_in_a_format),
                     style = MaterialTheme.typography.body1,
@@ -106,14 +103,14 @@ fun LoginPage(
                         .align(Alignment.CenterHorizontally)
                 )
             } else {
-                Button(onClick = { viewModel.tryIfPortalExists(portalAddress) }) {
+                Button(onClick = { viewModel.tryIfPortalExists(uiState.portalAddress) }) {
                     Text(stringResource(R.string.connect))
                 }
             }
         }
 
         AnimatedVisibility(
-            loginInputState.isPortalValidated == true,
+            uiState.loginInputState.canConnectToPortal == true,
             enter = slideInHorizontally(
 
                 initialOffsetX = { fullHeight -> -fullHeight },
@@ -126,25 +123,25 @@ fun LoginPage(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 LoginEmailTextField(
-                    emailAddressInput = emailAddress,
+                    emailAddressInput = uiState.emailInput,
                     onChange = { input -> viewModel.onChangeEmail(input) },
-                    isError = loginInputState.isEmailValidated  != true,
+                    isError = uiState.loginInputState.isEmailValidated != true,
                     focusRequester = focusRequesterPassword,
                     passFocusTo = focusRequesterMail
                 )
                 LoginPasswordTextField(
-                    password = password,
+                    password = uiState.passwordInput,
                     onChange = { input ->
                         viewModel.onChangePassword(input)
                     },
                     passFocusTo = focusRequesterPassword,
-                    isError = loginInputState.isPasswordValidated != true
+                    isError = uiState.loginInputState.isPasswordValidated != true
                 )
 
-                if (loginInputState.twoFactorAuth == true) {
+                if (uiState.loginInputState.twoFactorAuth == true) {
                     Text(stringResource(R.string.please_input_code_from_google))
                     TextField(
-                        value = tfaGoogleInput,
+                        value = uiState.tfaGoogleInput.toString(),
                         onValueChange = viewModel::setTfaGoogleInput
                     )
                 }

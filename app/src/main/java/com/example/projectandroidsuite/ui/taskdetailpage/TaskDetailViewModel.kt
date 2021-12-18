@@ -18,11 +18,18 @@ import com.example.domain.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class TaskDetailScreenState(
+    val taskId: Int? = null,
+    val currentTask: Task? = null,
+    val taskAndMilestones: Map<Milestone?, List<Task>>? = emptyMap(),
+    val listFiles: List<File>? = emptyList(),
+    val listComments: List<Comment>? = null,
+    val taskDeletionStatus: Result<String, String>? = null
+)
 
 @HiltViewModel
 class TaskDetailViewModel @Inject constructor(
@@ -35,70 +42,55 @@ class TaskDetailViewModel @Inject constructor(
     private val deleteComment: DeleteComment
 ) : ViewModel() {
 
-    private var _taskId = MutableStateFlow<Int?>(null)
-    val taskId: StateFlow<Int?> = _taskId
-
-    private var _currentTask = MutableStateFlow<Task?>(null)
-    val currentTask: StateFlow<Task?> = _currentTask
-
-    private var _taskMilestone = MutableStateFlow<Milestone?>(null)
-    val taskMilestone: StateFlow<Milestone?> = _taskMilestone
-
-    private var _filesForTask = MutableStateFlow<List<File>?>(null)
-    val filesForTask: StateFlow<List<File>?> = _filesForTask
-
-    private var _listComments = MutableStateFlow<List<Comment>?>(null)
-    val listComments: StateFlow<List<Comment>?> = _listComments
-
-    private var _taskDeletionStatus = MutableStateFlow<Result<String, String>?>(null)
-    val taskDeletionStatus: StateFlow<Result<String, String>?> = _taskDeletionStatus
+    private val _uiState = MutableStateFlow(TaskDetailScreenState())
+    val uiState: StateFlow<TaskDetailScreenState> = _uiState.asStateFlow()
 
     fun setCurrentTask(taskId: Int) {
         Log.d("DetailViewModel", taskId.toString())
-        _taskId.value = taskId
+        _uiState.update { it.copy(taskId = taskId) }
         viewModelScope.launch {
-            getTaskById(taskId).collectLatest {
-                Log.d("DetailViewModel", it.toString())
-                _currentTask.value = it
+            getTaskById(taskId).collectLatest { task ->
+                _uiState.update { it.copy(currentTask = task) }
             }
         }
         viewModelScope.launch {
-            getCommentByTaskId(taskId).collectLatest {
-                _listComments.value = it
+            getCommentByTaskId(taskId).collectLatest { list->
+                _uiState.update { it.copy(listComments = list) }
             }
         }
         viewModelScope.launch {
-            getFilesByTaskId(taskId).collectLatest {
-                _filesForTask.value = it
+            getFilesByTaskId(taskId).collectLatest {list->
+                _uiState.update { it.copy(listFiles = list) }
             }
         }
     }
 
     fun deleteTask() {
         CoroutineScope(IO).launch {
-            _taskDeletionStatus.value = deleteTask(taskId.value)
+            val response = deleteTask(uiState.value.taskId)
+            _uiState.update { it.copy(taskDeletionStatus = response) }
         }
     }
 
     fun addCommentToTask(comment: Comment) {
         CoroutineScope(IO).launch {
-            putCommentToTask(taskId.value ?: 0, comment)
+            putCommentToTask(uiState.value.taskId ?: 0, comment)
         }
     }
 
     fun resetState() {
-        _taskDeletionStatus.value = null
+        _uiState.value = TaskDetailScreenState()
     }
 
     fun deleteComment(commentEntity: Comment) {
         CoroutineScope(IO).launch {
-            deleteComment(commentEntity.id, taskId.value)
+            deleteComment(commentEntity.id, uiState.value.taskId)
         }
     }
 
     fun changeTaskStatus() {
         viewModelScope.launch(IO) {
-            updateTaskStatus(taskId.value, currentTask.value?.status)
+            updateTaskStatus(uiState.value.taskId, uiState.value.currentTask?.status)
         }
     }
 }

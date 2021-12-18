@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.projectpage
+package com.example.projectandroidsuite.ui.mainscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,11 +26,7 @@ fun FilterProjects(
 ) {
     var showUserPicker by remember { mutableStateOf(false) }
 
-    val listUsersFlow by viewModel.users.collectAsState()
-    val userSearch by viewModel.userSearchProject.collectAsState()
-    val stage by viewModel.stageForFilteringProject.collectAsState()
-    val user by viewModel.userForFilteringProject.collectAsState()
-    val sorting by viewModel.projectSorting.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     Box(
         Modifier.semantics { contentDescription = "FilterProjects" }
@@ -51,17 +47,17 @@ fun FilterProjects(
                     ) {
                         CustomButton(
                             text = "Active",
-                            clicked = (stage == ProjectStatus.ACTIVE),
+                            clicked = (uiState.stageForFilteringProject == ProjectStatus.ACTIVE),
                             onClick = { viewModel.setStatusForFilteringProjects(ProjectStatus.ACTIVE) })
                         Spacer(Modifier.size(12.dp))
                         CustomButton(
                             text = "Paused",
-                            clicked = (stage == ProjectStatus.PAUSED),
+                            clicked = (uiState.stageForFilteringProject == ProjectStatus.PAUSED),
                             onClick = { viewModel.setStatusForFilteringProjects(ProjectStatus.PAUSED) })
                         Spacer(Modifier.size(12.dp))
                         CustomButton(
                             text = "Stopped",
-                            clicked = (stage == ProjectStatus.STOPPED),
+                            clicked = (uiState.stageForFilteringProject == ProjectStatus.STOPPED),
                             onClick = { viewModel.setStatusForFilteringProjects(ProjectStatus.STOPPED) }
                         )
                         Spacer(Modifier.size(24.dp))
@@ -72,7 +68,7 @@ fun FilterProjects(
                                 onClicked = { showUserPicker = true }
                             )
                             Spacer(Modifier.size(12.dp))
-                            user?.let { user -> CardTeamMember(user = user) }
+                            uiState.userForFilteringProject?.let { user -> CardTeamMember(user = user) }
                         }
 
                         Spacer(Modifier.size(24.dp))
@@ -100,13 +96,13 @@ fun FilterProjects(
                             Row() {
                                 CustomSortButton(
                                     ascending = true,
-                                    clicked = (sorting == ProjectSorting.CREATED_ASC)
+                                    clicked = (uiState.projectSorting == ProjectSorting.CREATED_ASC)
                                 ) { viewModel.setProjectSorting(ProjectSorting.CREATED_ASC) }
 
                                 Spacer(modifier = Modifier.width(12.dp))
                                 CustomSortButton(
                                     ascending = false,
-                                    clicked = (sorting == ProjectSorting.CREATED_DESC)
+                                    clicked = (uiState.projectSorting == ProjectSorting.CREATED_DESC)
                                 ) { viewModel.setProjectSorting(ProjectSorting.CREATED_DESC) }
                             }
                         }
@@ -121,13 +117,13 @@ fun FilterProjects(
                             Row() {
                                 CustomSortButton(
                                     ascending = true,
-                                    clicked = (sorting == ProjectSorting.STAGE_ASC)
+                                    clicked = (uiState.projectSorting == ProjectSorting.STAGE_ASC)
                                 ) { viewModel.setProjectSorting(ProjectSorting.STAGE_ASC) }
 
                                 Spacer(modifier = Modifier.width(12.dp))
                                 CustomSortButton(
                                     ascending = false,
-                                    clicked = (sorting == ProjectSorting.STAGE_DESC)
+                                    clicked = (uiState.projectSorting == ProjectSorting.STAGE_DESC)
                                 ) { viewModel.setProjectSorting(ProjectSorting.STAGE_DESC) }
                             }
                         }
@@ -137,13 +133,13 @@ fun FilterProjects(
         }
         if (showUserPicker) {
             TeamPickerDialog(
-                list = listUsersFlow,
+                list = uiState.users,
                 onSubmit = { },
                 onClick = { user -> viewModel.setUserForFilteringProjects(user = user) },
                 closeDialog = { showUserPicker = false },
                 pickerType = PickerType.SINGLE,
-                userSearch,
-                { query -> viewModel.setUserSearch(query) }
+                searchString = uiState.userSearchProject,
+                onSearchChanged = { query -> viewModel.setUserSearch(query) }
             )
         }
     }

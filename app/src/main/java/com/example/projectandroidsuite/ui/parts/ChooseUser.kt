@@ -15,7 +15,6 @@ fun ChooseUser(
     responsible: User?
 ) {
 
-
     Row(
         Modifier
             .padding(vertical = 12.dp)
@@ -29,6 +28,31 @@ fun ChooseUser(
                 Modifier.weight(4F)
             ) {
                 CardTeamMember(user = user)
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ChooseTeam(
+    onClick: () -> Unit,
+    team: List<User>?
+) {
+
+    Row(
+        Modifier
+            .padding(vertical = 12.dp)
+            .clickable { onClick() }) {
+        ButtonUsers(
+            singleUser = true,
+            onClicked = { onClick() }
+        )
+        team?.let { team ->
+            Row(
+                Modifier.weight(4F)
+            ) {
+                RowTeamMember(list = team)
             }
         }
     }

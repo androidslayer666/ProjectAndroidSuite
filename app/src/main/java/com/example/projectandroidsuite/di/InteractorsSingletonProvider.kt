@@ -7,10 +7,7 @@ import com.example.domain.interactor.comment.PutCommentToTask
 import com.example.domain.interactor.file.GetFilesByProjectId
 import com.example.domain.interactor.file.GetFilesByTaskId
 import com.example.domain.interactor.login.*
-import com.example.domain.interactor.message.CreateMessage
-import com.example.domain.interactor.message.DeleteMessage
-import com.example.domain.interactor.message.GetMessageByProjectId
-import com.example.domain.interactor.message.UpdateMessage
+import com.example.domain.interactor.message.*
 import com.example.domain.interactor.milestone.*
 import com.example.domain.interactor.project.CreateProject
 import com.example.domain.interactor.project.DeleteProject
@@ -24,10 +21,7 @@ import com.example.domain.interactorimpl.comment.PutCommentToTaskImpl
 import com.example.domain.interactorimpl.file.GetFilesByProjectIdImpl
 import com.example.domain.interactorimpl.file.GetFilesByTaskIdImpl
 import com.example.domain.interactorimpl.login.*
-import com.example.domain.interactorimpl.message.CreateMessageImpl
-import com.example.domain.interactorimpl.message.DeleteMessageImpl
-import com.example.domain.interactorimpl.message.GetMessageByProjectIdImpl
-import com.example.domain.interactorimpl.message.UpdateMessageImpl
+import com.example.domain.interactorimpl.message.*
 import com.example.domain.interactorimpl.milestone.*
 import com.example.domain.interactorimpl.project.CreateProjectImpl
 import com.example.domain.interactorimpl.project.DeleteProjectImpl
@@ -129,6 +123,12 @@ class InteractorsSingletonProvider {
     @Singleton
     fun provideGetMessageByProjectId(messageRepository: MessageRepository): GetMessageByProjectId {
         return GetMessageByProjectIdImpl(messageRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetMessageById(messageRepository: MessageRepository): GetMessageById {
+        return GetMessageByIdImpl(messageRepository)
     }
 
     @Provides

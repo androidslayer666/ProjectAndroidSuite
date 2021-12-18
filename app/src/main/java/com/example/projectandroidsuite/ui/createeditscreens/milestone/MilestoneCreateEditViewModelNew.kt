@@ -10,6 +10,7 @@ import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Milestone
 import com.example.domain.model.User
 import com.example.domain.utils.Result
+import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.utils.validation.MilestoneInputState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +22,7 @@ import javax.inject.Inject
 
 
 data class MilestoneCreateState(
+    val screenMode: ScreenMode = ScreenMode.CREATE,
     val title: String = "",
     val description: String = "",
     val priority: Boolean = false,
@@ -57,25 +59,25 @@ class MilestoneCreateEditViewModelNew @Inject constructor(
         }
     }
 
-
     fun setProjectId(projectId: Int) {
         this.projectId = projectId
     }
 
     fun setMilestone(milestoneId: Int) {
+        if(milestoneId >0 ) {
+            _uiState.update { it.copy(screenMode = ScreenMode.EDIT) }
+            this.milestoneId = milestoneId
 
-
-        viewModelScope.launch(IO) {
-            getMilestoneById(milestoneId).collectLatest { milestone ->
-//                Log.d("setMilestone", milestone.toString())
-                this@MilestoneCreateEditViewModelNew.milestoneId = milestone?.id
-                _uiState.value = MilestoneCreateState(
-                    title = milestone?.title ?: "",
-                    priority = milestone?.isKey ?: false,
-                    description = milestone?.description ?: "",
-                    endDate = milestone?.deadline ?: Date(),
-                    responsible = milestone?.responsible
-                )
+            viewModelScope.launch(IO) {
+                getMilestoneById(milestoneId).collectLatest { milestone ->
+                    _uiState.value = MilestoneCreateState(
+                        title = milestone?.title ?: "",
+                        priority = milestone?.isKey ?: false,
+                        description = milestone?.description ?: "",
+                        endDate = milestone?.deadline ?: Date(),
+                        responsible = milestone?.responsible
+                    )
+                }
             }
         }
     }

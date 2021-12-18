@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
+import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
 import com.example.projectandroidsuite.ui.parts.customitems.DescriptionInput
@@ -15,14 +16,14 @@ import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 
 @Composable
-fun CreateEditMilestoneScreen(
+fun MilestoneCreateEditScreen(
     viewModel: MilestoneCreateEditViewModelNew,
     projectId: Int?,
     milestoneId: Int?,
     navigateBack: () -> Unit
 ) {
 
-    Log.d("CreateMilestonePage", projectId.toString())
+    Log.d("CreateMilestonePage", milestoneId.toString())
 
     if (projectId != null) viewModel.setProjectId(projectId)
     if (milestoneId != null) viewModel.setMilestone(milestoneId)
@@ -44,11 +45,9 @@ fun CreateEditMilestoneScreen(
 
     when {
 
-
         uiState.milestoneInputState.isTitleEmpty == true -> LaunchedEffect(key1 = uiState.milestoneInputState) {
             makeToast("Please enter title", context)
         }
-
 
         uiState.milestoneInputState.isResponsibleEmpty == true -> LaunchedEffect(key1 = uiState.milestoneInputState) {
             makeToast("Please choose responsible", context)
@@ -61,13 +60,11 @@ fun CreateEditMilestoneScreen(
             }
         }
 
-
         uiState.milestoneInputState.serverResponse is Failure -> {
             LaunchedEffect(key1 = uiState.milestoneInputState) {
                 makeToast("Something went wrong with the server request", context)
             }
         }
-
 
         uiState.milestoneDeletionStatus is Success -> {
             LaunchedEffect(key1 = uiState.milestoneDeletionStatus) {
@@ -82,7 +79,6 @@ fun CreateEditMilestoneScreen(
 
     Box {
         Column {
-
 
             TitleInput(
                 text = uiState.title,
@@ -115,7 +111,10 @@ fun CreateEditMilestoneScreen(
                     onDismissRequest = { showDatePicker = !showDatePicker })
             }
             ButtonRow(
-                onSubmit = { if (milestoneId == 0) viewModel.createMilestone() else viewModel.updateMilestone() },
+                onSubmit = {
+                    if (uiState.screenMode == ScreenMode.CREATE) viewModel.createMilestone()
+                    else viewModel.updateMilestone()
+                },
                 onDismiss = navigateBack,
                 onDelete = { showDeleteDialog = true }
             )
@@ -125,29 +124,12 @@ fun CreateEditMilestoneScreen(
         if (showResponsiblePicker) {
             TeamPickerDialog(
                 list = uiState.users,
-                onSubmit = { },
-                onClick = { user ->
-                    run {
-                        viewModel.setResponsible(user)
-                        showResponsiblePicker = false
-                    }
-                },
-                closeDialog = { showResponsiblePicker = false },
-                pickerType = PickerType.SINGLE,
-                searchString = uiState.userSearchQuery,
-                onSearchChanged = { query -> viewModel.setUserSearch(query) }
-            )
-        }
-        if (showResponsiblePicker) {
-            TeamPickerDialog(
-                list = uiState.users,
                 onClick = { user -> viewModel.setResponsible(user) },
                 closeDialog = { showResponsiblePicker = !showResponsiblePicker },
                 pickerType = PickerType.SINGLE,
                 searchString = uiState.userSearchQuery,
                 onSearchChanged = { query -> viewModel.setUserSearch(query) }
             )
-
         }
         if (showDeleteDialog) {
             ConfirmationDialog(
@@ -158,6 +140,4 @@ fun CreateEditMilestoneScreen(
                 closeDialog = { showDeleteDialog = false })
         }
     }
-
-
 }

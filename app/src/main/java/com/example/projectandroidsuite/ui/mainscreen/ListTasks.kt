@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.projectpage
+package com.example.projectandroidsuite.ui.mainscreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.domain.filters.task.TaskStatus
 import com.example.domain.model.Task
+import com.example.domain.model.TaskPriority
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
 import java.text.SimpleDateFormat
@@ -32,9 +33,9 @@ fun TaskList(
     viewModel: TasksViewModel,
     navController: NavHostController
 ) {
-    val list by viewModel.tasks.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
-        items(list) { task ->
+        items(uiState.tasks) { task ->
             TaskItem(task) { id -> navController.navigate("task/$id") }
         }
     }
@@ -72,7 +73,7 @@ fun TaskItem(
             .clickable { onClick(task.id) }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.size(6.dp))
-                if (task.priority != null && task.priority == 1) {
+                if (task.priority != null && task.priority == TaskPriority.HIGH) {
                     Image(
                         painterResource(
                             R.drawable.ic_baseline_flag_24

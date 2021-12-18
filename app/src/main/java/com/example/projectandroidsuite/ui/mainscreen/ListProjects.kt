@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.projectpage
+package com.example.projectandroidsuite.ui.mainscreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,10 +28,10 @@ fun ProjectList(
     viewModel: ProjectsViewModel,
     navController: NavHostController
 ) {
-    val list by viewModel.projects.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
-        items(list) { project ->
+        items(uiState.projects) { project ->
             ProjectItem(project) { id -> navController.navigate("project/$id") }
         }
     }

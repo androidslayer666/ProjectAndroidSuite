@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -10,20 +9,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.domain.utils.Failure
-import com.example.domain.utils.Success
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.ConfirmationDialog
 import com.example.projectandroidsuite.ui.parts.DetailHeaderWrapper
 import com.example.projectandroidsuite.ui.parts.ListComments
 import com.example.projectandroidsuite.ui.parts.ListFiles
-import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
-import com.example.projectandroidsuite.ui.utils.makeToast
 
 
 @Composable
@@ -33,144 +26,102 @@ fun TaskDetailPage(
     navController: NavHostController
 ) {
 
+    val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(key1 = taskId) {
-        if (taskId != null && viewModel.taskId.value == null) {
+        if (taskId != null && uiState.taskId == null) {
             viewModel.setCurrentTask(taskId)
         }
     }
 
-    val context = LocalContext.current
+    var tabState by remember { mutableStateOf(0) }
 
-    var state by remember { mutableStateOf(0) }
-    val titles = listOf( "Subtasks","Comments", "Files" )
+    val navigation = TaskDetailPageNavigation( navController = navController, taskId)
 
-    var showUpdateTaskDialog by remember { mutableStateOf(false) }
-    var showCreateSubtaskDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
     var showUpdateStatusDialog by remember { mutableStateOf(false) }
-    var showUpdateTaskDialog by remember { mutableStateOf(false) }
-    var showCreateSubtaskDialog by remember { mutableStateOf(false) }
 
-    val task by viewModel.currentTask.collectAsState()
-    val comments by viewModel.listComments.collectAsState()
-    val files by viewModel.filesForTask.collectAsState()
-    val taskDeletionStatus by viewModel.taskDeletionStatus.collectAsState()
-    val taskMilestone by viewModel.taskMilestone.collectAsState()
+    Column {
+        Row {
+            Column(Modifier.weight(5F)) {
+                //Log.d("TaskDetailPage", uiState.currentTask.toString())
+                DetailHeaderWrapper(
+                    title = uiState.currentTask?.title,
+                    description = uiState.currentTask?.description,
+                    responsible = null,
+                    team = uiState.currentTask?.responsibles,
+                    endDate = uiState.currentTask?.deadline,
+                    taskStatus = uiState.currentTask?.status,
+                    project = uiState.currentTask?.projectOwner?.title,
+                    milestone = "",
+                    priority = uiState.currentTask?.priority,
+                    onEditClick = {
+                        if (uiState.currentTask?.canEdit == true) {
+                            navigation.navigateToTaskEditScreen()
+                        }
+                    },
+                    onStatusClicked = { showUpdateStatusDialog = true }
+                )
+            }
+        }
 
-
-
-    CustomScaffold(navController = navController, viewModel = hiltViewModel()) {
         Column {
-            Row {
-                Column(Modifier.weight(5F)) {
-                    Log.d("TaskDetailPage", task.toString())
-                    DetailHeaderWrapper(
-                        title = task?.title,
-                        description = task?.description,
-                        responsible = null,
-                        team = task?.responsibles,
-                        endDate = task?.deadline,
-                        taskStatus = task?.status,
-                        project = task?.projectOwner?.title,
-                        milestone = taskMilestone?.title,
-                        priority = task?.priority,
-                        onEditClick = {
-                            if (task?.canEdit == true) {
-                                showUpdateTaskDialog = true
-                            }
-                        },
-                        onStatusClicked = { showUpdateStatusDialog = true }
-                    )
-                }
+            TaskTabRow(
+                tabState = tabState,
+                setTabState = { int -> tabState = int }
+            ) {
+                navigation.navigateToSubtaskCreationScreen()
             }
+            when (tabState) {
+                0 -> ListSubtask(uiState.currentTask?.subtasks ?: listOf())
+                1 -> ListComments(
+                    listComments = uiState.listComments,
+                    onReplyClick = { comment -> viewModel.addCommentToTask(comment) },
+                    onDeleteClick = { comment -> viewModel.deleteComment(comment) })
+                2 -> ListFiles(listFiles = uiState.listFiles ?: listOf())
+            }
+        }
+    }
 
-            Column {
-                TabRow(selectedTabIndex = state) {
-                    titles.forEachIndexed { index, title ->
-                        Tab(
-                            modifier = Modifier
-                                .height(50.dp)
-                                .background(MaterialTheme.colors.primary),
-                            text = {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(title)
-                                    if (index == 0 && state == 0) IconButton(onClick = {
-                                        showCreateSubtaskDialog = true
-                                    }) {
-                                        Image(
-                                            painterResource(id = R.drawable.plus_circle_outline),
-                                            ""
-                                        )
-                                    }
-                                }
-                            },
-                            selected = state == index,
-                            onClick = { state = index }
-                        )
+    if (showUpdateStatusDialog) {
+        ConfirmationDialog(
+            text = "Do you want to change the task status?",
+            onSubmit = { viewModel.changeTaskStatus() },
+            closeDialog = { showUpdateStatusDialog = false })
+    }
+
+}
+
+@Composable
+fun TaskTabRow(
+    tabState: Int,
+    setTabState: (Int) -> Unit,
+    navigateToCreateSubtask: () -> Unit
+) {
+
+    val titles = listOf("Subtasks", "Comments", "Files")
+
+    TabRow(selectedTabIndex = tabState) {
+        titles.forEachIndexed { index, title ->
+            Tab(
+                modifier = Modifier
+                    .height(50.dp)
+                    .background(MaterialTheme.colors.primary),
+                text = {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(title)
+                        if (index == 0 && tabState == 0) IconButton(onClick = {
+                            navigateToCreateSubtask()
+                        }) {
+                            Image(
+                                painterResource(id = R.drawable.plus_circle_outline),
+                                ""
+                            )
+                        }
                     }
-                }
-                when (state) {
-                    0 -> ListSubtask(task?.subtasks ?: listOf())
-                    1 -> ListComments(
-                        listComments = comments,
-                        onReplyClick = { comment -> viewModel.addCommentToTask(comment) },
-                        onDeleteClick = { comment -> viewModel.deleteComment(comment) })
-                    2 -> ListFiles(listFiles = files?: listOf())
-                }
-            }
-        }
-
-        if (showUpdateTaskDialog) {
-            CreateUpdateTaskDialog(
-                viewModel = hiltViewModel(),
-                closeDialog = { showUpdateTaskDialog = false },
-                task = task,
-                onTaskDeletedOrEdited = { string -> makeToast(string, context) },
-                onDeleteClick = { if (task?.canDelete == true) showDeleteDialog = true }
-            )
-        }
-        if (taskDeletionStatus != null) {
-            when (taskDeletionStatus) {
-                is Success -> {
-                    //Log.d("delete task", taskDeletionStatus.toString())
-                    showDeleteDialog = false
-                    showUpdateTaskDialog = false
-                    makeToast((taskDeletionStatus as Success<String>).value, context)
-                    viewModel.resetState()
-                    navController.popBackStack()
-                }
-                is Failure -> {
-                    //Log.d("delete task", taskDeletionStatus.toString())
-                    makeToast((taskDeletionStatus as Failure<String>).reason, context)
-                }
-            }
-        }
-
-        if (showCreateSubtaskDialog) {
-            task?.id?.let {
-                CreateSubtaskDialog(
-                    taskId = it,
-                    viewModel = hiltViewModel(),
-                    closeDialog = { showCreateSubtaskDialog = false }) }
-        }
-
-        if (showDeleteDialog) {
-            ConfirmationDialog(
-                text = "Do you want to delete the task?",
-                onSubmit = {
-                    viewModel.deleteTask()
                 },
-                { showDeleteDialog = false })
-        }
-
-        if (showUpdateStatusDialog) {
-            ConfirmationDialog(
-                text = "Do you want to change the task status?",
-                onSubmit = { viewModel.changeTaskStatus()
-                    showUpdateStatusDialog = false},
-                { showUpdateStatusDialog = false })
+                selected = tabState == index,
+                onClick = { setTabState(index) }
+            )
         }
     }
 }
-
-
