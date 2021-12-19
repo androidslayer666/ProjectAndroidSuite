@@ -1,8 +1,8 @@
 package com.example.projectandroidsuite.ui.taskdetailpage
 
 import androidx.navigation.NavHostController
-import com.example.projectandroidsuite.ui.ProjectsScreens
-import com.example.projectandroidsuite.ui.navigateTo
+import com.example.projectandroidsuite.ui.navigation.ProjectsScreens
+import com.example.projectandroidsuite.ui.navigation.navigateTo
 
 class TaskDetailPageNavigation(
     private val navController: NavHostController,

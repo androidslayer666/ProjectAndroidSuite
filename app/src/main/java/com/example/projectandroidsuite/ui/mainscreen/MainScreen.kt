@@ -1,5 +1,6 @@
 package com.example.projectandroidsuite.ui.mainscreen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateIntOffsetAsState
@@ -29,22 +30,25 @@ import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.utils.BackPressedHandler
 import com.example.projectandroidsuite.ui.utils.SwipeDirections
 import com.example.projectandroidsuite.ui.utils.expandScrollingViewportWidthBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun ProjectsPage(
+fun MainScreen(
     navController: NavHostController
 ) {
 
-    var showFilters by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
-    var animateTo by remember { mutableStateOf(0) }
+    var showFilters by remember { mutableStateOf(false) }
 
     val swipeState = rememberSwipeableState(SwipeDirections.LEFT)
 
     var tabState by rememberSaveable { mutableStateOf(0) }
+
 
     val offset by animateIntOffsetAsState(
         targetValue = IntOffset(
@@ -69,18 +73,16 @@ fun ProjectsPage(
         ) {
 
             ProjectTabRow(
-                swipeState = swipeState.currentValue,
-                setAnimation = { int -> animateTo = int },
+                swipeState = swipeState,
                 tabState = tabState,
-                setTabState = { int -> tabState - int }
+                setTabState = { int -> tabState = int },
+                scope = coroutineScope
             )
 
             ListsTabs(
                 swipeState = swipeState,
                 width = width,
                 setWidth = { int -> width = int },
-                animateTo = animateTo,
-                discardAnimate = { animateTo = 0 },
                 offset = offset,
                 navController = navController
             )
@@ -166,18 +168,19 @@ fun FilterToggler(
 }
 
 
+@ExperimentalMaterialApi
 @Composable
 fun ProjectTabRow(
-    setAnimation: (Int) -> Unit,
-    swipeState: SwipeDirections,
+    swipeState: SwipeableState<SwipeDirections>,
     tabState: Int,
-    setTabState: (Int) -> Unit
+    setTabState: (Int) -> Unit,
+    scope: CoroutineScope
 ) {
 
     val titles = listOf("Projects", "Tasks")
 
     TabRow(
-        selectedTabIndex = if (swipeState == SwipeDirections.LEFT) 0 else 1
+        selectedTabIndex = if (swipeState.currentValue == SwipeDirections.LEFT) 0 else 1
     ) {
         titles.forEachIndexed { index, title ->
             Tab(
@@ -194,14 +197,15 @@ fun ProjectTabRow(
                         Text(title)
                     }
                 },
-                selected = if (index == 0) swipeState == SwipeDirections.LEFT
-                else swipeState == SwipeDirections.RIGHT,
+                selected = if (index == 0) swipeState.currentValue == SwipeDirections.LEFT
+                else swipeState.currentValue == SwipeDirections.RIGHT,
                 onClick = {
+                    Log.d("index", tabState.toString())
                     setTabState(index)
                     if (tabState == 0)
-                        setAnimation(1)
+                        scope.launch { swipeState.snapTo(SwipeDirections.RIGHT) }
                     if (tabState == 1)
-                        setAnimation(2)
+                        scope.launch { swipeState.snapTo(SwipeDirections.LEFT) }
                 }
             )
         }
@@ -214,22 +218,9 @@ fun ListsTabs(
     swipeState: SwipeableState<SwipeDirections>,
     width: Int,
     setWidth: (Int) -> Unit,
-    animateTo: Int,
-    discardAnimate: () -> Unit,
     offset: IntOffset,
     navController: NavHostController
 ) {
-
-    if (animateTo == 1)
-        LaunchedEffect(offset) {
-            swipeState.snapTo(SwipeDirections.LEFT)
-            discardAnimate()
-        }
-    if (animateTo == 2)
-        LaunchedEffect(offset) {
-            swipeState.snapTo(SwipeDirections.RIGHT)
-            discardAnimate()
-        }
 
     BoxWithConstraints(
         modifier = Modifier

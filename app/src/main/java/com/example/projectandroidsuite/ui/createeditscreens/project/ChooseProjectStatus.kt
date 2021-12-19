@@ -17,11 +17,7 @@ fun ChooseProjectStatus(
 
 ) {
     Row(Modifier.padding(vertical = 12.dp)) {
-//        Row(
-//            Modifier
-//                .weight(4F)
-//        )
-//        {
+
         CustomButton(
             text = "Active",
             clicked = (status == ProjectStatus.ACTIVE),

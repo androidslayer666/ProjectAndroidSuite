@@ -7,8 +7,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.ui.ProjectsScreens
-import com.example.projectandroidsuite.ui.navigateTo
+import com.example.projectandroidsuite.ui.navigation.ProjectsScreens
+import com.example.projectandroidsuite.ui.navigation.navigateTo
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
 

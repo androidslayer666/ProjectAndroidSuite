@@ -54,7 +54,7 @@ class LoginViewModel @Inject constructor(
             _uiState.update { it.copy(loginInputState = LoginInputState(canConnectToPortal = false)) }
         }
         if (isValidated) {
-            tryIfPortalExists(sequence.toString())
+            tryIfPortalExists()
         }
     }
 
@@ -63,78 +63,40 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onChangeEmail(sequence: CharSequence) {
-        _uiState.update {
-            it.copy(
-                loginInputState = it.loginInputState.copy(
-                    isEmailValidated = validateEmail(
-                        sequence.toString()
-                    )
-                )
-            )
-        }
+        updateInputState(LoginInputState(isEmailValidated = validateEmail(sequence.toString())))
         _uiState.update { it.copy(emailInput = sequence.toString()) }
     }
 
     fun onChangePassword(sequence: CharSequence) {
-        _uiState.update {
-            it.copy(
-                loginInputState = it.loginInputState.copy(
-                    isPasswordValidated = validatePassword(
-                        sequence.toString()
-                    )
-                )
-            )
-        }
+        updateInputState(LoginInputState(isPasswordValidated = validatePassword(sequence.toString())))
         _uiState.update { it.copy(passwordInput = sequence.toString()) }
 
     }
 
     fun setTfaGoogleInput(value: String) {
-        _uiState.update {
-            it.copy(
-                loginInputState = it.loginInputState.copy(
-                    isCodeValidated = validateCode(
-                        value
-                    )
-                )
-            )
-        }
+        updateInputState(LoginInputState(isCodeValidated = validateCode(value)))
         _uiState.update { it.copy(tfaGoogleInput = value.toIntOrNull()) }
     }
 
-    fun tryIfPortalExists(address: String) {
-        rememberPortalAddress(address)
+    fun tryIfPortalExists() {
+        rememberPortalAddress(uiState.value.portalAddress)
         viewModelScope.launch(IO) {
             //Log.d("authRepository", address)
-            val response = checkPortalPossibilities(address)
+            val response = checkPortalPossibilities(uiState.value.portalAddress)
             when (response) {
                 is Success -> {
                     Log.d("tryIfPortalExists", "success")
-                    _uiState.update {
-                        it.copy(
-                            loginInputState = it.loginInputState.copy(
-                                canConnectToPortal = true
-                            )
-                        )
-                    }
+                    updateInputState(LoginInputState(canConnectToPortal = true))
                 }
                 is Failure -> {
                     Log.d("tryIfPortalExists", "failure")
-                    _uiState.update {
-                        it.copy(
-                            loginInputState = it.loginInputState.copy(
-                                serverResponseError = response.reason
-                            )
-                        )
-                    }
+                    updateInputState(LoginInputState(serverResponseError = response.reason))
                 }
             }
         }
     }
 
-    fun authenticate(
-        onCompleteLogin: () -> Unit
-    ) {
+    fun authenticate() {
         if (uiState.value.loginInputState.readyToTryAuth()) {
             viewModelScope.launch {
                 rememberPortalAddress(uiState.value.portalAddress)
@@ -146,22 +108,95 @@ class LoginViewModel @Inject constructor(
                 )
                 when (response) {
                     is Success -> {
-                        if (response.value.token != null) {
-                            onCompleteLogin()
+                        if (response.value.token != null && response.value.tfa != true ) {
+                            updateInputState(LoginInputState(authenticationIsComplete = true))
+                        } else if (response.value.tfa == true ){
+                            updateInputState(LoginInputState(twoFactorAuth = true))
                         }
                     }
                     is Failure -> {
-                        _uiState.update {
-                            it.copy(
-                                loginInputState = it.loginInputState.copy(
-                                    serverResponseError = response.reason
-                                )
-                            )
-                        }
+                        updateInputState(LoginInputState(serverResponseError = response.reason))
                     }
                 }
             }
         }
     }
 
+    private fun updateInputState(inputState: LoginInputState) {
+        if (inputState.authenticationIsComplete != null) {
+            _uiState.update { screenState ->
+                screenState.copy(
+                    loginInputState = screenState.loginInputState.copy(
+                        authenticationIsComplete = inputState.authenticationIsComplete
+                    )
+                )
+            }
+        }
+        if (inputState.twoFactorAuth != null) {
+            _uiState.update { screenState ->
+                screenState.copy(
+                    loginInputState = screenState.loginInputState.copy(
+                        twoFactorAuth = inputState.twoFactorAuth
+                    )
+                )
+            }
+        }
+        if (inputState.canConnectToPortal != null){
+            _uiState.update { screenState ->
+                screenState.copy(
+                    loginInputState = screenState.loginInputState.copy(
+                        canConnectToPortal = inputState.canConnectToPortal
+                    )
+                )
+            }
+        }
+
+        if (inputState.isCodeValidated != null){
+            _uiState.update { screenState ->
+                screenState.copy(
+                    loginInputState = screenState.loginInputState.copy(
+                        isCodeValidated = inputState.isCodeValidated
+                    )
+                )
+            }
+        }
+        if (inputState.isEmailValidated != null) {
+            _uiState.update { screenState ->
+                screenState.copy(
+                    loginInputState = screenState.loginInputState.copy(
+                        isEmailValidated = inputState.isEmailValidated
+                    )
+                )
+            }
+        }
+        if (inputState.isPortalValidated != null) {
+            _uiState.update { screenState ->
+                screenState.copy(
+                    loginInputState = screenState.loginInputState.copy(
+                        isPortalValidated = inputState.isPortalValidated
+                    )
+                )
+            }
+        }
+
+        if (inputState.isPasswordValidated != null) {
+            _uiState.update { screenState ->
+                screenState.copy(
+                    loginInputState = screenState.loginInputState.copy(
+                        isPasswordValidated = inputState.isPasswordValidated
+                    )
+                )
+            }
+        }
+
+        if (inputState.serverResponseError != null) {
+            _uiState.update { screenState ->
+                screenState.copy(
+                    loginInputState = screenState.loginInputState.copy(
+                        serverResponseError = inputState.serverResponseError
+                    )
+                )
+            }
+        }
+    }
 }

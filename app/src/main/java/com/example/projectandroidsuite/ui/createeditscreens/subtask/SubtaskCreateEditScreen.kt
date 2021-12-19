@@ -17,8 +17,6 @@ fun SubtaskCreateEditScreen(
     viewModel: SubtaskCreateEditViewModel,
     taskId: Int?,
     navigateBack: () -> Unit
-
-
 ) {
 
 

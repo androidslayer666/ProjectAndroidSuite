@@ -7,7 +7,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.domain.di.DatabaseProvider
 import com.example.projectandroidsuite.MainActivity
 import com.example.projectandroidsuite.newui.ProjectTheme
-import com.example.projectandroidsuite.newui.utils.ComposeTestDescriptions
+import com.example.projectandroidsuite.ui.utils.ComposeTestDescriptions
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules

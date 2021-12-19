@@ -30,9 +30,11 @@ fun ProjectList(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val navigation = MainScreenNavigation(navController)
+
     LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
         items(uiState.projects) { project ->
-            ProjectItem(project) { id -> navController.navigate("project/$id") }
+            ProjectItem(project) { id -> navigation.navigateToProjectDetails(id) }
         }
     }
 }
@@ -75,14 +77,12 @@ fun ProjectItem(project: Project, onClick: (projectId: Int) -> Unit) {
                 .fillMaxSize()
                 .clickable { onClick(project.id) }) {
             Spacer(Modifier.size(6.dp))
-            project.title.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.body1,
-                    maxLines = 1,
-                    overflow = TextOverflow.Clip,
-                )
-            }
+            Text(
+                text = project.title,
+                style = MaterialTheme.typography.body1,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
+            )
             if (responsibleString != null) {
                 Text(
                     text = responsibleString,

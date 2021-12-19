@@ -1,7 +1,5 @@
 package com.example.projectandroidsuite.ui.utils.validation
 
-import com.example.domain.utils.Result
-
 data class LoginInputState (
         val isPortalValidated: Boolean? = null,
         val isEmailValidated: Boolean? = null,
@@ -9,7 +7,8 @@ data class LoginInputState (
         val isCodeValidated: Boolean? = true,
         val canConnectToPortal: Boolean? = null,
         val twoFactorAuth: Boolean? = null,
-        val serverResponseError: String? = null
+        val serverResponseError: String? = null,
+        val authenticationIsComplete: Boolean? = null
     ) {
         fun readyToTryAuth(): Boolean {
                 return isPortalValidated == true

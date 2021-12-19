@@ -18,7 +18,7 @@ import org.junit.Test
 
 @HiltAndroidTest
 @UninstallModules(DatabaseProvider::class)
-class ProjectsPageKtTest{
+class MainScreenKtTest{
 
     @get:Rule(order =0)
     val hiltRule = HiltAndroidRule(this)
@@ -32,7 +32,7 @@ class ProjectsPageKtTest{
         composeRule.setContent {
             val navController = rememberNavController()
             ProjectTheme{
-                ProjectsPage(navController = navController)
+                MainScreen(navController = navController)
             }
         }
     }

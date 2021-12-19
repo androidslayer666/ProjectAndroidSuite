@@ -33,10 +33,14 @@ fun TaskList(
     viewModel: TasksViewModel,
     navController: NavHostController
 ) {
+
     val uiState by viewModel.uiState.collectAsState()
+
+    val navigation = MainScreenNavigation(navController)
+
     LazyColumn(Modifier.background(MaterialTheme.colors.background)) {
         items(uiState.tasks) { task ->
-            TaskItem(task) { id -> navController.navigate("task/$id") }
+            TaskItem(task) { id -> navigation.navigateToTaskDetails(id) }
         }
     }
 }

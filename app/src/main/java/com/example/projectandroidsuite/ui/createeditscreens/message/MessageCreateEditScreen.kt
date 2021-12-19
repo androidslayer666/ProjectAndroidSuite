@@ -24,9 +24,6 @@ fun MessageCreateEditScreen(
     navigateBack: () -> Unit
 ) {
 
-    if (projectId != null) viewModel.setProjectId(projectId)
-    if (messageId != null) viewModel.setMessage(messageId)
-
     LaunchedEffect(key1 = projectId) {
         if (projectId != null) viewModel.setProjectId(projectId)
     }
@@ -68,7 +65,6 @@ fun MessageCreateEditScreen(
                 makeToast("Message deleted successfully", context)
                 navigateBack()
             }
-
         }
     }
 
@@ -98,21 +94,20 @@ fun MessageCreateEditScreen(
             )
 
         }
+
         if (showDeleteDialog) {
             ConfirmationDialog(
                 text = "Do you want to delete the message?",
                 onSubmit = { viewModel.deleteMessage() },
-                closeDialog = { showDeleteDialog = false }
-            )
+                { showDeleteDialog = false })
         }
 
+        uiState.users?.let {
             if (showTeamPicker) {
                 TeamPickerDialog(
-                    list = uiState.users,
+                    list = it,
                     onSubmit = { viewModel.updateChosenUsers() },
-                    onClick = { user ->
-                        viewModel.addOrRemoveUser(user)
-                    },
+                    onClick = { user -> viewModel.addOrRemoveUser(user) },
                     closeDialog = { showTeamPicker = false },
                     pickerType = PickerType.MULTIPLE,
                     searchString = uiState.userSearchQuery,
@@ -120,27 +115,6 @@ fun MessageCreateEditScreen(
                 )
             }
         }
-
-        if (showDeleteDialog) {
-            ConfirmationDialog(
-                text = "Do you want to delete the message?",
-                onSubmit = {
-                    viewModel.deleteMessage()
-                },
-                { showDeleteDialog = false })
-            uiState.users?.let {
-                if (showTeamPicker) {
-                    TeamPickerDialog(
-                        list = it,
-                        onSubmit = { viewModel.updateChosenUsers() },
-                        onClick = { user -> viewModel.addOrRemoveUser(user) },
-                        closeDialog = { showTeamPicker = false },
-                        pickerType = PickerType.MULTIPLE,
-                        searchString = uiState.userSearchQuery,
-                        onSearchChanged = { query -> viewModel.setUserSearch(query) }
-                    )
-                }
-            }
-        }
     }
+}
 

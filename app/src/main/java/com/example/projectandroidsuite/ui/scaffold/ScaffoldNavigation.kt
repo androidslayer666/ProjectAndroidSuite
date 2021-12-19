@@ -1,8 +1,8 @@
 package com.example.projectandroidsuite.ui.scaffold
 
 import androidx.navigation.NavHostController
-import com.example.projectandroidsuite.ui.ProjectsScreens
-import com.example.projectandroidsuite.ui.navigateTo
+import com.example.projectandroidsuite.ui.navigation.ProjectsScreens
+import com.example.projectandroidsuite.ui.navigation.navigateTo
 
 class ScaffoldNavigation(
     private val navController: NavHostController
@@ -17,6 +17,16 @@ class ScaffoldNavigation(
         navController = navController,
         screen = ProjectsScreens.CreateEditTask,
         0
+    )
+
+    fun navigateToSearch() = navigateTo(
+        navController = navController,
+        screen = ProjectsScreens.Search
+    )
+
+    fun navigateToLogin() = navigateTo(
+        navController = navController,
+        screen = ProjectsScreens.Login
     )
 
 }

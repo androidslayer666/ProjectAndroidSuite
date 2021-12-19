@@ -18,11 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.ui.ProjectsScreens
-import com.example.projectandroidsuite.ui.search.SearchDialog
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -31,7 +28,6 @@ fun CustomScaffold(
     viewModel: ScaffoldViewModel,
     content: @Composable () -> Unit,
 ) {
-    var showSearch by remember { mutableStateOf(false) }
     var showFabOptions by remember { mutableStateOf(false) }
     var showUserOptions by remember { mutableStateOf(false) }
 
@@ -87,7 +83,7 @@ fun CustomScaffold(
                         Image(
                             painterResource(R.drawable.ic_baseline_search_24), "",
                             modifier = Modifier
-                                .clickable { showSearch = true }
+                                .clickable { navigation.navigateToSearch() }
                                 .height(50.dp)
                                 .padding(start = 12.dp, end = 12.dp)
                                 .weight(2F)
@@ -146,18 +142,11 @@ fun CustomScaffold(
                 }
             }
 
-            if (showSearch) {
-                SearchDialog(
-                    viewModel = hiltViewModel(),
-                    closeDialog = { showSearch = false },
-                    navController = navController
-                )
-            }
             if (showUserOptions) {
                 Button(modifier =
                 Modifier.padding(start = 200.dp, top = 50.dp), onClick = {
                     viewModel.logOut()
-                    navController.navigate(ProjectsScreens.Login.name)
+                    navigation.navigateToLogin()
 
                 }) {
                     Text("Log Out")

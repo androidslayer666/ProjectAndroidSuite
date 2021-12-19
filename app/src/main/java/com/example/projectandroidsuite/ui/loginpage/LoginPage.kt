@@ -1,24 +1,25 @@
 package com.example.projectandroidsuite.ui.loginpage
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
+import android.util.Log
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.ui.ProjectsScreens
 import com.example.projectandroidsuite.ui.utils.makeToast
+import com.example.projectandroidsuite.ui.utils.validation.LoginInputState
 
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
@@ -29,14 +30,25 @@ fun LoginPage(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val navigation = LoginScreenNavigation(navController)
+
     //Log.d("LoginPage", uiState.toString())
 
+    var currentTab by remember { mutableStateOf(LoginPages.PORTAL) }
+
     val (focusRequesterMail, focusRequesterPassword) = FocusRequester.createRefs()
-    val titles =
-        listOf(stringResource(R.string.cloud_portal), stringResource(R.string.local_portal))
 
     uiState.loginInputState.serverResponseError?.let {
         makeToast(it, LocalContext.current)
+    }
+    LaunchedEffect(key1 = uiState.loginInputState) {
+        Log.d("LoginPage", uiState.loginInputState.toString())
+        if (uiState.loginInputState.canConnectToPortal == true)
+            currentTab = LoginPages.CREDENTIALS
+        if (uiState.loginInputState.twoFactorAuth == true)
+            currentTab = LoginPages.CODE
+        if (uiState.loginInputState.authenticationIsComplete == true)
+            navigation.navigateToMainScreen()
     }
 
     Column(
@@ -45,83 +57,21 @@ fun LoginPage(
             .fillMaxSize()
             .background(MaterialTheme.colors.primary)
     ) {
-        AnimatedVisibility(
-            uiState.loginInputState.isPortalValidated != true,
-            enter = slideInVertically(
 
-                initialOffsetY = { fullHeight -> -fullHeight },
-                animationSpec = tween(durationMillis = 400)
-            ),
-            exit = slideOutVertically(
-                targetOffsetY = { fullHeight -> -fullHeight },
-                animationSpec = tween(durationMillis = 400)
-            )
-        ) {
-            LoginTextGreeting()
-        }
+        when (currentTab) {
+            LoginPages.PORTAL -> {
+                LoginTextGreeting()
 
-        Spacer(modifier = Modifier.size(12.dp))
-        Row {
-            TabRow(
-                selectedTabIndex = if (uiState.portalIsInCloud) 0 else 1,
-                modifier = Modifier.size(width = 300.dp, height = 50.dp)
-            ) {
-                titles.forEachIndexed { index, title ->
-                    Tab(
-                        text = { Text(title) },
-                        selected = if (index == 0) uiState.portalIsInCloud else !uiState.portalIsInCloud,
-                        onClick = { viewModel.setPortalIsInCloud(if (index == 0) uiState.portalIsInCloud else !uiState.portalIsInCloud) }
-                    )
-                }
-            }
-        }
-        Spacer(modifier = Modifier.size(12.dp))
-
-        TextField(
-            value = uiState.portalAddress,
-            onValueChange = { input ->
-                viewModel.onChangePortalAddress(input)
-            },
-            singleLine = true,
-            modifier = Modifier
-                .defaultMinSize(minWidth = 300.dp)
-                .padding(bottom = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colors.background,
-                textColor = MaterialTheme.colors.onBackground
-            ),
-            isError = uiState.loginInputState.isPortalValidated != true && uiState.portalAddress.isNotEmpty()
-        )
-        if (uiState.loginInputState.isPortalValidated != true) {
-            if (uiState.portalIsInCloud) {
-                Text(
-                    text = stringResource(R.string.input_your_portal_address_in_a_format),
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onPrimary,
-                    modifier = Modifier
-                        .padding(start = 50.dp, end = 50.dp)
-                        .align(Alignment.CenterHorizontally)
+                PortalAddressInput(
+                    uiState = uiState,
+                    onChangeInput = { input ->
+                        viewModel.onChangePortalAddress(input)
+                    },
+                    changeTab = { boolean -> viewModel.setPortalIsInCloud(boolean) },
+                    onClickConnect = { viewModel.tryIfPortalExists() }
                 )
-            } else {
-                Button(onClick = { viewModel.tryIfPortalExists(uiState.portalAddress) }) {
-                    Text(stringResource(R.string.connect))
-                }
             }
-        }
-
-        AnimatedVisibility(
-            uiState.loginInputState.canConnectToPortal == true,
-            enter = slideInHorizontally(
-
-                initialOffsetX = { fullHeight -> -fullHeight },
-                animationSpec = tween(durationMillis = 400)
-            ),
-            exit = slideOutHorizontally(
-                targetOffsetX = { fullHeight -> -fullHeight },
-                animationSpec = tween(durationMillis = 400)
-            )
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            LoginPages.CREDENTIALS -> {
                 LoginEmailTextField(
                     emailAddressInput = uiState.emailInput,
                     onChange = { input -> viewModel.onChangeEmail(input) },
@@ -138,27 +88,45 @@ fun LoginPage(
                     isError = uiState.loginInputState.isPasswordValidated != true
                 )
 
-                if (uiState.loginInputState.twoFactorAuth == true) {
-                    Text(stringResource(R.string.please_input_code_from_google))
-                    TextField(
-                        value = uiState.tfaGoogleInput.toString(),
-                        onValueChange = viewModel::setTfaGoogleInput
-                    )
+                Button(onClick = { viewModel.authenticate() }) {
+                    Text(text = stringResource(R.string.log_in))
                 }
 
-                Button(onClick = {
-                    viewModel.authenticate(onCompleteLogin = {
-                        navController.navigate(
-                            ProjectsScreens.Projects.name
-                        )
-                    })
-                    //Log.d("authenticated", viewModel.authenticated.value.toString())
-                }) {
+            }
+
+            LoginPages.CODE -> {
+                Text(stringResource(R.string.please_input_code_from_google))
+                TextField(
+                    value = uiState.tfaGoogleInput.toString(),
+                    onValueChange = viewModel::setTfaGoogleInput
+                )
+
+                Button(onClick = { viewModel.authenticate() }) {
                     Text(text = stringResource(R.string.log_in))
                 }
             }
         }
+
+        LoginButtonNavigationRow(
+            selectedTab = currentTab,
+            setPage = { page ->
+                changePageResolver(
+                    loginInputState = uiState.loginInputState,
+                    newPage = page,
+                    setPage = { newPage -> currentTab = newPage })
+
+            })
     }
 }
 
-
+fun changePageResolver(
+    loginInputState: LoginInputState,
+    newPage: LoginPages,
+    setPage: (LoginPages) -> Unit
+) {
+    when (newPage) {
+        LoginPages.PORTAL -> setPage(newPage)
+        LoginPages.CREDENTIALS -> if (loginInputState.canConnectToPortal == true) setPage(newPage)
+        LoginPages.CODE -> if (loginInputState.twoFactorAuth == true) setPage(newPage)
+    }
+}
