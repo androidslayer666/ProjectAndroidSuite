@@ -7,8 +7,8 @@ import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.parts.ChooseUser
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.TitleInput
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
-import com.example.projectandroidsuite.ui.parts.customitems.TitleInput
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 
@@ -67,7 +67,7 @@ fun SubtaskCreateEditScreen(
         if (showResponsiblePicker) {
             TeamPickerDialog(
                 list = uiState.users,
-                onSubmit = { },
+                //onSubmit = { },
                 onClick = { user -> viewModel.setResponsible(user) },
                 closeDialog = { showResponsiblePicker = false },
                 pickerType = PickerType.SINGLE,

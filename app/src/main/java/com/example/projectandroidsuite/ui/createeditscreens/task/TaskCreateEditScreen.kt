@@ -8,8 +8,7 @@ import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
-import com.example.projectandroidsuite.ui.parts.customitems.DescriptionInput
-import com.example.projectandroidsuite.ui.parts.customitems.TitleInput
+import com.example.projectandroidsuite.ui.taskdetailpage.ProjectPickerDialog
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 
@@ -138,7 +137,7 @@ fun TaskCreateEditScreen(
         if (showTeamPicker) {
             TeamPickerDialog(
                 list = listUsersFlow,
-                onSubmit = { showTeamPicker = false },
+                //onSubmit = { showTeamPicker = false },
                 onClick = { user -> viewModel.addOrRemoveUser(user) },
                 closeDialog = { showTeamPicker = false },
                 pickerType = PickerType.MULTIPLE,

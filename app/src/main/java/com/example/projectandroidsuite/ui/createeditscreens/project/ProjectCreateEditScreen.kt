@@ -6,13 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
-import com.example.projectandroidsuite.ui.parts.ChooseTeam
-import com.example.projectandroidsuite.ui.parts.ChooseUser
-import com.example.projectandroidsuite.ui.parts.ConfirmationDialog
-import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
-import com.example.projectandroidsuite.ui.parts.customitems.DescriptionInput
-import com.example.projectandroidsuite.ui.parts.customitems.TitleInput
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 
@@ -105,7 +100,7 @@ fun ProjectCreateEditScreen(
         if (showResponsiblePicker) {
             TeamPickerDialog(
                 list = uiState.users,
-                onSubmit = { },
+                //onSubmit = { },
                 onClick = { user ->
                     run {
                         viewModel.setResponsible(user)
@@ -121,7 +116,7 @@ fun ProjectCreateEditScreen(
         if (showTeamPicker) {
             TeamPickerDialog(
                 list = uiState.users,
-                onSubmit = { viewModel.updateChosenUsers() },
+                //onSubmit = { viewModel.updateChosenUsers() },
                 onClick = { user ->
                     viewModel.addOrRemoveUser(user)
                 },

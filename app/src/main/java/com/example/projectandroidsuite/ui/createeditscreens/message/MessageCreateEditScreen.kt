@@ -10,8 +10,6 @@ import com.example.projectandroidsuite.ui.parts.ChooseTeam
 import com.example.projectandroidsuite.ui.parts.ConfirmationDialog
 import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
-import com.example.projectandroidsuite.ui.parts.customitems.DescriptionInput
-import com.example.projectandroidsuite.ui.parts.customitems.TitleInput
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
 
@@ -72,15 +70,15 @@ fun MessageCreateEditScreen(
     Box {
         Column {
 
-            TitleInput(
-                text = uiState.title,
-                onInputChange = { text -> viewModel.setTitle(text) }
-            )
-
-            DescriptionInput(
-                text = uiState.content,
-                onInputChange = { text -> viewModel.setContent(text) }
-            )
+//            TitleInput(
+//                text = uiState.title,
+//                onInputChange = { text -> viewModel.setTitle(text) }
+//            )
+//
+//            DescriptionInput(
+//                text = uiState.content,
+//                onInputChange = { text -> viewModel.setContent(text) }
+//            )
 
             ChooseTeam(
                 team = uiState.chosenUserList,
@@ -106,7 +104,7 @@ fun MessageCreateEditScreen(
             if (showTeamPicker) {
                 TeamPickerDialog(
                     list = it,
-                    onSubmit = { viewModel.updateChosenUsers() },
+                    //onSubmit = { viewModel.updateChosenUsers() },
                     onClick = { user -> viewModel.addOrRemoveUser(user) },
                     closeDialog = { showTeamPicker = false },
                     pickerType = PickerType.MULTIPLE,

@@ -69,7 +69,7 @@ fun FilterProjects(
         if (showUserPicker) {
             TeamPickerDialog(
                 list = uiState.users,
-                onSubmit = { },
+                //onSubmit = { },
                 onClick = { user -> viewModel.setUserForFilteringProjects(user = user) },
                 closeDialog = { showUserPicker = false },
                 pickerType = PickerType.SINGLE,

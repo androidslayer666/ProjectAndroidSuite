@@ -24,8 +24,8 @@ import com.example.projectandroidsuite.ui.utils.PickerType
 
 @Composable
 fun TeamPickerDialog(
-    list: List<User>,
-    onSubmit: () -> Unit,
+    list: List<User>?,
+    //onSubmit: () -> Unit,
     onClick: (user: User) -> Unit,
     closeDialog: () -> Unit,
     pickerType: PickerType,
@@ -40,9 +40,11 @@ fun TeamPickerDialog(
             PickerType.SINGLE -> stringResource(R.string.choose_responsible)
             PickerType.MULTIPLE -> stringResource(R.string.choose_team)
         },
-        onSubmit = { onSubmit() }) {
+        onSubmit = {
+//            onSubmit()
+        }) {
         TeamPickerBody(
-            list = list, { user -> onClick(user) }, pickerType,
+            list = list?:listOf(), { user -> onClick(user) }, pickerType,
             searchString, onSearchChanged, closeDialog
         )
     }

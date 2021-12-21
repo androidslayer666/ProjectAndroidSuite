@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.taskdetailpage
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -20,7 +20,7 @@ import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 
 @Composable
 fun ProjectPickerDialog(
-    list: List<Project>,
+    list: List<Project>?,
     onSubmit: () -> Unit,
     onClick: (user: Project) -> Unit,
     closeDialog: () -> Unit,
@@ -38,7 +38,7 @@ fun ProjectPickerDialog(
         showButtons = false,
     ) {
         ProjectPickerBody(
-            list = list, { project -> onClick(project)
+            list = list?:listOf(), { project -> onClick(project)
                 closeDialog()
                          }, ifChooseResponsibleOrTeam,
             searchString, onSearchChanged, problemWithFetchingProjects

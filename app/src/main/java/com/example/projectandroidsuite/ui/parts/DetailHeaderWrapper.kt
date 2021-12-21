@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.domain.filters.project.ProjectStatus
 import com.example.domain.filters.task.TaskStatus
+import com.example.domain.model.TaskPriority
 import com.example.domain.model.User
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.customitems.TitleOverflowedText
@@ -31,7 +32,7 @@ fun DetailHeaderWrapper(
     projectStatus: ProjectStatus? = null,
     project: String? = null,
     milestone: String? = null,
-    priority: Int? = null,
+    priority: TaskPriority? = null,
     onEditClick: (()-> Unit)? = null,
     onStatusClicked: (()-> Unit)? = null
 ) {
@@ -80,7 +81,7 @@ fun DetailHeaderWrapper(
                 }
 
                 Row(Modifier.weight(5F), verticalAlignment = Alignment.CenterVertically) {
-                    if (priority != null && priority == 1) {
+                    if (priority != null && priority == TaskPriority.HIGH) {
                         Image(
                             painterResource(
                                 R.drawable.ic_baseline_flag_24
