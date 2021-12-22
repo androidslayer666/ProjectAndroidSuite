@@ -19,10 +19,10 @@ fun SubtaskCreateEditScreen(
     navigateBack: () -> Unit
 ) {
 
+    if (taskId != null) LaunchedEffect( key1 = taskId) { viewModel.setTaskId(newTaskId = taskId) }
 
     val context = LocalContext.current
 
-    var showTeamPicker by remember { mutableStateOf(false) }
     var showResponsiblePicker by remember { mutableStateOf(false) }
 
     val uiState by viewModel.uiState.collectAsState()
@@ -63,18 +63,17 @@ fun SubtaskCreateEditScreen(
         )
     }
 
-    if (showTeamPicker) {
-        if (showResponsiblePicker) {
-            TeamPickerDialog(
-                list = uiState.users,
-                //onSubmit = { },
-                onClick = { user -> viewModel.setResponsible(user) },
-                closeDialog = { showResponsiblePicker = false },
-                pickerType = PickerType.SINGLE,
-                searchString = uiState.userSearchQuery,
-                onSearchChanged = { query -> viewModel.setUserSearch(query) }
-            )
-        }
+    if (showResponsiblePicker) {
+        TeamPickerDialog(
+            list = uiState.users,
+            //onSubmit = { },
+            onClick = { user -> viewModel.setResponsible(user) },
+            closeDialog = { showResponsiblePicker = false },
+            pickerType = PickerType.SINGLE,
+            searchString = uiState.userSearchQuery,
+            onSearchChanged = { query -> viewModel.setUserSearch(query) }
+        )
     }
+
 }
 

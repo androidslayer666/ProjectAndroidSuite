@@ -64,8 +64,7 @@ class MilestoneCreateEditViewModelNew @Inject constructor(
     }
 
     fun setMilestone(milestoneId: Int) {
-        if(milestoneId >0 ) {
-            _uiState.update { it.copy(screenMode = ScreenMode.EDIT) }
+        if(milestoneId > 0 ) {
             this.milestoneId = milestoneId
 
             viewModelScope.launch(IO) {
@@ -75,7 +74,8 @@ class MilestoneCreateEditViewModelNew @Inject constructor(
                         priority = milestone?.isKey ?: false,
                         description = milestone?.description ?: "",
                         endDate = milestone?.deadline ?: Date(),
-                        responsible = milestone?.responsible
+                        responsible = milestone?.responsible,
+                        screenMode = ScreenMode.EDIT
                     )
                 }
             }
@@ -118,36 +118,39 @@ class MilestoneCreateEditViewModelNew @Inject constructor(
     }
 
     fun createMilestone() {
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = putMilestoneToProject(
+                    projectId ?: 0,
 
-        viewModelScope.launch(IO) {
-            val response = putMilestoneToProject(
-                projectId ?: 0,
-
-                constructMilestone()
-            )
-
-            _uiState.update {
-                it.copy(
-                    milestoneInputState = it.milestoneInputState.copy(
-                        serverResponse = response
-                    )
+                    constructMilestone()
                 )
+
+                _uiState.update {
+                    it.copy(
+                        milestoneInputState = it.milestoneInputState.copy(
+                            serverResponse = response
+                        )
+                    )
+                }
             }
         }
     }
 
     fun updateMilestone() {
-        viewModelScope.launch(IO) {
-            val response = updateMilestone(
-                projectId ?: 0,
-                constructMilestone()
-            )
-            _uiState.update {
-                it.copy(
-                    milestoneInputState = it.milestoneInputState.copy(
-                        serverResponse = response
-                    )
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = updateMilestone(
+                    projectId ?: 0,
+                    constructMilestone()
                 )
+                _uiState.update {
+                    it.copy(
+                        milestoneInputState = it.milestoneInputState.copy(
+                            serverResponse = response
+                        )
+                    )
+                }
             }
         }
     }

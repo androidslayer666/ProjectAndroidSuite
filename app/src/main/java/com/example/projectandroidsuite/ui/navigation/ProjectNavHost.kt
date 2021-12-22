@@ -21,6 +21,7 @@ import com.example.projectandroidsuite.ui.navigation.ArgumentLists.subtaskList
 import com.example.projectandroidsuite.ui.navigation.ArgumentLists.taskDetailList
 import com.example.projectandroidsuite.ui.navigation.ArgumentLists.taskList
 import com.example.projectandroidsuite.ui.navigation.ArgumentStrings.idString
+import com.example.projectandroidsuite.ui.navigation.ArgumentStrings.messageId
 import com.example.projectandroidsuite.ui.navigation.ArgumentStrings.messageString
 import com.example.projectandroidsuite.ui.navigation.ArgumentStrings.milestoneId
 import com.example.projectandroidsuite.ui.navigation.ArgumentStrings.milestoneString
@@ -99,7 +100,7 @@ fun ProjectNavHost(
             arguments = messageList,
         ) { entry ->
             MessageCreateEditScreen(
-                messageId = entry.arguments?.getInt(milestoneId),
+                messageId = entry.arguments?.getInt(messageId),
                 projectId = entry.arguments?.getInt(projectId),
                 viewModel = hiltViewModel(),
                 navigateBack = { navController.popBackStack() }

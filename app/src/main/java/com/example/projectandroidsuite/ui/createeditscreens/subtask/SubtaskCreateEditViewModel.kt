@@ -47,24 +47,18 @@ class SubtaskCreateEditViewModel @Inject constructor(
         getAllUsers.setFilter(query)
     }
 
-    fun setSubtask(subtask: Subtask) {
-        //Log.d("setTask", task.toString())
-        taskId = subtask.id
 
+    fun setTitle(text: String) {
+        _uiState.update { it.copy(title = text) }
+        if (text.isNotEmpty())
+            _uiState.update {
+                it.copy(subtaskInputState = it.subtaskInputState.copy(isTitleEmpty = false))
+            }
     }
 
-    fun setTitle(string: String) {
-        fun setTitle(text: String) {
-            _uiState.update { it.copy(title = text) }
-            if (text.isNotEmpty())
-                _uiState.update {
-                    it.copy(subtaskInputState = it.subtaskInputState.copy(isTitleEmpty = false))
-                }
-        }
-    }
 
-    fun setTaskId(taskId: Int) {
-
+    fun setTaskId(newTaskId: Int) {
+        taskId = newTaskId
     }
 
     fun setResponsible(user: User) {
@@ -81,23 +75,23 @@ class SubtaskCreateEditViewModel @Inject constructor(
     }
 
     fun createSubtask() {
-        viewModelScope.launch(IO) {
-            val response = createSubtask(
-                Subtask(
-                    id = 0,
-                    title = uiState.value.title ?: "",
-                    responsible = uiState.value.responsible,
-                    taskId = taskId ?: 0
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = createSubtask(
+                    Subtask(
+                        id = 0,
+                        title = uiState.value.title ?: "",
+                        responsible = uiState.value.responsible,
+                        taskId = taskId ?: 0
+                    )
                 )
-            )
-            _uiState.update { it.copy(subtaskInputState = SubtaskInputState(serverResponse = response)) }
+                _uiState.update { it.copy(subtaskInputState = SubtaskInputState(serverResponse = response)) }
+            }
         }
     }
 
 
     private fun validateInput(onSuccess: () -> Unit) {
-
-
         when {
             _uiState.value.title.isEmpty() -> _uiState.update {
                 it.copy(

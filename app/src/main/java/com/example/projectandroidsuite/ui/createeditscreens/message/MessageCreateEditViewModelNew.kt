@@ -1,6 +1,7 @@
 package com.example.projectandroidsuite.ui.createeditscreens.message
 
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.interactor.message.CreateMessage
@@ -12,6 +13,7 @@ import com.example.domain.model.Message
 import com.example.domain.model.User
 import com.example.domain.utils.Result
 import com.example.domain.utils.getListUserIdsFromList
+import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.utils.getUserById
 import com.example.projectandroidsuite.ui.utils.validation.MessageInputState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +24,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class MessageCreateState(
+    val screenMode: ScreenMode = ScreenMode.CREATE,
     val title: String = "",
     val content: String = "",
     val chosenUserList: MutableList<User> = mutableListOf(),
@@ -62,17 +65,21 @@ class MessageCreateEditViewModel @Inject constructor(
     }
 
     fun setMessage(messageId: Int) {
-        this.messageId = messageId
-        viewModelScope.launch {
+        Log.d("setMessage", messageId.toString())
+        if(messageId != 0) {
+            this.messageId = messageId
+            viewModelScope.launch {
 
-            getMessageById(messageId).collectLatest { message ->
-                if (message != null) {
-                    _uiState.update {
-                        it.copy(
-                            title = message.title,
-                            content = message.text ?: "",
-                            //todo add fetching team for message
-                        )
+                getMessageById(messageId).collectLatest { message ->
+                    if (message != null) {
+                        _uiState.update {
+                            it.copy(
+                                title = message.title,
+                                content = message.text ?: "",
+                                //todo add fetching team for message
+                                screenMode = ScreenMode.EDIT
+                            )
+                        }
                     }
                 }
             }
@@ -108,7 +115,6 @@ class MessageCreateEditViewModel @Inject constructor(
 
     fun clearInput() {
         projectId = null
-
         messageId = null
         _uiState.value = MessageCreateState()
     }
@@ -118,26 +124,30 @@ class MessageCreateEditViewModel @Inject constructor(
     }
 
     fun createMessage() {
-        viewModelScope.launch(IO) {
-            val response = createMessage(
-                projectId ?: 0,
-                constructMessage(),
-                uiState.value.chosenUserList
-            )
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = createMessage(
+                    projectId ?: 0,
+                    constructMessage(),
+                    uiState.value.chosenUserList
+                )
 
-            _uiState.update { it.copy(messageInputState = MessageInputState(serverResponse = response)) }
+                _uiState.update { it.copy(messageInputState = MessageInputState(serverResponse = response)) }
+            }
         }
     }
 
     fun updateMessage() {
-        viewModelScope.launch(IO) {
-            val response = updateMessage(
-                projectId ?: 0,
+        validateInput {
+            viewModelScope.launch(IO) {
+                val response = updateMessage(
+                    projectId ?: 0,
 
-                constructMessage(),
-                uiState.value.chosenUserList
-            )
-            _uiState.update { it.copy(messageInputState = MessageInputState(serverResponse = response)) }
+                    constructMessage(),
+                    uiState.value.chosenUserList
+                )
+                _uiState.update { it.copy(messageInputState = MessageInputState(serverResponse = response)) }
+            }
         }
     }
 

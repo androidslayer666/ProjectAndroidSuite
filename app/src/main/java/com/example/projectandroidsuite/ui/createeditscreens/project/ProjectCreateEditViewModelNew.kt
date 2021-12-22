@@ -13,6 +13,7 @@ import com.example.domain.model.Project
 import com.example.domain.model.User
 import com.example.domain.utils.Result
 import com.example.domain.utils.getListUserIdsFromList
+import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.utils.getUserById
 import com.example.projectandroidsuite.ui.utils.validation.ProjectInputState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class ProjectCreateState(
+    val screenMode: ScreenMode = ScreenMode.CREATE,
     val title: String = "",
     val description: String = "",
     val responsible: User? = null,
@@ -70,7 +72,8 @@ class ProjectCreateEditViewModelNew @Inject constructor(
                             description = project.description,
                             responsible = project.responsible,
                             chosenUserList = project.team,
-                            projectStatus = project.status
+                            projectStatus = project.status,
+                            screenMode = ScreenMode.EDIT
                         )
                     }
             }

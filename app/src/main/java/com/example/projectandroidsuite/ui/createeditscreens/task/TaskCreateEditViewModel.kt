@@ -18,6 +18,7 @@ import com.example.domain.interactor.task.UpdateTask
 import com.example.domain.model.*
 import com.example.domain.utils.Result
 import com.example.domain.utils.getListUserIdsFromList
+import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.utils.getListIds
 import com.example.projectandroidsuite.ui.utils.getUserById
 import com.example.projectandroidsuite.ui.utils.validation.ProjectInputState
@@ -49,7 +50,8 @@ data class TaskCreateState(
     val projectList: List<Project>? = null,
     val milestonesList: List<Milestone>? = null,
     val taskInputState: TaskInputState = TaskInputState(),
-    val taskDeletionStatus: Result<String, String>? = null
+    val taskDeletionStatus: Result<String, String>? = null,
+    val screenMode: ScreenMode = ScreenMode.CREATE
 )
 
 
@@ -111,7 +113,8 @@ class TaskCreateEditViewModelNew @Inject constructor(
                             description = task.description,
                             chosenUserList = task.responsibles.toMutableList(),
                             endDate = task.deadline,
-                            project = task.projectOwner
+                            project = task.projectOwner,
+                            screenMode = ScreenMode.EDIT
                         )
                     }
                     task.projectOwner?.let {
@@ -218,7 +221,7 @@ class TaskCreateEditViewModelNew @Inject constructor(
     }
 
 
-    fun createTask(){
+    fun createTask() {
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("createTask", "start creating a task")
             val response = createTask(
@@ -264,7 +267,7 @@ class TaskCreateEditViewModelNew @Inject constructor(
     }
 
     private fun validateInput(
-        onSuccess: ()-> Unit
+        onSuccess: () -> Unit
     ) {
         when {
             _uiState.value.title.isEmpty() -> _uiState.update {

@@ -20,7 +20,7 @@ interface MilestoneDao {
     suspend fun getMilestoneById(milestoneId: Int): MilestoneEntity
 
     @Query("SELECT * FROM milestones WHERE id = :milestoneId")
-    fun getMilestoneByIdFlow(milestoneId: Int): Flow<MilestoneEntity>
+    fun getMilestoneByIdFlow(milestoneId: Int): Flow<MilestoneEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMilestones(taskList: List<MilestoneEntity>)

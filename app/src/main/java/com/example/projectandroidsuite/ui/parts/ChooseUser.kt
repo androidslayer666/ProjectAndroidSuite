@@ -45,7 +45,7 @@ fun ChooseTeam(
             .padding(vertical = 12.dp)
             .clickable { onClick() }) {
         ButtonUsers(
-            singleUser = true,
+            singleUser = false,
             onClicked = { onClick() }
         )
         team?.let { team ->

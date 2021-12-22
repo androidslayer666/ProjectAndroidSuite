@@ -23,8 +23,6 @@ fun MilestoneCreateEditScreen(
 
     Log.d("CreateMilestonePage", milestoneId.toString())
 
-    if (projectId != null) viewModel.setProjectId(projectId)
-    if (milestoneId != null) viewModel.setMilestone(milestoneId)
     LaunchedEffect(key1 = milestoneId) {
         if (milestoneId != null) viewModel.setMilestone(milestoneId)
     }

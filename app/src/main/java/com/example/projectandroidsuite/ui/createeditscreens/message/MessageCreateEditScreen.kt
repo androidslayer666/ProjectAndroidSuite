@@ -1,14 +1,14 @@
 package com.example.projectandroidsuite.ui.createeditscreens.message
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
-import com.example.projectandroidsuite.ui.parts.ChooseTeam
-import com.example.projectandroidsuite.ui.parts.ConfirmationDialog
-import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
+import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.makeToast
@@ -22,9 +22,12 @@ fun MessageCreateEditScreen(
     navigateBack: () -> Unit
 ) {
 
+    Log.d("MessageCreateEditScreen", messageId.toString())
+
     LaunchedEffect(key1 = projectId) {
         if (projectId != null) viewModel.setProjectId(projectId)
     }
+
     LaunchedEffect(key1 = messageId) {
         if (messageId != null) viewModel.setMessage(messageId)
     }
@@ -70,15 +73,15 @@ fun MessageCreateEditScreen(
     Box {
         Column {
 
-//            TitleInput(
-//                text = uiState.title,
-//                onInputChange = { text -> viewModel.setTitle(text) }
-//            )
-//
-//            DescriptionInput(
-//                text = uiState.content,
-//                onInputChange = { text -> viewModel.setContent(text) }
-//            )
+            TitleInput(
+                text = uiState.title,
+                onInputChange = { text -> viewModel.setTitle(text) }
+            )
+
+            DescriptionInput(
+                text = uiState.content,
+                onInputChange = { text -> viewModel.setContent(text) }
+            )
 
             ChooseTeam(
                 team = uiState.chosenUserList,
@@ -86,7 +89,10 @@ fun MessageCreateEditScreen(
             )
 
             ButtonRow(
-                onSubmit = { if (messageId == 0) viewModel.createMessage() else viewModel.updateMessage() },
+                onSubmit = {
+                    if (uiState.screenMode == ScreenMode.CREATE) viewModel.createMessage()
+                    else viewModel.updateMessage()
+                },
                 onDismiss = navigateBack,
                 onDelete = { showDeleteDialog = true }
             )

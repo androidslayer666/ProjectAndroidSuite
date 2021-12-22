@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
+import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
 import com.example.projectandroidsuite.ui.utils.PickerType
@@ -18,10 +19,10 @@ fun ProjectCreateEditScreen(
     navigateBack: () -> Unit
 ) {
 
+    if (projectId != null)
+        LaunchedEffect(key1 = projectId) { viewModel.setProject(projectId) }
 
-    if (projectId != null) viewModel.setProject(projectId)
-
-
+    val context = LocalContext.current
     var showResponsiblePicker by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showTeamPicker by remember { mutableStateOf(false) }
@@ -53,17 +54,19 @@ fun ProjectCreateEditScreen(
             )
         }
         uiState.projectDeletionStatus is Success -> {
-            makeToast(
-                (uiState.projectDeletionStatus as Success<String>).value,
-                LocalContext.current
-            )
-            navigateBack()
+            LaunchedEffect(key1 = uiState.projectDeletionStatus) {
+                makeToast(
+                    (uiState.projectDeletionStatus as Success<String>).value,
+                    context
+                    )
+                navigateBack()
+                navigateBack()
+            }
         }
     }
 
     Box {
         Column {
-
 
             TitleInput(
                 text = uiState.title,
@@ -91,7 +94,10 @@ fun ProjectCreateEditScreen(
             )
 
             ButtonRow(
-                onSubmit = { if (projectId == 0) viewModel.createProject() else viewModel.updateProject() },
+                onSubmit = {
+                    if (uiState.screenMode == ScreenMode.CREATE) viewModel.createProject()
+                    else viewModel.updateProject()
+                           },
                 onDelete = { showDeleteDialog = true },
                 onDismiss = { navigateBack() }
 

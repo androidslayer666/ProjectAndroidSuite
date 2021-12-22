@@ -14,9 +14,9 @@ class UpdateTaskImpl(
     private val taskRepository: TaskRepository
 ) : UpdateTask {
     override suspend operator fun invoke(taskId: Int?, task: Task, taskStatus: TaskStatus?): Result<String, String> {
-        CoroutineScope(Dispatchers.IO).launch {
-            taskRepository.populateTasks()
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            taskRepository.populateTasks()
+//        }
 
         return taskId?.let {
             taskRepository.updateTask(

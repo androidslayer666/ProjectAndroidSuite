@@ -15,9 +15,9 @@ class CreateTaskImpl(
 ) : CreateTask {
     override suspend operator fun invoke(milestoneId: Int?, task: Task): Result<String, String> {
         Log.d("CreateTask", task.toString())
-        CoroutineScope(Dispatchers.IO).launch {
-            taskRepository.populateTasks()
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            taskRepository.populateTasks()
+//        }
         return task.projectId?.let { taskRepository.createTask(milestoneId, task, it) }
             ?: Failure("can't figure out to which project attach the task ")
     }

@@ -1,9 +1,10 @@
 package com.example.projectandroidsuite.ui.navigation
 
+import android.util.Log
 import androidx.navigation.NavHostController
 
 fun navigateTo(navController: NavHostController, screen: ProjectsScreens, vararg ids: Int?) {
-    //Log.d("navigateTo", "$screen    ${ids[0]}")
+    Log.d("navigateTo", "$screen    ${ids[0]}")
     when (screen) {
         ProjectsScreens.CreateEditMessage -> navController.navigate(
             ProjectsScreens.CreateEditMessage.name +

@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
+import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
 import com.example.projectandroidsuite.ui.taskdetailpage.ProjectPickerDialog
@@ -20,7 +21,7 @@ fun TaskCreateEditScreen(
     navigateBack: () -> Unit
 ) {
 
-    if (taskId != 0) viewModel.setTask(taskId!!)
+    if (taskId != 0) LaunchedEffect(key1 = taskId) {viewModel.setTask(taskId!!)}
 
 
     val context = LocalContext.current
@@ -60,6 +61,8 @@ fun TaskCreateEditScreen(
         uiState.taskDeletionStatus is Success -> {
             LaunchedEffect(key1 = uiState.taskDeletionStatus) {
                 makeToast((uiState.taskDeletionStatus as Success<String>).value, context)
+                //to skip the empty project details screen
+                navigateBack()
                 navigateBack()
             }
         }
@@ -112,7 +115,10 @@ fun TaskCreateEditScreen(
 
 
             ButtonRow(
-                onSubmit = { if (taskId == null) viewModel.createTask() else viewModel.updateTask() },
+                onSubmit = {
+                    if (uiState.screenMode == ScreenMode.CREATE) viewModel.createTask()
+                    else viewModel.updateTask()
+                           },
                 onDismiss = navigateBack,
                 onDelete = { showDeleteDialog = true }
             )
@@ -154,6 +160,12 @@ fun TaskCreateEditScreen(
                     closeDialog = { showMilestonePicker = false }
                 )
             }
+        }
+
+        if (showDatePicker) {
+            DatePicker(
+                onDateSelected = { date -> viewModel.setDate(date) },
+                onDismissRequest = { showDatePicker = !showDatePicker })
         }
 
         if (showDeleteDialog) {

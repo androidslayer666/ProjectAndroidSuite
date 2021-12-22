@@ -98,7 +98,7 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun deleteProject(projectId: Int): Result<String, String> {
         return networkCaller(
             call = { projectEndPoint.deleteProject(projectId) },
-            onSuccess = { },
+            onSuccess = { getProjects() },
             onSuccessString = "Project deleted successfully",
             onFailureString = "Having problem while deleting the project, please check the network connection"
         )

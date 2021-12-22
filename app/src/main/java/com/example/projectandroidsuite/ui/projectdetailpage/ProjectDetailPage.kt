@@ -33,59 +33,57 @@ fun ProjectDetailPage(
 
     val navigation = ProjectDetailPageNavigation(navController, projectId)
 
-    CustomScaffold(navController = navController, viewModel = hiltViewModel()) {
-        Column {
-            DetailHeaderWrapper(
-                title = uiState.currentProject?.title,
-                description = uiState.currentProject?.description,
-                responsible = uiState.currentProject?.responsible,
-                team = uiState.currentProject?.team,
-                projectStatus = uiState.currentProject?.status,
-                onEditClick = {
-                    if (uiState.currentProject?.canEdit == true) {
-                        navigateTo(
-                            navController = navController,
-                            screen = ProjectsScreens.CreateEditProject,
-                            projectId ?: 0
-                        )
-                    }
-                }
-            )
-
-            Column {
-                ProjectDetailTabRow(
-                    state = state,
-                    changeState = { newState -> state = newState },
-                    navigation = navigation
-                )
-
-                when (state) {
-                    0 -> ListTasksMilestones(
-                        listTasksAndMilestones = uiState.taskAndMilestones,
-                        navigateToTaskId = { id ->
-                            navigation.navigateToTaskDetailScreen(id)
-                        },
-                        onEditMilestone = { milestone ->
-                            navigation.navigateToMilestoneEditingScreen(milestone?.id ?: 0)
-                        })
-                    1 -> ListMessages(
-                        listMessages = uiState.messages,
-                        onReplyClick = { comment -> viewModel.addCommentToMessage(comment) },
-                        onEditMessageClick = { message ->
-                            navigation.navigateToMessageEditingScreen(message.id)
-                        },
-                        onDeleteCommentClick = { comment -> viewModel.deleteComment(comment) })
-                    2 -> ListFiles(listFiles = uiState.listFiles ?: listOf())
+    Column {
+        DetailHeaderWrapper(
+            title = uiState.currentProject?.title,
+            description = uiState.currentProject?.description,
+            responsible = uiState.currentProject?.responsible,
+            team = uiState.currentProject?.team,
+            projectStatus = uiState.currentProject?.status,
+            onEditClick = {
+                if (uiState.currentProject?.canEdit == true) {
+                    navigateTo(
+                        navController = navController,
+                        screen = ProjectsScreens.CreateEditProject,
+                        projectId ?: 0
+                    )
                 }
             }
-        }
+        )
 
-        if (showDeleteDialog) {
-            ConfirmationDialog(
-                text = stringResource(R.string.do_you_want_to_delete_the_project),
-                onSubmit = { viewModel.deleteProject() },
-                closeDialog = { showDeleteDialog = false })
+        Column {
+            ProjectDetailTabRow(
+                state = state,
+                changeState = { newState -> state = newState },
+                navigation = navigation
+            )
+
+            when (state) {
+                0 -> ListTasksMilestones(
+                    listTasksAndMilestones = uiState.taskAndMilestones,
+                    navigateToTaskId = { id ->
+                        navigation.navigateToTaskDetailScreen(id)
+                    },
+                    onEditMilestone = { milestone ->
+                        navigation.navigateToMilestoneEditingScreen(milestone?.id ?: 0)
+                    })
+                1 -> ListMessages(
+                    listMessages = uiState.messages,
+                    onReplyClick = { comment -> viewModel.addCommentToMessage(comment) },
+                    onEditMessageClick = { message ->
+                        navigation.navigateToMessageEditingScreen(message.id)
+                    },
+                    onDeleteCommentClick = { comment -> viewModel.deleteComment(comment) })
+                2 -> ListFiles(listFiles = uiState.listFiles ?: listOf())
+            }
         }
+    }
+
+    if (showDeleteDialog) {
+        ConfirmationDialog(
+            text = stringResource(R.string.do_you_want_to_delete_the_project),
+            onSubmit = { viewModel.deleteProject() },
+            closeDialog = { showDeleteDialog = false })
     }
 }
 

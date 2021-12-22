@@ -17,9 +17,9 @@ class UpdateProjectImpl(
         project: Project,
         projectStatus: ProjectStatus?
     ): Result<String, String> {
-        CoroutineScope(Dispatchers.IO).launch {
-            projectRepository.getProjects()
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            projectRepository.getProjects()
+//        }
 
         return projectRepository.updateProject(
             projectId,
