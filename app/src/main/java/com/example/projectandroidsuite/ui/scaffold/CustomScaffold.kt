@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.domain.model.User
 import com.example.projectandroidsuite.R
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -26,19 +27,19 @@ import com.example.projectandroidsuite.R
 fun CustomScaffold(
     navController: NavHostController,
     viewModel: ScaffoldViewModel,
+    showScaffold: Boolean,
     content: @Composable () -> Unit,
 ) {
+
     var showFabOptions by remember { mutableStateOf(false) }
     var showUserOptions by remember { mutableStateOf(false) }
 
-    val self by viewModel.user.collectAsState()
+    val user by viewModel.user.collectAsState()
 
     val navigation = ScaffoldNavigation(navController = navController)
 
-    val currentRoute = navController.currentBackStackEntry?.destination?.route
-
     // Hide scaffold on Login Page
-    if (currentRoute == "Login") {
+    if (!showScaffold) {
         content()
     } else {
 
@@ -48,82 +49,21 @@ fun CustomScaffold(
         Box {
             Scaffold(
                 topBar = {
-                    Row(
-                        modifier = Modifier
-                            .height(50.dp)
-                            .background(MaterialTheme.colors.primary),
-                        verticalAlignment = Alignment.CenterVertically
+                    ScaffoldTopBar(
+                        user = user,
+                        showUserOptions = { showUserOptions = !showUserOptions },
+                        navigation = navigation
                     )
-
-                    {
-                        Column(
-                            modifier = Modifier
-                                .weight(12F)
-                                .padding(start = 12.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = self?.displayName ?: "",
-                                    color = MaterialTheme.colors.onPrimary
-                                )
-                                Image(
-                                    painterResource(R.drawable.ic_baseline_arrow_drop_down_24),
-                                    "",
-                                    modifier = Modifier
-                                        .clickable { showUserOptions = !showUserOptions }
-                                        .height(50.dp)
-                                        .padding(start = 12.dp, end = 12.dp)
-                                        .weight(2F)
-                                )
-                            }
-                        }
-
-                        Image(
-                            painterResource(R.drawable.ic_baseline_search_24), "",
-                            modifier = Modifier
-                                .clickable { navigation.navigateToSearch() }
-                                .height(50.dp)
-                                .padding(start = 12.dp, end = 12.dp)
-                                .weight(2F)
-                        )
-                    }
                 },
                 modifier = if (showFabOptions) Modifier.clickable {
                     showFabOptions = false
                 } else Modifier.padding(),
                 floatingActionButton = {
-                    Column {
-                        AnimateExtendedFabVisibility(
-                            condition = showFabOptions,
-                            addOffset = true,
-                        ) {
-                            FloatingActionButton(
-                                modifier = Modifier.padding(bottom = 12.dp),
-                                onClick = { navigation.navigateToCreateProject() }
-                            ) {
-                                Icon(painterResource(R.drawable.clipboard_list_outline), "")
-                            }
-                        }
-                        AnimateExtendedFabVisibility(
-                            condition = showFabOptions,
-                            addOffset = false,
-                        ) {
-                            FloatingActionButton(
-                                modifier = Modifier.padding(bottom = 12.dp),
-                                onClick = { navigation.navigateToCreateTask() }
-                            ) {
-                                Icon(painterResource(R.drawable.calendar_check_outline), "")
-                            }
-                        }
-
-                        FloatingActionButton(
-                            onClick = { showFabOptions = !showFabOptions }
-                        ) {
-                            Icon(Icons.Filled.Add, "")
-                        }
-                    }
+                    ScaffoldFabs(
+                        showFabOptions = showFabOptions,
+                        navigation = navigation,
+                        toggleFabOptions = { showFabOptions = !showFabOptions }
+                    )
                 }
             ) {
                 Box(Modifier.background(MaterialTheme.colors.background)) {
@@ -136,7 +76,7 @@ fun CustomScaffold(
                                 .clickable(enabled = showFabOptions) {
                                     showFabOptions = false
                                 },
-                            color = Color.Black.copy(alpha = 0f)
+                            color = Color.Black.copy(alpha = 0.1f)
                         ) {}
                     }
                 }
@@ -178,5 +118,93 @@ fun AnimateExtendedFabVisibility(
         )
     ) {
         content()
+    }
+}
+
+
+@Composable
+fun ScaffoldTopBar(
+    user: User?,
+    showUserOptions: () -> Unit,
+    navigation: ScaffoldNavigation
+) {
+    Row(
+        modifier = Modifier
+            .height(50.dp)
+            .background(MaterialTheme.colors.primary),
+        verticalAlignment = Alignment.CenterVertically
+    )
+
+    {
+        Column(
+            modifier = Modifier
+                .weight(12F)
+                .padding(start = 12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = user?.displayName ?: "",
+                    color = MaterialTheme.colors.onPrimary
+                )
+                Image(
+                    painterResource(R.drawable.ic_baseline_arrow_drop_down_24),
+                    "",
+                    modifier = Modifier
+                        .clickable { showUserOptions() }
+                        .height(50.dp)
+                        .padding(start = 12.dp, end = 12.dp)
+                        .weight(2F)
+                )
+            }
+        }
+
+        Image(
+            painterResource(R.drawable.ic_baseline_search_24), "",
+            modifier = Modifier
+                .clickable { navigation.navigateToSearch() }
+                .height(50.dp)
+                .padding(start = 12.dp, end = 12.dp)
+                .weight(2F)
+        )
+    }
+}
+
+@Composable
+fun ScaffoldFabs(
+    showFabOptions: Boolean,
+    navigation: ScaffoldNavigation,
+    toggleFabOptions: () -> Unit
+){
+    Column {
+        AnimateExtendedFabVisibility(
+            condition = showFabOptions,
+            addOffset = true,
+        ) {
+            FloatingActionButton(
+                modifier = Modifier.padding(bottom = 12.dp),
+                onClick = { navigation.navigateToCreateProject() }
+            ) {
+                Icon(painterResource(R.drawable.clipboard_list_outline), "")
+            }
+        }
+        AnimateExtendedFabVisibility(
+            condition = showFabOptions,
+            addOffset = false,
+        ) {
+            FloatingActionButton(
+                modifier = Modifier.padding(bottom = 12.dp),
+                onClick = { navigation.navigateToCreateTask() }
+            ) {
+                Icon(painterResource(R.drawable.calendar_check_outline), "")
+            }
+        }
+
+        FloatingActionButton(
+            onClick = { toggleFabOptions() }
+        ) {
+            Icon(Icons.Filled.Add, "")
+        }
     }
 }

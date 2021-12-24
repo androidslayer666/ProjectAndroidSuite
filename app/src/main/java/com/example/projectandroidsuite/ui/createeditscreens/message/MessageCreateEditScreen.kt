@@ -1,16 +1,21 @@
 package com.example.projectandroidsuite.ui.createeditscreens.message
 
 import android.util.Log
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
 import com.example.projectandroidsuite.ui.utils.PickerType
+import com.example.projectandroidsuite.ui.utils.hideKeyboardOnLoseFocus
 import com.example.projectandroidsuite.ui.utils.makeToast
 
 
@@ -36,6 +41,7 @@ fun MessageCreateEditScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showTeamPicker by remember { mutableStateOf(false) }
 
+    val focusManager = LocalFocusManager.current
 
     val uiState by viewModel.uiState.collectAsState()
 
@@ -53,8 +59,10 @@ fun MessageCreateEditScreen(
             makeToast("Please choose task responsible", context)
         }
         uiState.messageInputState.serverResponse is Success -> {
-            viewModel.clearInput()
-            navigateBack()
+            LaunchedEffect(key1 = uiState.messageInputState) {
+                viewModel.clearInput()
+                navigateBack()
+            }
         }
         uiState.messageInputState.serverResponse is Failure -> {
             LaunchedEffect(key1 = uiState.messageInputState) {
@@ -71,7 +79,7 @@ fun MessageCreateEditScreen(
 
 
     Box {
-        Column {
+        Column(modifier = Modifier.hideKeyboardOnLoseFocus(focusManager)) {
 
             TitleInput(
                 text = uiState.title,

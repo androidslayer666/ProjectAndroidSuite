@@ -42,6 +42,7 @@ fun TeamPickerDialog(
         },
         onSubmit = {
 //            onSubmit()
+            closeDialog()
         }) {
         TeamPickerBody(
             list = list?:listOf(), { user -> onClick(user) }, pickerType,

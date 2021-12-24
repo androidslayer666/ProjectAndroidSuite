@@ -34,13 +34,17 @@ fun ProjectPickerDialog(
         show = true,
         hide = { closeDialog() },
         text = "Project",
-        onSubmit = { onSubmit() },
+        onSubmit = {
+            onSubmit()
+            closeDialog()
+        },
         showButtons = false,
     ) {
         ProjectPickerBody(
-            list = list?:listOf(), { project -> onClick(project)
+            list = list ?: listOf(), { project ->
+                onClick(project)
                 closeDialog()
-                         }, ifChooseResponsibleOrTeam,
+            }, ifChooseResponsibleOrTeam,
             searchString, onSearchChanged, problemWithFetchingProjects
         )
     }

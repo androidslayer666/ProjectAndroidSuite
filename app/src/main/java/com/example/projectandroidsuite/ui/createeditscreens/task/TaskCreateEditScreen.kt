@@ -3,7 +3,9 @@ package com.example.projectandroidsuite.ui.createeditscreens.task
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
@@ -11,6 +13,7 @@ import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
 import com.example.projectandroidsuite.ui.taskdetailpage.ProjectPickerDialog
 import com.example.projectandroidsuite.ui.utils.PickerType
+import com.example.projectandroidsuite.ui.utils.hideKeyboardOnLoseFocus
 import com.example.projectandroidsuite.ui.utils.makeToast
 
 
@@ -23,6 +26,7 @@ fun TaskCreateEditScreen(
 
     if (taskId != 0) LaunchedEffect(key1 = taskId) {viewModel.setTask(taskId!!)}
 
+    val focusManager = LocalFocusManager.current
 
     val context = LocalContext.current
 
@@ -71,7 +75,8 @@ fun TaskCreateEditScreen(
 
 
     Box {
-        Column {
+
+        Column(modifier = Modifier.hideKeyboardOnLoseFocus(focusManager)) {
 
             TitleInput(
                 text = uiState.title,

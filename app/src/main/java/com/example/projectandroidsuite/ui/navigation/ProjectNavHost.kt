@@ -35,11 +35,11 @@ import com.example.projectandroidsuite.ui.search.SearchScreen
 import com.example.projectandroidsuite.ui.taskdetailpage.TaskDetailPage
 
 
-
 @Composable
 fun ProjectNavHost(
     loginViewModel: LoginViewModel,
     navController: NavHostController,
+    setShowScaffold: (Boolean) -> Unit,
 ) {
 
     NavHost(
@@ -49,6 +49,7 @@ fun ProjectNavHost(
     ) {
 
         composable(route = ProjectsScreens.Login.name) {
+            setShowScaffold(false)
             LoginPage(
                 viewModel = hiltViewModel(),
                 navController = navController
@@ -56,6 +57,7 @@ fun ProjectNavHost(
         }
 
         composable(route = ProjectsScreens.Main.name) {
+            setShowScaffold(true)
             MainScreen(
                 navController = navController
             )

@@ -3,13 +3,16 @@ package com.example.projectandroidsuite.ui.createeditscreens.project
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
 import com.example.projectandroidsuite.ui.utils.PickerType
+import com.example.projectandroidsuite.ui.utils.hideKeyboardOnLoseFocus
 import com.example.projectandroidsuite.ui.utils.makeToast
 
 @Composable
@@ -28,7 +31,7 @@ fun ProjectCreateEditScreen(
     var showTeamPicker by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsState()
 
-
+    val focusManager = LocalFocusManager.current
     when {
         uiState.projectInputState.isTitleEmpty == true -> makeToast(
             "Please enter project title",
@@ -66,7 +69,7 @@ fun ProjectCreateEditScreen(
     }
 
     Box {
-        Column {
+        Column(modifier = Modifier.hideKeyboardOnLoseFocus(focusManager)) {
 
             TitleInput(
                 text = uiState.title,
