@@ -1,6 +1,7 @@
 package com.example.data.repository
 
 import android.util.Log
+import com.example.data.ResponseIsEmptyException
 import com.example.data.dao.CommentDao
 import com.example.domain.*
 import com.example.domain.mappers.toCommentPost
@@ -9,11 +10,14 @@ import com.example.domain.mappers.toListEntities
 import com.example.domain.model.Comment
 import com.example.domain.repository.CommentRepository
 import com.example.data.endpoints.CommentEndPoint
+import com.example.domain.dto.CommentDto
+import com.example.domain.entities.CommentEntity
 import com.example.domain.mappers.fromListCommentEntitiesToListComments
 import com.example.domain.utils.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.transform
+import retrofit2.HttpException
 import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,76 +28,58 @@ class CommentRepositoryImpl @Inject constructor(
     private val commentDao: CommentDao
 ) : CommentRepository {
 
-    override suspend fun populateCommentsWithTaskId(taskId: Int): Result<String, String> {
-        try {
-            //Log.d("CommentRepository", taskId.toString())
+    override suspend fun populateCommentsWithTaskId(taskId: Int): Result<String, Throwable> {
+        return try {
             val comments = commentEndPoint.getTaskComment(taskId).listCommentDtos
-            //Log.d("CommentRepository", comments.toString())
 
-            return if (comments == null) {
-                Failure("Can't download comments")
+            if (comments == null) {
+                Failure(ResponseIsEmptyException())
             } else {
-                arrangingComments(comments.toListEntities(taskId)).let {
-                    commentDao.insertComments(it)
-                }
-                commentDao.getCommentsByTaskId(taskId).forEach {
-                    //Log.d("CommentRepository", "id " + it.id)
-                    if(!comments.toListCommentIds().contains(it.id)){
-                        //Log.d("CommentRepository", "DeleteMessage with id " + it.id)
-                        commentDao.deleteComment(it.id)
-                    }
-                }
-                Success("Comments are populated")
+                deleteCommentFromDbIfDeletedOnServer(taskId, comments )
+                commentDao.insertComments(comments.toListEntities(taskId))
+                Success("")
             }
         } catch (e: Exception) {
-            Log.e("CommentRepository", "caught an exception $e")
-            return Failure("Network/server problem")
+            Failure(e)
+        }
+    }
+
+    private suspend fun deleteCommentFromDbIfDeletedOnServer(
+        taskId: Int,
+        comments: List<CommentDto>
+    ) {
+        commentDao.getCommentsByTaskId(taskId).forEach {
+            if(!comments.toListCommentIds().contains(it.id)){
+                commentDao.deleteComment(it.id)
+            }
         }
     }
 
 
-    override fun getCommentByTaskId(taskId: Int?): Flow<List<Comment>?> {
-        if(taskId != null)
+    override fun getCommentByTaskId(taskId: Int): Flow<List<Comment>?> {
         return commentDao.getCommentsByTaskIdFlow(taskId).transform { listComments ->
-            Log.d("CommentRepository", "arranging comments" + listComments.toString())
-            emit(arrangingComments(listComments).fromListCommentEntitiesToListComments())
+            emit(listComments.fromListCommentEntitiesToListComments())
         }
-        return flow {}
     }
 
-    override suspend fun putCommentToMessage(messageId: Int, comment: Comment): Result<String, String> {
-        //Log.d("ProjectRepository", "Started creating pproject" + comment.toCommentPost().toString())
-
+    override suspend fun putCommentToMessage(messageId: Int, comment: Comment): Result<String, Throwable> {
         return networkCaller(
             call = { commentEndPoint.putCommentToMessage(messageId, comment.toCommentPost()) },
-            onSuccess = { },
-            onSuccessString = "Comment added successfully",
-            onFailureString = "Having problem while creating the comment, please check the network connection"
+            onSuccess = {populateCommentsWithTaskId(comment.taskId?:0) }
         )
     }
 
-    override suspend fun putCommentToTask(taskId: Int, comment: Comment) : Result<String, String> {
-        Log.d("CommentRepository", "Started creating comment $taskId")
-
+    override suspend fun putCommentToTask(taskId: Int, comment: Comment) : Result<String, Throwable> {
         return networkCaller(
             call = { commentEndPoint.putCommentToTask(taskId, comment.toCommentPost()) },
-            onSuccess = { },
-            onSuccessString = "Comment added successfully",
-            onFailureString = "Having problem while creating the comment, please check the network connection"
+            onSuccess = {populateCommentsWithTaskId(taskId) }
         )
     }
 
-    override suspend fun deleteComment(commentId: String, taskId: Int?): Result<String, String> {
-
+    override suspend fun deleteComment(commentId: String, taskId: Int): Result<String, Throwable> {
         return networkCaller(
             call = { commentEndPoint.deleteComment(commentId) },
-            onSuccess = {
-                if (taskId != null) {
-                    populateCommentsWithTaskId(taskId)
-                }
-            },
-            onSuccessString = "Comment added successfully",
-            onFailureString = "Having problem while вулуештп the comment, please check the network connection"
+            onSuccess = {  populateCommentsWithTaskId(taskId) }
         )
     }
 }

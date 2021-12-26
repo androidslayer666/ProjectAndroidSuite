@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.parts.dialogs
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,6 +18,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.User
 import com.example.projectandroidsuite.R
+import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.customitems.CustomDialog
 import com.example.projectandroidsuite.ui.utils.ComposeTestDescriptions.TEAM_PICKER_DIALOG
 import com.example.projectandroidsuite.ui.utils.PickerType
@@ -41,7 +42,6 @@ fun TeamPickerDialog(
             PickerType.MULTIPLE -> stringResource(R.string.choose_team)
         },
         onSubmit = {
-//            onSubmit()
             closeDialog()
         }) {
         TeamPickerBody(

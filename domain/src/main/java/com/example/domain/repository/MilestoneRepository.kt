@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MilestoneRepository {
 
-    suspend fun populateMilestonesByProject(projectId: Int)
+    suspend fun populateMilestonesByProject(projectId: Int): Result<String, Throwable>
 
     fun getMilestonesByProjectFlow(projectId: Int): Flow<List<Milestone>>
 
@@ -20,12 +20,12 @@ interface MilestoneRepository {
     suspend fun putMilestoneToProject(
         projectId: Int,
         milestone: Milestone
-    ): Result<String, String>
+    ): Result<String, Throwable>
 
-    suspend fun deleteMilestone(milestoneId: Int, projectId: Int?): Result<String, String>
+    suspend fun deleteMilestone(milestoneId: Int, projectId: Int?): Result<String, Throwable>
 
     suspend fun updateMilestoneToProject(
         projectId: Int,
         milestone: Milestone
-    ): Result<String, String>
+    ): Result<String, Throwable>
 }

@@ -5,6 +5,7 @@ import com.example.domain.interactor.project.UpdateProject
 import com.example.domain.model.Project
 import com.example.domain.repository.ProjectRepository
 import com.example.domain.utils.Result
+import com.example.domain.utils.toStringString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +31,7 @@ class UpdateProjectImpl(
                 ProjectStatus.STOPPED -> "Closed"
                 else -> "open"
             }
-        )
+        ).toStringString()
     }
 
 }

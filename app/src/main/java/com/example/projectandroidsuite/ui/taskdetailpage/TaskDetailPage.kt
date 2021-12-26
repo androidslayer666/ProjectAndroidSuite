@@ -15,8 +15,8 @@ import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.parts.ConfirmationDialog
 import com.example.projectandroidsuite.ui.parts.DetailHeaderWrapper
-import com.example.projectandroidsuite.ui.parts.ListComments
-import com.example.projectandroidsuite.ui.parts.ListFiles
+import com.example.projectandroidsuite.ui.parts.lists.ListComments
+import com.example.projectandroidsuite.ui.parts.lists.ListFiles
 
 
 @Composable

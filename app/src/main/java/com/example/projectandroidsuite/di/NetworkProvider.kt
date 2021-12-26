@@ -4,7 +4,6 @@ import android.content.Context
 import com.example.data.endpoints.*
 import com.example.data.repository.AuthCredentialsProvider
 import com.example.data.repository.AuthRepositoryImpl
-import com.example.data.buildEndPoint
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

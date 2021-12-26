@@ -2,10 +2,11 @@ package com.example.domain.utils
 
 import com.example.domain.Constants
 import com.example.domain.entities.CommentEntity
+import com.example.domain.model.Comment
 
-fun arrangingComments(list: List<CommentEntity>): List<CommentEntity> {
-    val childList = mutableListOf<CommentEntity>()
-    val parentList = mutableListOf<CommentEntity>()
+fun arrangingComments(list: List<Comment>): List<Comment> {
+    val childList = mutableListOf<Comment>()
+    val parentList = mutableListOf<Comment>()
     for (comment in list) {
         if (comment.parentId != Constants.COMMENT_ID_ALL_NULLS) {
             childList.add(comment)
@@ -17,10 +18,10 @@ fun arrangingComments(list: List<CommentEntity>): List<CommentEntity> {
 }
 
 fun insertingCommentToParent(
-    parentList: MutableList<CommentEntity>,
-    childList: MutableList<CommentEntity>,
+    parentList: MutableList<Comment>,
+    childList: MutableList<Comment>,
     commentLevel: Int = 1
-): List<CommentEntity> {
+): List<Comment> {
 
     var counter = childList.size
 

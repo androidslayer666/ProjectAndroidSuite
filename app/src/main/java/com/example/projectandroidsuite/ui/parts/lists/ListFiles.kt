@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.parts.lists
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row

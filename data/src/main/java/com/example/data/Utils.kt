@@ -20,6 +20,4 @@ fun constructCheckPossibilitiesUrl(address: String): String {
     return "$HTTPS$address$CAPABILITIES"
 }
 
-
-
-
+class ResponseIsEmptyException: Exception()

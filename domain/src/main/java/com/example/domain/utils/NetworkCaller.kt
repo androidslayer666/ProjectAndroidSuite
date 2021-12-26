@@ -1,23 +1,22 @@
 package com.example.domain.utils
 
 import android.util.Log
+import retrofit2.HttpException
 
 suspend fun <T> networkCaller(
     call: suspend () -> T,
     onSuccess: suspend (T) -> Unit,
-    onSuccessString: String = "",
-    onFailureString: String = ""
-): Result<String, String> {
+): Result<String, Throwable> {
     return try {
         val result = call()
         if (result != null) {
             onSuccess(result)
-            Success(onSuccessString)
+            Success("")
         } else {
             Log.d("networkCaller", "failure" + result.toString())
-            Failure(onFailureString)
+            Failure(HttpException(result))
         }
     } catch (e: Exception) {
-        Failure(onFailureString)
+        Failure(e)
     }
 }

@@ -6,6 +6,7 @@ import com.example.domain.mappers.fromTaskStatusToString
 import com.example.domain.repository.TaskRepository
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Result
+import com.example.domain.utils.toStringString
 
 class UpdateTaskStatusImpl(
     private val taskRepository: TaskRepository
@@ -21,6 +22,6 @@ class UpdateTaskStatusImpl(
         return taskRepository.updateTaskStatus(
             taskId,
             status.fromTaskStatusToString()
-        )
+        ).toStringString()
     }
 }

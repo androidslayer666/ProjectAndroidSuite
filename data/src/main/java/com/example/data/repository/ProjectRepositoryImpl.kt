@@ -11,6 +11,7 @@ import com.example.domain.mappers.*
 import com.example.domain.model.Project
 import com.example.domain.repository.ProjectRepository
 import com.example.domain.utils.Result
+import com.example.domain.utils.log
 import com.example.domain.utils.networkCaller
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,7 @@ class ProjectRepositoryImpl @Inject constructor(
     private val teamEndPoint: TeamEndPoint,
 ) : ProjectRepository {
 
-    override suspend fun getProjects(): Result<String, String> {
+    override suspend fun getProjects(): Result<String, Throwable> {
         return networkCaller(
             call = { projectEndPoint.getAllProjects().listProjectDtos },
             onSuccess = { projects ->
@@ -44,9 +45,7 @@ class ProjectRepositoryImpl @Inject constructor(
 
     private suspend fun clearDeletedProjects(list: List<ProjectDto>?) {
         projectDao.getAll().forEach { project ->
-            //Log.d("ProjectRepository", list?.map{ it.title}.toString())
             if (list?.toListEntities()?.toListProjectIds()?.contains(project.id) != true) {
-                //Log.d("ProjectRepository", project.title)
                 projectDao.deleteProject(project.id)
             }
         }
@@ -64,50 +63,40 @@ class ProjectRepositoryImpl @Inject constructor(
         projectId: Int,
         project: Project,
         projectStatus: String
-    ): Result<String, String> {
-        Log.d(
-            "ProjectRepository",
-            "list users  " + project.fromEntityToPost().participants?.toString()
-        )
+    ): Result<String, Throwable> {
+
         return networkCaller(
             call = {
                 projectEndPoint.updateProject(projectId, project.fromEntityToPost())
                 updateProjectStatus(projectId, projectStatus)
                 if (project.fromEntityToPost().participants != null)
-                    Log.d("ProjectRepository", project.fromEntityToPost().toString())
                 projectEndPoint.updateProjectTeam(
                     projectId,
                     ProjectTeamPost(project.fromEntityToPost().participants!!, true)
                 )
             },
             onSuccess = { getTeamAndInsertProjectToDb(projectId) },
-            onSuccessString = "Project updated successfully",
-            onFailureString = "Having problem while updating the project, please check the network connection"
         )
     }
 
-    override suspend fun createProject(project: Project): Result<String, String> {
+    override suspend fun createProject(project: Project): Result<String, Throwable> {
         return networkCaller(
             call = { projectEndPoint.createProject(project.fromEntityToPost()) },
-            onSuccess = { getProjects() },
-            onSuccessString = "Project created successfully",
-            onFailureString = "Having problem while creating the project, please check the network connection"
+            onSuccess = { getProjects() }
         )
     }
 
-    override suspend fun deleteProject(projectId: Int): Result<String, String> {
+    override suspend fun deleteProject(projectId: Int): Result<String, Throwable> {
         return networkCaller(
             call = { projectEndPoint.deleteProject(projectId) },
-            onSuccess = { getProjects() },
-            onSuccessString = "Project deleted successfully",
-            onFailureString = "Having problem while deleting the project, please check the network connection"
+            onSuccess = { getProjects() }
         )
     }
 
     private suspend fun updateProjectStatus(
         projectId: Int,
         projectStatus: String
-    ): Result<String, String> {
+    ): Result<String, Throwable> {
         return networkCaller(
             call = {
                 projectEndPoint.updateProjectStatus(
@@ -115,9 +104,7 @@ class ProjectRepositoryImpl @Inject constructor(
                     ProjectStatusPost(projectStatus)
                 )
             },
-            onSuccess = { getTeamAndInsertProjectToDb(projectId) },
-            onSuccessString = "Project status updated successfully",
-            onFailureString = "Having problem while deleting the project, please check the network connection"
+            onSuccess = { getTeamAndInsertProjectToDb(projectId) }
         )
     }
 
@@ -126,9 +113,7 @@ class ProjectRepositoryImpl @Inject constructor(
             call = { projectEndPoint.getProjectById(projectId).projectDto?.toProjectEntity() },
             onSuccess = { project ->
                 val team = teamEndPoint.getProjectTeam(projectId)
-                //Log.d("getTeamAndInsertToDb", team.toString())
                 project?.team = team.ids?.toListUserEntity()
-                //Log.d("getTeamAndInsertToDb", project.toString())
                 if (project != null)
                     projectDao.insertProject(project)
             }

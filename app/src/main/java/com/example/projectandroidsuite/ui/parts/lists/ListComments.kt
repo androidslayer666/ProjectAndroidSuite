@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.parts.lists
 
 import android.os.Build
 import android.text.Html
@@ -20,6 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Comment
 import com.example.projectandroidsuite.R
+import com.example.projectandroidsuite.ui.parts.CardTeamMember
+import com.example.projectandroidsuite.ui.parts.ConfirmationDialog
 import com.example.projectandroidsuite.ui.utils.fromHtml
 
 @Composable

@@ -6,7 +6,7 @@ import com.example.domain.model.Project
 import kotlinx.coroutines.flow.Flow
 
 interface ProjectRepository {
-    suspend fun getProjects(): Result<String, String>
+    suspend fun getProjects(): Result<String, Throwable>
 
     fun getProjectFromDbById(projectId: Int): Flow<Project?>
 
@@ -16,11 +16,11 @@ interface ProjectRepository {
         projectId: Int,
         project: Project,
         projectStatus: String
-    ): Result<String, String>
+    ): Result<String, Throwable>
 
-    suspend fun createProject(project: Project): Result<String, String>
+    suspend fun createProject(project: Project): Result<String, Throwable>
 
-    suspend fun deleteProject(projectId: Int): Result<String, String>
+    suspend fun deleteProject(projectId: Int): Result<String, Throwable>
 
 
 

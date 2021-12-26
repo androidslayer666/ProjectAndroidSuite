@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
 
-    suspend fun populateMessageWithProjectId(projectId: Int): Result<String, String>
+    suspend fun populateMessageWithProjectId(projectId: Int): Result<String, Throwable>
 
     suspend fun updateMessageComments(messageId:Int, projectId: Int)
 
@@ -17,17 +17,17 @@ interface MessageRepository {
         projectId: Int,
         message: Message,
         participants: List<User>
-    ): Result<String, String>
+    ): Result<String, Throwable>
 
     suspend fun updateMessage(
         projectId: Int,
         message: Message,
         participants: List<User>
-    ): Result<String, String>
+    ): Result<String, Throwable>
 
     fun getMessageById(messageId: Int): Flow<Message?>
 
     suspend fun clearTable()
 
-    suspend fun deleteMessage( messageId: Int, projectId: Int?): Result<String, String>
+    suspend fun deleteMessage( messageId: Int, projectId: Int?): Result<String, Throwable>
 }

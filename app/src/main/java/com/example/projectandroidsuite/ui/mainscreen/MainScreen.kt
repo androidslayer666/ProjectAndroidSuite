@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.domain.utils.log
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.utils.BackPressedHandler
 import com.example.projectandroidsuite.ui.utils.SwipeDirections
@@ -200,7 +201,6 @@ fun ProjectTabRow(
                 selected = if (index == 0) swipeState.currentValue == SwipeDirections.LEFT
                 else swipeState.currentValue == SwipeDirections.RIGHT,
                 onClick = {
-                    Log.d("index", tabState.toString())
                     setTabState(index)
                     if (tabState == 0)
                         scope.launch { swipeState.snapTo(SwipeDirections.RIGHT) }

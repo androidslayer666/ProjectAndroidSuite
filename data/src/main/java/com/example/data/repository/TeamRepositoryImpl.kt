@@ -1,6 +1,7 @@
 package com.example.data.repository
 
 import android.util.Log
+import com.example.data.ResponseIsEmptyException
 import com.example.data.dao.UserDao
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Result
@@ -25,18 +26,17 @@ class TeamRepositoryImpl @Inject constructor(
     private val userDao: UserDao
 ) : TeamRepository {
 
-    override suspend fun populateAllPortalUsers(): Result<String, String> {
+    override suspend fun populateAllPortalUsers(): Result<String, Throwable> {
         return try {
             val users = teamEndPoint.getAllPortalUsers().ids
             if (users != null) {
                 userDao.insertUsers(users.excludeVisitors().markSelf())
-                Success("Users are populated")
+                Success("")
             } else {
-                Failure("Network/server problem")
+                Failure(ResponseIsEmptyException())
             }
         } catch (e: Exception) {
-            Log.e("TeamRepository", "caught an exception$e")
-            Failure("Network/server problem")
+            Failure(e)
         }
     }
 

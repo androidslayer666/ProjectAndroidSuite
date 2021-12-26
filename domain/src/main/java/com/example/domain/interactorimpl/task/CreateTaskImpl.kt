@@ -6,6 +6,7 @@ import com.example.domain.model.Task
 import com.example.domain.repository.TaskRepository
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Result
+import com.example.domain.utils.toStringString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +19,7 @@ class CreateTaskImpl(
 //        CoroutineScope(Dispatchers.IO).launch {
 //            taskRepository.populateTasks()
 //        }
-        return task.projectId?.let { taskRepository.createTask(milestoneId, task, it) }
+        return task.projectId?.let { taskRepository.createTask(milestoneId, task, it).toStringString() }
             ?: Failure("can't figure out to which project attach the task ")
     }
 }

@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.parts.inputs
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

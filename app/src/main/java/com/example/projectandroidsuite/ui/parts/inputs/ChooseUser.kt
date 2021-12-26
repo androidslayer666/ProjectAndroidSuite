@@ -1,4 +1,4 @@
-package com.example.projectandroidsuite.ui.parts
+package com.example.projectandroidsuite.ui.parts.inputs
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -7,12 +7,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.User
+import com.example.projectandroidsuite.ui.parts.CardTeamMember
+import com.example.projectandroidsuite.ui.parts.RowTeamMember
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 
 @Composable
 fun ChooseUser(
     onClick: () -> Unit,
-    responsible: User?
+    responsible: User?,
+    userIsEmptyWhenShouldnt: Boolean? = null
 ) {
 
     Row(
@@ -23,6 +26,9 @@ fun ChooseUser(
             singleUser = true,
             onClicked = { onClick() }
         )
+        if (userIsEmptyWhenShouldnt == true) {
+            ErrorMessage(condition = userIsEmptyWhenShouldnt, text = "please choose user")
+        }
         responsible?.let { user ->
             Row(
                 Modifier.weight(4F)
@@ -37,7 +43,8 @@ fun ChooseUser(
 @Composable
 fun ChooseTeam(
     onClick: () -> Unit,
-    team: List<User>?
+    team: List<User>?,
+    teamIsEmptyWhenShouldnt: Boolean? = null
 ) {
 
     Row(
@@ -48,6 +55,9 @@ fun ChooseTeam(
             singleUser = false,
             onClicked = { onClick() }
         )
+        if (teamIsEmptyWhenShouldnt == true) {
+            ErrorMessage(condition = teamIsEmptyWhenShouldnt, text = "please choose team")
+        }
         team?.let { team ->
             Row(
                 Modifier.weight(4F)

@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.createeditscreens.project
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.filters.project.ProjectStatus
@@ -38,14 +37,13 @@ data class ProjectCreateState(
 
 
 @HiltViewModel
-class ProjectCreateEditViewModelNew @Inject constructor(
+class ProjectCreateEditViewModel @Inject constructor(
     private val getAllUsers: GetAllUsers,
     private val createProject: CreateProject,
     private val updateProject: UpdateProject,
     private val getProjectById: GetProjectById,
     private val deleteProject: DeleteProject
 ) : ViewModel() {
-
 
     private var projectId: Int? = null
 
@@ -62,22 +60,12 @@ class ProjectCreateEditViewModelNew @Inject constructor(
 
     fun setProject(projectId: Int) {
         this.projectId = projectId
-        viewModelScope.launch(IO)
-        {
+        viewModelScope.launch(IO) {
             getProjectById(projectId).collectLatest { project ->
                 if (project != null)
-                    _uiState.update {
-                        it.copy(
-                            title = project.title,
-                            description = project.description,
-                            responsible = project.responsible,
-                            chosenUserList = project.team,
-                            projectStatus = project.status,
-                            screenMode = ScreenMode.EDIT
-                        )
-                    }
+                    updateProjectInUistate(project)
+                getAllUsers.setChosenUsersList(uiState.value.chosenUserList)
             }
-
         }
     }
 
@@ -89,7 +77,6 @@ class ProjectCreateEditViewModelNew @Inject constructor(
                 it.copy(projectInputState = it.projectInputState.copy(isTitleEmpty = false))
             }
     }
-
 
     fun setDescription(text: String) {
         _uiState.update { it.copy(description = text) }
@@ -105,7 +92,6 @@ class ProjectCreateEditViewModelNew @Inject constructor(
     }
 
     fun setProjectStatus(status: ProjectStatus) {
-
         _uiState.update { it.copy(projectStatus = status) }
     }
 
@@ -116,7 +102,6 @@ class ProjectCreateEditViewModelNew @Inject constructor(
     }
 
     fun addOrRemoveUser(user: User) {
-
         val listIds = uiState.value.chosenUserList?.getListUserIdsFromList()
         if (listIds?.contains(user.id) == true) {
             uiState.value.chosenUserList?.remove(
@@ -127,107 +112,111 @@ class ProjectCreateEditViewModelNew @Inject constructor(
         } else {
             uiState.value.chosenUserList?.add(user)
         }
+        getAllUsers.setChosenUsersList(uiState.value.chosenUserList)
+        if(uiState.value.chosenUserList?.isEmpty() != true)
+            _uiState.update {
+                it.copy(projectInputState = it.projectInputState.copy(isTeamEmpty = false))
+            }
     }
 
     fun setUserSearch(query: String) {
-
         _uiState.update { it.copy(userSearchQuery = query) }
         getAllUsers.setFilter(query)
     }
 
-    fun updateChosenUsers() {
-
-        getAllUsers.setChosenUsersList(uiState.value.chosenUserList)
-    }
-
     fun createProject() {
-
-        Log.d("createProject", "input validated")
-        CoroutineScope(IO).launch {
-            val response = createProject(
-                constructProject()
-            )
-
-            _uiState.update {
-                it.copy(
-                    projectInputState = ProjectInputState(
-                        serverResponse = response
-                    )
+        validateInput {
+            CoroutineScope(IO).launch {
+                val response = createProject(
+                    project = constructProject()
                 )
+                _uiState.update {
+                    it.copy(
+                        projectInputState = ProjectInputState(
+                            serverResponse = response
+                        )
+                    )
+                }
             }
         }
     }
 
 
     fun updateProject() {
-        Log.d("updateProject", "before validating")
         validateInput {
-            validateInput {
-                Log.d("updateProject", "input validated")
-                CoroutineScope(IO).launch {
-                    val response = updateProject(
-                        projectId ?: 0,
-                        constructProject(),
-                        uiState.value.projectStatus
-                    )
-                    Log.d("updateProject", response.toString())
-                    _uiState.update {
-                        it.copy(
-                            projectInputState = ProjectInputState(
-                                serverResponse = response
-                            )
+            CoroutineScope(IO).launch {
+                val response = updateProject(
+                    projectId = projectId ?: 0,
+                    project = constructProject(),
+                    projectStatus = uiState.value.projectStatus
+                )
+                _uiState.update {
+                    it.copy(
+                        projectInputState = ProjectInputState(
+                            serverResponse = response
                         )
-                    }
-
+                    )
                 }
             }
         }
     }
 
-    fun deleteProject(){
-    projectId?.let {
-        Log.d("deleteProject", "deleting project")
-        CoroutineScope(IO).launch {
-            val response = deleteProject(projectId!!)
-            _uiState.update { it.copy(projectDeletionStatus = response) }
-        }
-    }
-}
-
-private fun validateInput(onSuccess: () -> Unit) {
-    when {
-
-                _uiState.value.title.isEmpty() -> _uiState.update {
-                    it.copy(
-                        projectInputState = it.projectInputState.copy(
-                            isTitleEmpty = true
-                        )
-                    )
-                }
-                _uiState.value.chosenUserList?.isEmpty() == true -> _uiState.update {
-                    it.copy(
-                        projectInputState = it.projectInputState.copy(isTeamEmpty = true)
-                    )
-                }
-                _uiState.value.responsible == null -> _uiState.update {
-                    it.copy(
-                        projectInputState = it.projectInputState.copy(
-                            isResponsibleEmpty = true
-                        )
-                    )
-                }
-                else -> onSuccess()
+    fun deleteProject() {
+        projectId?.let {
+            CoroutineScope(IO).launch {
+                val response = deleteProject(projectId!!)
+                _uiState.update { it.copy(projectDeletionStatus = response) }
             }
         }
+    }
 
-        private fun constructProject()
+    private fun validateInput(onSuccess: () -> Unit) {
+        when {
+            _uiState.value.title.isEmpty() -> _uiState.update {
+                it.copy(
+                    projectInputState = it.projectInputState.copy(
+                        isTitleEmpty = true
+                    )
+                )
+            }
+            _uiState.value.chosenUserList?.isEmpty() == true -> _uiState.update {
+                it.copy(
+                    projectInputState = it.projectInputState.copy(isTeamEmpty = true)
+                )
+            }
+            _uiState.value.responsible == null -> _uiState.update {
+                it.copy(
+                    projectInputState = it.projectInputState.copy(
+                        isResponsibleEmpty = true
+                    )
+                )
+            }
+            else -> onSuccess()
+        }
+    }
+
+    private fun constructProject()
             : Project {
-            return Project(
-                id = projectId ?: 0,
-                title = uiState.value.title,
-                description = uiState.value.description,
-                team = uiState.value.chosenUserList,
-                responsible = uiState.value.responsible
+        return Project(
+            id = projectId ?: 0,
+            title = uiState.value.title,
+            description = uiState.value.description,
+            team = uiState.value.chosenUserList,
+            responsible = uiState.value.responsible
+        )
+    }
+
+    private fun updateProjectInUistate(project: Project) {
+        _uiState.update {
+            it.copy(
+                title = project.title,
+                description = project.description,
+                responsible = project.responsible,
+                chosenUserList = project.team,
+                projectStatus = project.status,
+                screenMode = ScreenMode.EDIT
             )
         }
     }
+
+}

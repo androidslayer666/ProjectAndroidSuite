@@ -36,6 +36,10 @@ fun List<FileEntity>.fromListFileEntitiesToListFiles() : List<File>{
     return listFiles
 }
 
+fun List<FileEntity>.fromListFileEntitiesToListIds() : List<Int>{
+    return this.map { it.id }
+}
+
 
 fun FileEntity.fromFileEntityToFile(): File {
     return File(

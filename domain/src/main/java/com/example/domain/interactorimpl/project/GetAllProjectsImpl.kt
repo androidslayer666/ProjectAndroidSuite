@@ -9,6 +9,7 @@ import com.example.domain.model.User
 import com.example.domain.repository.ProjectRepository
 import com.example.domain.sorting.ProjectSorting
 import com.example.domain.sorting.sortProjects
+import com.example.domain.utils.log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

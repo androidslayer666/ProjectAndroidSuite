@@ -20,5 +20,8 @@ interface FileDao {
     fun getFilesByProjectId(projectId: Int): Flow<List<FileEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTasks(taskList: List<FileEntity>?)
+    suspend fun insertFiles(fileList: List<FileEntity>?)
+
+    @Query("DELETE FROM files WHERE id = :fileId")
+    suspend fun deleteFile(fileId: Int)
 }

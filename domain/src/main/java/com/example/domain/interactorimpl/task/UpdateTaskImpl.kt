@@ -6,6 +6,7 @@ import com.example.domain.model.Task
 import com.example.domain.repository.TaskRepository
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Result
+import com.example.domain.utils.toStringString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +27,7 @@ class UpdateTaskImpl(
                     TaskStatus.ACTIVE -> "Open"
                     TaskStatus.COMPLETE -> "Closed"
                     else -> "Open"
-                })
+                }).toStringString()
         }?: Failure("Can't figure out the task id, please reload the page")
     }
 }

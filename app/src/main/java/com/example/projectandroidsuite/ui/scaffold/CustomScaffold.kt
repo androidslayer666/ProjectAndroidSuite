@@ -176,7 +176,7 @@ fun ScaffoldFabs(
     showFabOptions: Boolean,
     navigation: ScaffoldNavigation,
     toggleFabOptions: () -> Unit
-){
+) {
     Column {
         AnimateExtendedFabVisibility(
             condition = showFabOptions,
@@ -184,7 +184,10 @@ fun ScaffoldFabs(
         ) {
             FloatingActionButton(
                 modifier = Modifier.padding(bottom = 12.dp),
-                onClick = { navigation.navigateToCreateProject() }
+                onClick = {
+                    toggleFabOptions()
+                    navigation.navigateToCreateProject()
+                }
             ) {
                 Icon(painterResource(R.drawable.clipboard_list_outline), "")
             }
@@ -195,7 +198,10 @@ fun ScaffoldFabs(
         ) {
             FloatingActionButton(
                 modifier = Modifier.padding(bottom = 12.dp),
-                onClick = { navigation.navigateToCreateTask() }
+                onClick = {
+                    toggleFabOptions()
+                    navigation.navigateToCreateTask()
+                }
             ) {
                 Icon(painterResource(R.drawable.calendar_check_outline), "")
             }

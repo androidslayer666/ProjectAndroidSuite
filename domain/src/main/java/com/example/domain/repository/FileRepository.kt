@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface FileRepository {
 
-    suspend fun populateTaskFiles(taskId: Int): Result<String, String>
+    suspend fun populateTaskFiles(taskId: Int): Result<String, Throwable>
 
-    suspend fun populateProjectFiles(projectId: Int): Result<String, String>
+    suspend fun populateProjectFiles(projectId: Int): Result<String, Throwable>
 
     fun getFilesWithTaskId(taskId: Int): Flow<List<File>>
 

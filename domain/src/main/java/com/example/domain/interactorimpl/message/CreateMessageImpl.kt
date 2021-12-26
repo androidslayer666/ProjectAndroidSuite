@@ -5,6 +5,7 @@ import com.example.domain.model.Message
 import com.example.domain.model.User
 import com.example.domain.repository.MessageRepository
 import com.example.domain.utils.Result
+import com.example.domain.utils.toStringString
 
 class CreateMessageImpl(
     private val messageRepository:MessageRepository
@@ -15,7 +16,7 @@ class CreateMessageImpl(
         message: Message,
         participants: List<User>
     ): Result<String, String> {
-        return messageRepository.putMessageToProject(projectId, message, participants)
+        return messageRepository.putMessageToProject(projectId, message, participants).toStringString()
     }
 
 }

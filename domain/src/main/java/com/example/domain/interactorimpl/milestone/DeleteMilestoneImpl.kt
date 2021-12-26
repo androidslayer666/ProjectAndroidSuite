@@ -3,6 +3,7 @@ package com.example.domain.interactorimpl.milestone
 import com.example.domain.interactor.milestone.DeleteMilestone
 import com.example.domain.repository.MilestoneRepository
 import com.example.domain.utils.Result
+import com.example.domain.utils.toStringString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,6 +15,6 @@ class DeleteMilestoneImpl(
         CoroutineScope(Dispatchers.IO).launch {
             milestoneRepository.populateMilestonesByProject(projectId?:0)
         }
-        return milestoneRepository.deleteMilestone(milestoneId?:0, projectId)
+        return milestoneRepository.deleteMilestone(milestoneId?:0, projectId).toStringString()
     }
 }

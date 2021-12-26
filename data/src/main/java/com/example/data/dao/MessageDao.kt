@@ -17,7 +17,7 @@ interface MessageDao {
     fun getMessageByProjectIdFlow(projectId: Int): Flow<List<MessageEntity>>
 
     @Query("SELECT * FROM message WHERE id = :messageId")
-    fun getMessageByMessageId(messageId: Int): Flow<MessageEntity>
+    fun getMessageByMessageId(messageId: Int): Flow<MessageEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessages(messageList: List<MessageEntity>)

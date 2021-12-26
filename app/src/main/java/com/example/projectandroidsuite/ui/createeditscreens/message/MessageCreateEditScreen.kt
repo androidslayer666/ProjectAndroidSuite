@@ -1,12 +1,10 @@
 package com.example.projectandroidsuite.ui.createeditscreens.message
 
 import android.util.Log
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import com.example.domain.utils.Failure
@@ -14,6 +12,10 @@ import com.example.domain.utils.Success
 import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
+import com.example.projectandroidsuite.ui.parts.dialogs.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.inputs.ChooseTeam
+import com.example.projectandroidsuite.ui.parts.inputs.DescriptionInput
+import com.example.projectandroidsuite.ui.parts.inputs.TitleInput
 import com.example.projectandroidsuite.ui.utils.PickerType
 import com.example.projectandroidsuite.ui.utils.hideKeyboardOnLoseFocus
 import com.example.projectandroidsuite.ui.utils.makeToast

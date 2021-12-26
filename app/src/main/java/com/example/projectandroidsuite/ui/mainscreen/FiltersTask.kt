@@ -13,7 +13,7 @@ import com.example.domain.filters.task.TaskStatus
 import com.example.domain.model.User
 import com.example.domain.sorting.TaskSorting
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
-import com.example.projectandroidsuite.ui.parts.TeamPickerDialog
+import com.example.projectandroidsuite.ui.parts.dialogs.TeamPickerDialog
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 import com.example.projectandroidsuite.ui.parts.customitems.CustomButton
 import com.example.projectandroidsuite.ui.parts.customitems.CustomSortButton

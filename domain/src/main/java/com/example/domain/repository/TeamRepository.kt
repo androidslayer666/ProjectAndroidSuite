@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface TeamRepository {
 
-    suspend fun populateAllPortalUsers() : Result<String, String>
+    suspend fun populateAllPortalUsers() : Result<String, Throwable>
 
     fun getAllPortalUsers() : Flow<List<User>>
 

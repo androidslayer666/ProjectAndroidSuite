@@ -4,13 +4,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.navigation.ProjectsScreens
 import com.example.projectandroidsuite.ui.navigation.navigateTo
 import com.example.projectandroidsuite.ui.parts.*
-import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
+import com.example.projectandroidsuite.ui.parts.lists.ListFiles
+import com.example.projectandroidsuite.ui.parts.lists.ListMessages
+import com.example.projectandroidsuite.ui.parts.lists.ListTasksMilestones
 
 @Composable
 fun ProjectDetailPage(

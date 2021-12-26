@@ -39,7 +39,7 @@ data class TaskTransporter(
 
 data class FilesTransporter(
     @SerializedName("response")
-    val listFiles: FilesSubTransporter? = null
+    val filesSubTransporter: FilesSubTransporter? = null
 )
 
 data class FilesTransporterResponse(

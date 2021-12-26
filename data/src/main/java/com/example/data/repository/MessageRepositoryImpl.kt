@@ -1,10 +1,12 @@
 package com.example.data.repository
 
 import android.util.Log
+import com.example.data.ResponseIsEmptyException
 import com.example.data.dao.CommentDao
 import com.example.data.dao.MessageDao
 import com.example.data.endpoints.CommentEndPoint
 import com.example.data.endpoints.MessageEndPoint
+import com.example.domain.dto.MessageDto
 import com.example.domain.entities.MessageEntity
 import com.example.domain.mappers.*
 import com.example.domain.model.Message
@@ -24,31 +26,36 @@ class MessageRepositoryImpl @Inject constructor(
     private val commentDao: CommentDao
 ) : MessageRepository {
 
-    override suspend fun populateMessageWithProjectId(projectId: Int): Result<String, String> {
-        try {
-            //Log.d("CommentRepository", projectId.toString())
+    override suspend fun populateMessageWithProjectId(projectId: Int): Result<String, Throwable> {
+        return try {
             val messages = messageEndPoint.getMessagesWithProject(projectId).listMessages
 
-            val messagesFromDb = messageDao.getMessageByProjectId(projectId)
-            messagesFromDb.forEach {
-                if (messages?.toListMessageIds()?.contains(it.id) != true) {
-                    messageDao.deleteMessage(it.id)
-                }
-            }
-
-            return if (messages != null) {
+            if (messages == null) {
+                Failure(ResponseIsEmptyException())
+            } else {
+                deleteMessageFromDbIfDeletedOnServer(projectId, messages)
                 for (message in messages) {
                     putCommentsToMessage(message.toEntity(projectId))
                 }
-                Success("Messages are populated")
-            } else {
-                Failure("Can't download messages")
+                Success("")
             }
         } catch (e: Exception) {
-            Log.d("MessageRepository", "caught an exception : ${e.message}")
-            return Failure("Can't download messages")
+            Failure(e)
         }
     }
+
+    private suspend fun deleteMessageFromDbIfDeletedOnServer(
+        projectId : Int,
+        messages: List<MessageDto>?
+    ){
+        val messagesFromDb = messageDao.getMessageByProjectId(projectId)
+        messagesFromDb.forEach {
+            if (messages?.toListMessageIds()?.contains(it.id) != true) {
+                messageDao.deleteMessage(it.id)
+            }
+        }
+    }
+
 
     override suspend fun updateMessageComments(messageId: Int, projectId: Int) {
         val message = messageEndPoint.getMessageWithId(messageId).message
@@ -59,11 +66,7 @@ class MessageRepositoryImpl @Inject constructor(
         val comments = commentEndPoint.getMessageComments(message.id).listCommentDtos
 
         if (comments != null) {
-            Log.d(
-                "populateMessageWiectId",
-                "inserting comments" + comments.map { it.id }.toString()
-            )
-            message.listComments = arrangingComments(comments.toListEntities())
+            message.listComments = comments.toListEntities()
         }
 
         val commentFromDb = commentDao.getCommentsByMessageId(message.id)
@@ -84,7 +87,6 @@ class MessageRepositoryImpl @Inject constructor(
     override fun getMessageById(messageId: Int): Flow<Message?> {
         return messageDao.getMessageByMessageId(messageId)
             .transform {
-                //Log.d("getMessageById", it.toString())
                 emit(it?.fromMessageEntityToMessage()) }
     }
 
@@ -97,8 +99,7 @@ class MessageRepositoryImpl @Inject constructor(
         projectId: Int,
         message: Message,
         participants: List<User>
-    ): Result<String, String> {
-        Log.d("ProjectRepository", "Started creating message  $message")
+    ): Result<String, Throwable> {
 
         return networkCaller(
             call = {
@@ -107,9 +108,7 @@ class MessageRepositoryImpl @Inject constructor(
                     message.toMessagePost(participants = participants)
                 )
             },
-            onSuccess = { populateMessageWithProjectId(projectId) },
-            onSuccessString = "Message added successfully",
-            onFailureString = "Having problem while creating the message, please check the network connection"
+            onSuccess = { populateMessageWithProjectId(projectId) }
         )
     }
 
@@ -117,8 +116,7 @@ class MessageRepositoryImpl @Inject constructor(
         projectId: Int,
         message: Message,
         participants: List<User>
-    ): Result<String, String> {
-        Log.d("ProjectRepository", "Started creating message  $message")
+    ): Result<String, Throwable> {
 
         return networkCaller(
             call = {
@@ -127,20 +125,16 @@ class MessageRepositoryImpl @Inject constructor(
                     message.toMessagePost(projectId, participants)
                 )
             },
-            onSuccess = { populateMessageWithProjectId(projectId) },
-            onSuccessString = "Message added successfully",
-            onFailureString = "Having problem while creating the message, please check the network connection"
+            onSuccess = { populateMessageWithProjectId(projectId) }
         )
     }
 
 
-    override suspend fun deleteMessage(messageId: Int, projectId: Int?): Result<String, String> {
+    override suspend fun deleteMessage(messageId: Int, projectId: Int?): Result<String, Throwable> {
 
         return networkCaller(
             call = { messageEndPoint.deleteMessage(messageId) },
-            onSuccess = { projectId?.let { populateMessageWithProjectId(it) } },
-            onSuccessString = "Message deleted successfully",
-            onFailureString = "Having problem while deleting the message, please check the network connection"
+            onSuccess = { projectId?.let { populateMessageWithProjectId(it) } }
         )
     }
 }

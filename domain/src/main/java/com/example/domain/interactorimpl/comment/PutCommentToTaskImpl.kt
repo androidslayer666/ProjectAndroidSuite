@@ -4,6 +4,7 @@ import com.example.domain.interactor.comment.PutCommentToTask
 import com.example.domain.model.Comment
 import com.example.domain.repository.CommentRepository
 import com.example.domain.utils.Result
+import com.example.domain.utils.toStringString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,6 +16,6 @@ class PutCommentToTaskImpl(
         CoroutineScope(Dispatchers.IO).launch {
             commentRepository.populateCommentsWithTaskId(taskId)
         }
-        return commentRepository.putCommentToTask(taskId, comment)
+        return commentRepository.putCommentToTask(taskId, comment).toStringString()
     }
 }
