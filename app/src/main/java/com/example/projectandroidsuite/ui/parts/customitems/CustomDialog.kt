@@ -21,7 +21,7 @@ fun CustomDialog(
     hide: () -> Unit,
     text: String,
     onSubmit: () -> Unit,
-    onDeleteClick: (() -> Unit)? = null,
+    //onDeleteClick: (() -> Unit)? = null,
     showButtons: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -66,7 +66,6 @@ fun CustomDialog(
                     ButtonRow(
                         onSubmit = onSubmit,
                         onDismiss = hide,
-                        onDelete = onDeleteClick
                     )
                 }
             }

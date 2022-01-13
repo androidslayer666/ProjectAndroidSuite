@@ -25,7 +25,7 @@ class GetAllFilesImpl(
     override operator fun invoke(): Flow<List<File>> {
         CoroutineScope(Dispatchers.IO).launch {
             projectRepository.getAllStoredProjects().collectLatest { projects ->
-                projects.forEach {
+                projects?.forEach {
                     fileRepository.populateProjectFiles(it.id)
                 }
             }

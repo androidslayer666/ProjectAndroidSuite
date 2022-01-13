@@ -90,10 +90,9 @@ class MessageRepositoryImpl @Inject constructor(
                 emit(it?.fromMessageEntityToMessage()) }
     }
 
-    override suspend fun clearTable() {
-
+    override suspend fun clearLocalCache() {
+        messageDao.clearLocalCache()
     }
-
 
     override suspend fun putMessageToProject(
         projectId: Int,

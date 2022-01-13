@@ -31,4 +31,7 @@ interface MilestoneDao {
     @Query("SELECT * FROM milestones")
     fun getAllMilestones(): Flow<List<MilestoneEntity>>
 
+    @Query("DELETE FROM milestones")
+    suspend fun clearLocalCache()
+
 }

@@ -37,6 +37,7 @@ class TaskRepositoryImpl @Inject constructor(
         }
     }
 
+
     override fun getTasksByProject(projectId: Int): Flow<List<Task>> {
         return taskDao.getTasksWithProject(projectId).transform {
             emit(it.fromListTaskEntitiesToListTasks())
@@ -126,6 +127,10 @@ class TaskRepositoryImpl @Inject constructor(
             call = { taskEndPoint.deleteTask(taskId) },
             onSuccess = { populateTasks() }
         )
+    }
+
+    override suspend fun clearLocalCache() {
+        taskDao.clearLocalCache()
     }
 
 }

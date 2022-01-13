@@ -44,9 +44,6 @@ data class TaskCreateState(
     val projectSearchQuery: String = "",
     val endDate: Date = Date(),
     val users: List<User>? = null,
-    val projectStatus: ProjectStatus? = null,
-    val projectInputState: ProjectInputState = ProjectInputState(),
-    val projectDeletionStatus: Result<String, String>? = null,
     val projectList: List<Project>? = null,
     val milestonesList: List<Milestone>? = null,
     val taskInputState: TaskInputState = TaskInputState(),
@@ -262,7 +259,7 @@ class TaskCreateEditViewModelNew @Inject constructor(
         Log.d("deleteTask", "start deleting a task")
         CoroutineScope(Dispatchers.IO).launch {
             val response = deleteTask(taskId)
-            _uiState.update { it.copy(projectDeletionStatus = response) }
+            _uiState.update { it.copy(taskDeletionStatus = response) }
         }
     }
 

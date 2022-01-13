@@ -27,5 +27,8 @@ interface CommentDao {
     @Query("DELETE FROM comments WHERE id = :commentId")
     suspend fun deleteComment(commentId: String)
 
+    @Query("DELETE FROM comments")
+    suspend fun clearLocalCache()
+
 
 }

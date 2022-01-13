@@ -37,7 +37,6 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     private fun saveAuthToken(token: TokenDto) {
-        //Log.d("SessionManager", token.authToken)
         val editor = prefs.edit()
         _authenticated.value = true
         editor.putString(USER_TOKEN, token.authToken)

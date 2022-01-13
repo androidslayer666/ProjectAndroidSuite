@@ -53,7 +53,6 @@ class InteractorsSingletonProvider {
     }
 
 
-
     @Provides
     @Singleton
     fun provideCreateProject(projectRepository: ProjectRepository): CreateProject {
@@ -65,8 +64,6 @@ class InteractorsSingletonProvider {
     fun provideUpdateProject(projectRepository: ProjectRepository): UpdateProject {
         return UpdateProjectImpl(projectRepository)
     }
-
-
 
 
     @Provides
@@ -86,7 +83,6 @@ class InteractorsSingletonProvider {
     fun provideUpdateTaskStatus(taskRepository: TaskRepository): UpdateTaskStatus {
         return UpdateTaskStatusImpl(taskRepository)
     }
-
 
 
     @Provides
@@ -195,7 +191,6 @@ class InteractorsSingletonProvider {
     }
 
 
-
     @Provides
     @Singleton
     fun provideGetFilesByProjectId(
@@ -213,8 +208,24 @@ class InteractorsSingletonProvider {
 
     @Provides
     @Singleton
-    fun provideLogout(authRepository: AuthRepository): Logout {
-        return LogoutImpl(authRepository)
+    fun provideLogout(
+        authRepository: AuthRepository,
+        fileRepository: FileRepository,
+        taskRepository: TaskRepository,
+        projectRepository: ProjectRepository,
+        commentRepository: CommentRepository,
+        messageRepository: MessageRepository,
+        milestoneRepository: MilestoneRepository
+    ): Logout {
+        return LogoutImpl(
+            authRepository = authRepository,
+            fileRepository = fileRepository,
+            messageRepository = messageRepository,
+            taskRepository = taskRepository,
+            projectRepository = projectRepository,
+            commentRepository = commentRepository,
+            milestoneRepository = milestoneRepository
+        )
     }
 
     @Provides
@@ -247,5 +258,10 @@ class InteractorsSingletonProvider {
         return LoginImpl(authRepository)
     }
 
+    @Provides
+    @Singleton
+    fun provideGetOverdueTasksImpl(taskRepository: TaskRepository): GetOverdueTasks {
+        return GetOverdueTasksImpl(taskRepository)
+    }
 
 }

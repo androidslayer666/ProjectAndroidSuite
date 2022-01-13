@@ -24,4 +24,8 @@ interface FileDao {
 
     @Query("DELETE FROM files WHERE id = :fileId")
     suspend fun deleteFile(fileId: Int)
+
+    @Query("DELETE FROM files")
+    suspend fun clearLocalCache()
+
 }

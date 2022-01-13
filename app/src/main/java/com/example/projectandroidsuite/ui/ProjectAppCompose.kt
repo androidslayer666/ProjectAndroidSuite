@@ -12,7 +12,8 @@ import com.example.projectandroidsuite.ui.navigation.ProjectNavHost
 import com.example.projectandroidsuite.ui.scaffold.CustomScaffold
 
 @Composable
-fun ProjectAppCompose() {
+fun ProjectAppCompose()
+{
 
     val navController = rememberNavController()
     var showScaffold by rememberSaveable { mutableStateOf(true) }
@@ -24,7 +25,6 @@ fun ProjectAppCompose() {
             showScaffold = showScaffold
             ) {
             ProjectNavHost(
-                loginViewModel = hiltViewModel(),
                 navController = navController,
                 setShowScaffold = { bool -> showScaffold = bool}
             )

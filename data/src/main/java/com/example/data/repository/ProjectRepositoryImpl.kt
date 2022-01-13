@@ -119,4 +119,8 @@ class ProjectRepositoryImpl @Inject constructor(
             }
         )
     }
+
+    override suspend fun clearLocalCache() {
+        projectDao.clearLocalCache()
+    }
 }

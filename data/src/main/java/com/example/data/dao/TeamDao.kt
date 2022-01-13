@@ -8,10 +8,13 @@ import com.example.domain.entities.UserEntity
 
 @Dao
 interface TeamDao {
-
-    @Query("SELECT * FROM users")
-    fun getAllUsers(): List<UserEntity>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertUsers(usersList: List<UserEntity>)
+//
+//    @Query("SELECT * FROM users")
+//    fun getAllUsers(): List<UserEntity>
+//
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    suspend fun insertUsers(usersList: List<UserEntity>)
+//
+//    @Query("DELETE FROM users")
+//    suspend fun clearLocalCache()
 }

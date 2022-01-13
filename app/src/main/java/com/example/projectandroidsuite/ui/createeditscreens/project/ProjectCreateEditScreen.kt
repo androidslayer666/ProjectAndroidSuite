@@ -6,12 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.domain.filters.project.ProjectStatus
-import com.example.domain.model.User
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
 import com.example.domain.utils.log
+import com.example.projectandroidsuite.R
+import com.example.projectandroidsuite.ui.ProjectTheme
 import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
@@ -47,6 +49,7 @@ fun ProjectCreateEditScreen(
         viewModel.clearInput()
         navigateBack()
     }
+
     if (uiState.projectInputState.serverResponse is Failure) {
         LaunchedEffect(key1 = uiState.projectInputState.serverResponse) {
             viewModel.clearInput()
@@ -108,7 +111,7 @@ fun ProjectCreateEditScreen(
 
         if (showDeleteDialog) {
             ConfirmationDialog(
-                text = "Do you want to delete the project?",
+                text = stringResource(R.string.do_you_want_to_delete_the_project),
                 onSubmit = {
                     viewModel.deleteProject()
                 },
@@ -120,15 +123,15 @@ fun ProjectCreateEditScreen(
 @Composable
 fun ProjectCreateEditScreenBody(
     uiState: ProjectCreateState,
-    setTitle: (String) -> Unit,
-    setDescription: (String) -> Unit,
-    setProjectStatus: (ProjectStatus) -> Unit,
-    createProject: () -> Unit,
-    updateProject: () -> Unit,
-    showResponsiblePicker: () -> Unit,
-    showTeamPicker: () -> Unit,
-    showDeleteDialog: () -> Unit,
-    navigateBack: () -> Unit
+    setTitle: (String) -> Unit = {},
+    setDescription: (String) -> Unit = {},
+    setProjectStatus: (ProjectStatus) -> Unit = {},
+    createProject: () -> Unit = {},
+    updateProject: () -> Unit = {},
+    showResponsiblePicker: () -> Unit = {},
+    showTeamPicker: () -> Unit = {},
+    showDeleteDialog: () -> Unit = {},
+    navigateBack: () -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -138,7 +141,7 @@ fun ProjectCreateEditScreenBody(
         TitleInput(
             text = uiState.title,
             onInputChange = { text -> setTitle(text) },
-            textIsEmptyWhenShouldnt = uiState.projectInputState.isTitleEmpty
+            textIsEmpty = uiState.projectInputState.isTitleEmpty
         )
 
         DescriptionInput(
@@ -149,13 +152,13 @@ fun ProjectCreateEditScreenBody(
         ChooseUser(
             responsible = uiState.responsible,
             onClick = { showResponsiblePicker() },
-            userIsEmptyWhenShouldnt = uiState.projectInputState.isResponsibleEmpty
+            userIsEmpty = uiState.projectInputState.isResponsibleEmpty
         )
 
         ChooseTeam(
             team = uiState.chosenUserList,
             onClick = { showTeamPicker() },
-            teamIsEmptyWhenShouldnt = uiState.projectInputState.isTeamEmpty
+            teamIsEmpty = uiState.projectInputState.isTeamEmpty
         )
 
         ChooseProjectStatus(
@@ -168,9 +171,9 @@ fun ProjectCreateEditScreenBody(
                 if (uiState.screenMode == ScreenMode.CREATE) createProject()
                 else updateProject()
             },
-            onDelete = { showDeleteDialog() },
-            onDismiss = { navigateBack() }
-
+            onDelete = showDeleteDialog,
+            onDismiss = { navigateBack() },
+            showDeleteOption = uiState.screenMode == ScreenMode.EDIT
         )
     }
 }
@@ -178,22 +181,15 @@ fun ProjectCreateEditScreenBody(
 @Preview
 @Composable
 fun CreateProjectScreenPreview() {
-    ProjectCreateEditScreenBody(
-        uiState = ProjectCreateState(
-            screenMode = ScreenMode.CREATE,
-            projectStatus = ProjectStatus.STOPPED,
-            title = "Title",
-            description = "Description",
-            responsible = User(id = "", firstName = "FirstName", lastName = "LastName")
-        ),
-        setTitle = {},
-        setDescription = {},
-        setProjectStatus = {},
-        createProject = {  },
-        updateProject = {  },
-        showResponsiblePicker = {  },
-        showTeamPicker = {  },
-        showDeleteDialog = {  }) {
-
+    ProjectTheme {
+        ProjectCreateEditScreenBody(
+            uiState = ProjectCreateState(
+                screenMode = ScreenMode.CREATE,
+                projectStatus = ProjectStatus.STOPPED,
+                title = "Title",
+                description = "Description",
+                responsible = null
+            )) {
+        }
     }
 }

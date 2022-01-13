@@ -70,4 +70,8 @@ class TeamRepositoryImpl @Inject constructor(
         }
         return this
     }
+
+    override suspend fun clearLocalCache() {
+        userDao.clearLocalCache()
+    }
 }

@@ -1,5 +1,6 @@
 <resources>
     <dimen name="smallPadding">4dp</dimen>
+    <dimen name="mediumPadding">10dp</dimen>
 
 
 </resources>

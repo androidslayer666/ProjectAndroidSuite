@@ -6,8 +6,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import com.example.domain.filters.project.ProjectStatus
+import com.example.domain.filters.task.TaskStatus
+import com.example.domain.model.TaskPriority
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
@@ -29,9 +34,7 @@ fun TaskCreateEditScreen(
     navigateBack: () -> Unit
 ) {
 
-    if (taskId != 0) LaunchedEffect(key1 = taskId) {viewModel.setTask(taskId!!)}
-
-    val focusManager = LocalFocusManager.current
+    if (taskId != 0) LaunchedEffect(key1 = taskId) { viewModel.setTask(taskId!!) }
 
     val context = LocalContext.current
 
@@ -45,94 +48,43 @@ fun TaskCreateEditScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
 
-
-    when {
-        uiState.taskInputState.isTitleEmpty == true -> LaunchedEffect(key1 = uiState.taskInputState) {
-            makeToast("Please enter project title", context)
+    if (uiState.taskInputState.serverResponse is Success) {
+        LaunchedEffect(key1 = uiState.taskInputState) {
+            viewModel.clearInput()
+            navigateBack()
         }
-        uiState.taskInputState.isTeamEmpty == true -> LaunchedEffect(key1 = uiState.taskInputState) {
-            makeToast("Please choose project", context)
+    }
+    if (uiState.taskInputState.serverResponse is Failure) {
+        LaunchedEffect(key1 = uiState.taskInputState) {
+            makeToast("Something went wrong with the server request", context)
         }
-        uiState.taskInputState.isProjectEmpty == true -> LaunchedEffect(key1 = uiState.taskInputState) {
-            makeToast("Please enter task responsible", context)
-        }
-        uiState.taskInputState.serverResponse is Success -> {
-            LaunchedEffect(key1 = uiState.taskInputState) {
-                viewModel.clearInput()
-                navigateBack()
-            }
-        }
-        uiState.taskInputState.serverResponse is Failure -> {
-            LaunchedEffect(key1 = uiState.taskInputState) {
-                makeToast("Something went wrong with the server request", context)
-            }
-        }
-        uiState.taskDeletionStatus is Success -> {
-            LaunchedEffect(key1 = uiState.taskDeletionStatus) {
-                makeToast((uiState.taskDeletionStatus as Success<String>).value, context)
-                //to skip the empty project details screen
-                navigateBack()
-                navigateBack()
-            }
+    }
+    if (uiState.taskDeletionStatus is Success) {
+        LaunchedEffect(key1 = uiState.taskDeletionStatus) {
+            makeToast((uiState.taskDeletionStatus as Success<String>).value, context)
+            //to skip the project details screen which is empty now
+            navigateBack()
+            navigateBack()
         }
     }
 
-
-
     Box {
 
-        Column(modifier = Modifier.hideKeyboardOnLoseFocus(focusManager)) {
-
-            TitleInput(
-                text = uiState.title,
-                onInputChange = { text -> viewModel.setTitle(text) }
-            )
-
-            DescriptionInput(
-                text = uiState.description,
-                onInputChange = { text -> viewModel.setDescription(text) }
-            )
-
-            ChooseTaskStatus(
-                taskStatus = uiState.taskStatus,
-                setStatus = { status -> viewModel.setTaskStatus(status) }
-            )
-
-            ChooseTaskPriority(
-                priority = uiState.priority,
-                setPriority = { taskPriority -> viewModel.setPriority(taskPriority) }
-            )
-
-            ChooseProject(
-                onClick = { showProjectPicker = true },
-                project = uiState.project
-            )
-
-            ChooseTeam(
-                team = uiState.chosenUserList,
-                onClick = { showTeamPicker = true }
-            )
-
-            ChooseTaskMilestone(
-                onClick = { showMilestonePicker = true },
-                milestone = uiState.milestone
-            )
-
-            DatePickerRow(
-                toggleDatePicker = { showDatePicker = true },
-                endDate = uiState.endDate,
-            )
-
-
-            ButtonRow(
-                onSubmit = {
-                    if (uiState.screenMode == ScreenMode.CREATE) viewModel.createTask()
-                    else viewModel.updateTask()
-                           },
-                onDismiss = navigateBack,
-                onDelete = { showDeleteDialog = true }
-            )
-        }
+        TaskCreateEditScreenBody(
+            uiState = uiState,
+            setTitle = { text -> viewModel.setTitle(text) },
+            setDescription = { text -> viewModel.setDescription(text) },
+            setTaskStatus = { status -> viewModel.setTaskStatus(status) },
+            setPriority = { taskPriority -> viewModel.setPriority(taskPriority) },
+            createTask = { viewModel.createTask() },
+            updateTask = { viewModel.updateTask() },
+            showProjectPicker = { showProjectPicker = true },
+            showMilestonePicker = { showMilestonePicker = true },
+            showTeamPicker = { showTeamPicker = true },
+            showDatePicker = { showDatePicker = true },
+            showDeleteDialog = { showDeleteDialog = true },
+            navigateBack = navigateBack
+        )
 
         if (showProjectPicker) {
             ProjectPickerDialog(
@@ -153,7 +105,6 @@ fun TaskCreateEditScreen(
         if (showTeamPicker) {
             TeamPickerDialog(
                 list = listUsersFlow,
-                //onSubmit = { showTeamPicker = false },
                 onClick = { user -> viewModel.addOrRemoveUser(user) },
                 closeDialog = { showTeamPicker = false },
                 pickerType = PickerType.MULTIPLE,
@@ -162,10 +113,10 @@ fun TaskCreateEditScreen(
             )
         }
 
-        uiState.milestonesList.let {
-            if (showMilestonePicker && it?.isNotEmpty() == true) {
+        if (uiState.milestonesList != null ){
+            if (showMilestonePicker && uiState.milestonesList?.isNotEmpty() == true) {
                 DialogPickerMilestone(
-                    list = it,
+                    list = uiState.milestonesList,
                     onClick = { milestone -> viewModel.setMilestone(milestone) },
                     closeDialog = { showMilestonePicker = false }
                 )
@@ -180,12 +131,89 @@ fun TaskCreateEditScreen(
 
         if (showDeleteDialog) {
             ConfirmationDialog(
-                text = "Do you want to delete the task?",
+                text = stringResource(R.string.do_you_want_to_delete_the_task),
                 onSubmit = {
                     viewModel.deleteTask()
                 },
                 { showDeleteDialog = false })
         }
 
+    }
+}
+
+@Composable
+fun TaskCreateEditScreenBody(
+    uiState: TaskCreateState,
+    setTitle: (String) -> Unit = {},
+    setDescription: (String) -> Unit = {},
+    setTaskStatus: (TaskStatus) -> Unit = {},
+    setPriority: (TaskPriority) -> Unit = {},
+    createTask: () -> Unit = {},
+    updateTask: () -> Unit = {},
+    showProjectPicker: () -> Unit = {},
+    showMilestonePicker: () -> Unit = {},
+    showTeamPicker: () -> Unit = {},
+    showDatePicker: () -> Unit = {},
+    showDeleteDialog: () -> Unit = {},
+    navigateBack: () -> Unit = {}
+) {
+    val focusManager = LocalFocusManager.current
+
+
+    Column(modifier = Modifier.hideKeyboardOnLoseFocus(focusManager)) {
+
+        TitleInput(
+            text = uiState.title,
+            onInputChange = { text -> setTitle(text) },
+            textIsEmpty = uiState.taskInputState.isTitleEmpty
+        )
+
+        DescriptionInput(
+            text = uiState.description,
+            onInputChange = { text -> setDescription(text) }
+        )
+
+        ChooseTaskStatus(
+            taskStatus = uiState.taskStatus,
+            setStatus = { status -> setTaskStatus(status) }
+        )
+
+        ChooseTaskPriority(
+            priority = uiState.priority,
+            setPriority = { taskPriority -> setPriority(taskPriority) }
+        )
+
+        ChooseProject(
+            onClick = showProjectPicker,
+            project = uiState.project,
+            projectIsEmpty = uiState.taskInputState.isProjectEmpty
+        )
+
+        ChooseTeam(
+            team = uiState.chosenUserList,
+            onClick = showTeamPicker,
+            teamIsEmpty = uiState.taskInputState.isTeamEmpty
+        )
+
+        ChooseTaskMilestone(
+            onClick = showMilestonePicker,
+            milestone = uiState.milestone
+        )
+
+        DatePickerRow(
+            toggleDatePicker = showDatePicker,
+            endDate = uiState.endDate,
+        )
+
+
+        ButtonRow(
+            onSubmit = {
+                if (uiState.screenMode == ScreenMode.CREATE) createTask()
+                else updateTask()
+            },
+            onDismiss = navigateBack,
+            onDelete = showDeleteDialog,
+            showDeleteOption = uiState.screenMode == ScreenMode.EDIT
+        )
     }
 }

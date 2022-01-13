@@ -30,9 +30,9 @@ class GetAllProjectsImpl(
             projectRepository.getProjects()
         }
         return projectRepository.getAllStoredProjects().combine(projectFilter) { projects, filter ->
-            projects.filterProjectsByFilter(filter)
+            projects?.filterProjectsByFilter(filter)
         }.combine(projectSorting) { projects, sorting ->
-            projects.sortProjects(sorting)
+            projects?.sortProjects(sorting)
         }
     }
 

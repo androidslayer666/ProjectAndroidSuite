@@ -22,6 +22,6 @@ interface ProjectRepository {
 
     suspend fun deleteProject(projectId: Int): Result<String, Throwable>
 
-
+    suspend fun clearLocalCache()
 
 }

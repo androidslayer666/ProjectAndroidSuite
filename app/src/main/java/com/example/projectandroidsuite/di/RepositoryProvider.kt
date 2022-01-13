@@ -1,4 +1,4 @@
-package com.example.domain.di
+package com.example.projectandroidsuite.di
 
 import android.content.Context
 import com.example.data.dao.*

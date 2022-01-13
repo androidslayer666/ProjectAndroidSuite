@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.User
+import com.example.projectandroidsuite.ui.ProjectTheme
 import com.example.projectandroidsuite.ui.parts.CardTeamMember
 import com.example.projectandroidsuite.ui.parts.RowTeamMember
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
@@ -15,7 +17,7 @@ import com.example.projectandroidsuite.ui.parts.customitems.ButtonUsers
 fun ChooseUser(
     onClick: () -> Unit,
     responsible: User?,
-    userIsEmptyWhenShouldnt: Boolean? = null
+    userIsEmpty: Boolean? = null
 ) {
 
     Row(
@@ -26,8 +28,8 @@ fun ChooseUser(
             singleUser = true,
             onClicked = { onClick() }
         )
-        if (userIsEmptyWhenShouldnt == true) {
-            ErrorMessage(condition = userIsEmptyWhenShouldnt, text = "please choose user")
+        if (userIsEmpty == true) {
+            ErrorMessage(condition = userIsEmpty, text = "please choose user")
         }
         responsible?.let { user ->
             Row(
@@ -44,7 +46,7 @@ fun ChooseUser(
 fun ChooseTeam(
     onClick: () -> Unit,
     team: List<User>?,
-    teamIsEmptyWhenShouldnt: Boolean? = null
+    teamIsEmpty: Boolean? = null
 ) {
 
     Row(
@@ -55,8 +57,8 @@ fun ChooseTeam(
             singleUser = false,
             onClicked = { onClick() }
         )
-        if (teamIsEmptyWhenShouldnt == true) {
-            ErrorMessage(condition = teamIsEmptyWhenShouldnt, text = "please choose team")
+        if (teamIsEmpty == true) {
+            ErrorMessage(condition = teamIsEmpty, text = "please choose team")
         }
         team?.let { team ->
             Row(
@@ -65,5 +67,18 @@ fun ChooseTeam(
                 RowTeamMember(list = team)
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewChooseTeam(
+) {
+    ProjectTheme {
+        ChooseTeam(
+            onClick = {},
+            team = listOf(),
+            teamIsEmpty = true
+        )
     }
 }

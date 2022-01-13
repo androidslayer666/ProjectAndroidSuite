@@ -10,6 +10,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,8 +23,10 @@ import androidx.navigation.NavHostController
 import com.example.domain.filters.task.TaskStatus
 import com.example.domain.model.Task
 import com.example.domain.model.TaskPriority
+import com.example.domain.utils.log
 import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.utils.Constants.FORMAT_SHOW_DATE
+import com.example.projectandroidsuite.ui.utils.LocalGlobalUiState
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,6 +36,16 @@ fun TaskList(
     viewModel: TasksViewModel,
     navController: NavHostController
 ) {
+
+    val ifFromNotification = LocalGlobalUiState.current.fromNotification
+
+    LaunchedEffect(key1 = ifFromNotification ) {
+        log(ifFromNotification, "LaunchedEffect")
+        if (ifFromNotification) {
+            log(ifFromNotification, "if (ifFromNotification) {")
+            viewModel.setOverdueTaskFilter()
+        }
+    }
 
     val uiState by viewModel.uiState.collectAsState()
 

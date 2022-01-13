@@ -27,8 +27,8 @@ class GetAllMilestonesImpl(
 
     override suspend operator fun invoke(): Flow<List<Milestone>> {
         CoroutineScope(Dispatchers.IO).launch {
-            projectRepository.getAllStoredProjects().transform1<List<Project>, Unit> { projects ->
-                projects.forEach { project ->
+            projectRepository.getAllStoredProjects().transform1<List<Project>?, Unit> { projects ->
+                projects?.forEach { project ->
                     milestoneRepository.populateMilestonesByProject(project.id)
                 }
             }.collectLatest {  }

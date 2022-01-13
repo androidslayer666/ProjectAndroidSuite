@@ -26,7 +26,7 @@ interface ProjectDao {
     fun deleteProject(projectId: Int)
 
     @Query("DELETE FROM projects")
-    fun deleteAllProjects()
+    fun clearLocalCache()
 
     @Update
     fun updateProject(project: ProjectEntity)

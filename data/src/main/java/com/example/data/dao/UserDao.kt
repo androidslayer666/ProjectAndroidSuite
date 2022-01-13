@@ -19,4 +19,7 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE self is 1")
     fun getSelfProfile(): Flow<UserEntity?>
 
+    @Query("DELETE FROM users")
+    suspend fun clearLocalCache()
+
 }

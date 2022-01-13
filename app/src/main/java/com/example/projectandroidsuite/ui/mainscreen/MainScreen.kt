@@ -1,6 +1,5 @@
 package com.example.projectandroidsuite.ui.mainscreen
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateIntOffsetAsState
@@ -28,9 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.domain.utils.log
 import com.example.projectandroidsuite.R
-import com.example.projectandroidsuite.ui.utils.BackPressedHandler
-import com.example.projectandroidsuite.ui.utils.SwipeDirections
-import com.example.projectandroidsuite.ui.utils.expandScrollingViewportWidthBy
+import com.example.projectandroidsuite.ui.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -42,14 +39,16 @@ fun MainScreen(
     navController: NavHostController
 ) {
 
+    val ifFromNotification = LocalGlobalUiState.current.fromNotification
+
     val coroutineScope = rememberCoroutineScope()
 
     var showFilters by remember { mutableStateOf(false) }
 
-    val swipeState = rememberSwipeableState(SwipeDirections.LEFT)
+    val swipeState =
+        rememberSwipeableState(if (ifFromNotification) SwipeDirections.RIGHT else SwipeDirections.LEFT)
 
-    var tabState by rememberSaveable { mutableStateOf(0) }
-
+    var tabState by rememberSaveable { mutableStateOf(if (ifFromNotification) 1 else 0) }
 
     val offset by animateIntOffsetAsState(
         targetValue = IntOffset(
@@ -164,7 +163,6 @@ fun FilterToggler(
                     .padding(start = 12.dp, end = 12.dp)
             )
         }
-
     }
 }
 

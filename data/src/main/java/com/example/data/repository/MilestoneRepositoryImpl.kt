@@ -121,4 +121,8 @@ class MilestoneRepositoryImpl @Inject constructor(
             onSuccess = { populateMilestonesByProject(projectId) }
         )
     }
+
+    override suspend fun clearLocalCache() {
+        milestoneDao.clearLocalCache()
+    }
 }

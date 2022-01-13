@@ -7,8 +7,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import com.example.domain.utils.Failure
 import com.example.domain.utils.Success
+import com.example.domain.utils.log
+import com.example.projectandroidsuite.R
 import com.example.projectandroidsuite.ui.createeditscreens.ScreenMode
 import com.example.projectandroidsuite.ui.parts.*
 import com.example.projectandroidsuite.ui.parts.customitems.ButtonRow
@@ -29,7 +32,7 @@ fun MessageCreateEditScreen(
     navigateBack: () -> Unit
 ) {
 
-    Log.d("MessageCreateEditScreen", messageId.toString())
+    log(messageId)
 
     LaunchedEffect(key1 = projectId) {
         if (projectId != null) viewModel.setProjectId(projectId)
@@ -43,23 +46,11 @@ fun MessageCreateEditScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showTeamPicker by remember { mutableStateOf(false) }
 
-    val focusManager = LocalFocusManager.current
-
     val uiState by viewModel.uiState.collectAsState()
 
 
     when {
 
-        uiState.messageInputState.isTitleEmpty == true -> LaunchedEffect(key1 = uiState.messageInputState) {
-            makeToast("Please enter message title", context)
-        }
-
-        uiState.messageInputState.isTeamEmpty == true -> LaunchedEffect(key1 = uiState.messageInputState) {
-            makeToast("Please choose team", context)
-        }
-        uiState.messageInputState.isTextEmpty == true -> LaunchedEffect(key1 = uiState.messageInputState) {
-            makeToast("Please choose task responsible", context)
-        }
         uiState.messageInputState.serverResponse is Success -> {
             LaunchedEffect(key1 = uiState.messageInputState) {
                 viewModel.clearInput()
@@ -81,40 +72,17 @@ fun MessageCreateEditScreen(
 
 
     Box {
-        Column(modifier = Modifier.hideKeyboardOnLoseFocus(focusManager)) {
 
-            TitleInput(
-                text = uiState.title,
-                onInputChange = { text -> viewModel.setTitle(text) }
-            )
-
-            DescriptionInput(
-                text = uiState.content,
-                onInputChange = { text -> viewModel.setContent(text) }
-            )
-
-            ChooseTeam(
-                team = uiState.chosenUserList,
-                onClick = { showTeamPicker = true }
-            )
-
-            ButtonRow(
-                onSubmit = {
-                    if (uiState.screenMode == ScreenMode.CREATE) viewModel.createMessage()
-                    else viewModel.updateMessage()
-                },
-                onDismiss = navigateBack,
-                onDelete = { showDeleteDialog = true }
-            )
-
-        }
-
-        if (showDeleteDialog) {
-            ConfirmationDialog(
-                text = "Do you want to delete the message?",
-                onSubmit = { viewModel.deleteMessage() },
-                { showDeleteDialog = false })
-        }
+        MessageCreateEditScreenBody(
+            uiState = uiState,
+            setTitle = { text -> viewModel.setTitle(text) },
+            setContent = { text -> viewModel.setContent(text) },
+            showTeamPicker = { showTeamPicker = true },
+            showDeleteDialog = { showDeleteDialog = true },
+            createMessage = { viewModel.createMessage() },
+            updateMessage = { viewModel.updateMessage() },
+            navigateBack = navigateBack
+        )
 
         uiState.users?.let {
             if (showTeamPicker) {
@@ -129,6 +97,58 @@ fun MessageCreateEditScreen(
                 )
             }
         }
+
+        if (showDeleteDialog) {
+            ConfirmationDialog(
+                text = stringResource(R.string.do_you_want_to_delete_the_message),
+                onSubmit = { viewModel.deleteMessage() },
+                { showDeleteDialog = false })
+        }
     }
 }
 
+@Composable
+fun MessageCreateEditScreenBody(
+    uiState: MessageCreateState,
+    setTitle: (String) -> Unit,
+    setContent: (String) -> Unit,
+    showTeamPicker: () -> Unit,
+    showDeleteDialog: () -> Unit,
+    createMessage: () -> Unit,
+    updateMessage: () -> Unit,
+    navigateBack: () -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
+
+    Column(modifier = Modifier.hideKeyboardOnLoseFocus(focusManager)) {
+
+        TitleInput(
+            text = uiState.title,
+            onInputChange = { text -> setTitle(text) },
+            textIsEmpty = uiState.messageInputState.isTitleEmpty
+        )
+
+        DescriptionInput(
+            text = uiState.content,
+            onInputChange = { text -> setContent(text) },
+            textIsEmpty = uiState.messageInputState.isTextEmpty
+        )
+
+        ChooseTeam(
+            team = uiState.chosenUserList,
+            onClick = showTeamPicker,
+            teamIsEmpty = uiState.messageInputState.isTeamEmpty
+        )
+
+        ButtonRow(
+            onSubmit = {
+                if (uiState.screenMode == ScreenMode.CREATE) createMessage()
+                else updateMessage()
+            },
+            onDismiss = navigateBack,
+            onDelete = showDeleteDialog,
+            showDeleteOption = uiState.screenMode == ScreenMode.EDIT
+        )
+    }
+}

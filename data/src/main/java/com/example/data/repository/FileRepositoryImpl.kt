@@ -95,4 +95,8 @@ class FileRepositoryImpl @Inject constructor(
         return fileDao.getAllFiles().transform { emit(it.fromListFileEntitiesToListFiles()) }
     }
 
+    override suspend fun clearLocalCache() {
+        fileDao.clearLocalCache()
+    }
+
 }

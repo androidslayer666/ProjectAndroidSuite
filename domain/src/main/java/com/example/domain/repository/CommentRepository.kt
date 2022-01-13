@@ -17,4 +17,6 @@ interface CommentRepository {
 
     suspend fun deleteComment(commentId: String, taskId: Int): Result<String, Throwable>
 
+    suspend fun clearLocalCache()
+
 }

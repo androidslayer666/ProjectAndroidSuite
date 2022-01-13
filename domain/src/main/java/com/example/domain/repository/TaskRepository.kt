@@ -31,6 +31,7 @@ interface TaskRepository {
 
     suspend fun deleteTask(taskId: Int): Result<String, Throwable>
 
-
     suspend fun createTask(milestoneId: Int?, task: Task, projectId: Int): Result<String, Throwable>
+
+    suspend fun clearLocalCache()
 }

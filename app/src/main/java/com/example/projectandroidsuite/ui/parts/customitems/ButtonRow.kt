@@ -15,10 +15,11 @@ import com.example.projectandroidsuite.R
 fun ButtonRow(
     onSubmit: () -> Unit,
     onDismiss: () -> Unit,
-    onDelete: (() -> Unit)? = null
+    onDelete: (() -> Unit) = {},
+    showDeleteOption: Boolean = true
 ){
     Row {
-        if (onDelete != null) {
+        if (showDeleteOption) {
             Image(
                 painterResource(
                     R.drawable.ic_baseline_delete_36_red

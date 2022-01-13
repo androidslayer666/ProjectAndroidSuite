@@ -35,6 +35,6 @@ interface TaskDao {
     fun deleteTask(taskId: Int)
 
     @Query("DELETE FROM task")
-    fun deleteAllTasks()
+    fun clearLocalCache()
 
 }

@@ -30,6 +30,7 @@ fun FilterTasks(
     Box {
         Row {
 
+            // Make filters dialog fill 2/5 of the screen
             Row(Modifier.weight(3F)) {}
 
             Row(Modifier.weight(2F)) {
@@ -54,8 +55,6 @@ fun FilterTasks(
                             onClick = { showUserPicker = true }
                         )
 
-
-
                         Spacer(Modifier.size(12.dp))
 
                         ClearFilters {
@@ -76,7 +75,6 @@ fun FilterTasks(
         if (showUserPicker) {
             TeamPickerDialog(
                 list = uiState.users,
-                //onSubmit = { },
                 onClick = { user -> viewModel.setUserForFilteringTask(user) },
                 closeDialog = { showUserPicker = false },
                 pickerType = PickerType.SINGLE,
@@ -134,11 +132,11 @@ fun SetTaskSorting(
         color = MaterialTheme.colors.onPrimary,
         modifier = Modifier.padding(vertical = 12.dp)
     )
-    Column() {
-        Row() {
+    Column {
+        Row {
             Text(text = "Deadline ", color = MaterialTheme.colors.onPrimary)
         }
-        Row() {
+        Row {
             CustomSortButton(
                 ascending = true,
                 clicked = (taskSorting == TaskSorting.DEADLINE_ASC)
@@ -153,11 +151,11 @@ fun SetTaskSorting(
 
     Spacer(Modifier.size(24.dp))
 
-    Column() {
+    Column {
         Row {
             Text(text = "Stage ", color = MaterialTheme.colors.onPrimary)
         }
-        Row() {
+        Row {
             CustomSortButton(
                 ascending = true,
                 clicked = (taskSorting == TaskSorting.STAGE_ASC)
@@ -172,11 +170,11 @@ fun SetTaskSorting(
 
     Spacer(Modifier.size(24.dp))
 
-    Column() {
+    Column {
         Row {
             Text(text = "Importance", color = MaterialTheme.colors.onPrimary)
         }
-        Row() {
+        Row {
             CustomSortButton(
                 ascending = true,
                 clicked = (taskSorting == TaskSorting.IMPORTANT_ASC)

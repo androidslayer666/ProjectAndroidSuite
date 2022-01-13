@@ -36,7 +36,7 @@ data class MilestoneCreateState(
 
 
 @HiltViewModel
-class MilestoneCreateEditViewModelNew @Inject constructor(
+class MilestoneCreateEditViewModel @Inject constructor(
     private val getAllUsers: GetAllUsers,
     private val getMilestoneById: GetMilestoneById,
     private val putMilestoneToProject: PutMilestoneToProject,
@@ -93,7 +93,6 @@ class MilestoneCreateEditViewModelNew @Inject constructor(
     }
 
     fun setDate(date: Date) {
-
         _uiState.update { it.copy(endDate = date) }
     }
 

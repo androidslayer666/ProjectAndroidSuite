@@ -2,16 +2,19 @@ package com.example.projectandroidsuite.ui.mainscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.domain.filters.task.TaskFilter
 import com.example.domain.filters.task.TaskStatus
 import com.example.domain.interactor.task.GetAllTasks
 import com.example.domain.interactor.user.GetAllUsers
 import com.example.domain.model.Task
 import com.example.domain.model.User
 import com.example.domain.sorting.TaskSorting
+import com.example.domain.utils.log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 data class TaskScreenState(
@@ -56,6 +59,7 @@ class TasksViewModel @Inject constructor(
     }
 
     fun setStatusForFilteringTask(status: TaskStatus?) {
+        log(status)
         _uiState.update { it.copy(stageForFilteringTask = status) }
         getAllTasks.setFilter(status = status)
     }
@@ -63,6 +67,10 @@ class TasksViewModel @Inject constructor(
     fun setUserSearch(query: String) {
         _uiState.update { it.copy(userSearchQuery = query) }
         getAllTasks.setFilter(query)
+    }
+
+    fun setOverdueTaskFilter( ) {
+        getAllTasks.setFilter (status = TaskStatus.ACTIVE, interval = Pair(null, Date()) )
     }
 
     fun clearFiltersTask() {

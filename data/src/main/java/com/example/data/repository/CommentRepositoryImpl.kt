@@ -82,4 +82,8 @@ class CommentRepositoryImpl @Inject constructor(
             onSuccess = {  populateCommentsWithTaskId(taskId) }
         )
     }
+
+    override suspend fun clearLocalCache() {
+        commentDao.clearLocalCache()
+    }
 }

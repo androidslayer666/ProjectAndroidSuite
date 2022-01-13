@@ -21,10 +21,6 @@ class ScaffoldViewModel @Inject constructor(
     private var _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
-    init{
-        //getUser()
-    }
-
     fun getUser() {
         viewModelScope.launch {
             getSelfProfile().collectLatest {
@@ -34,8 +30,8 @@ class ScaffoldViewModel @Inject constructor(
     }
 
     fun logOut(){
+        viewModelScope.launch {
         logout()
+        }
     }
-
-
 }

@@ -1,4 +1,4 @@
-package com.example.domain.di
+package com.example.projectandroidsuite.di
 
 import android.content.Context
 import com.example.data.endpoints.*
@@ -83,7 +83,7 @@ class NetworkProvider {
         return buildEndPoint(
             TeamEndPoint::class.java,
             provider.fetchAuthToken() ?: "",
-            provider.fetchPortalAddress() ?: ""
+            provider.fetchPortalAddress() ?: "https://gog.com"
         )
     }
 

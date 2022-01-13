@@ -28,4 +28,7 @@ interface MessageDao {
     @Query("DELETE FROM message WHERE id = :messageId")
     suspend fun deleteMessage(messageId: Int)
 
+    @Query("DELETE FROM message")
+    suspend fun clearLocalCache()
+
 }

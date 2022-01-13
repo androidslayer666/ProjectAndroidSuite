@@ -11,7 +11,6 @@ import com.example.projectandroidsuite.ui.createeditscreens.project.ProjectCreat
 import com.example.projectandroidsuite.ui.createeditscreens.subtask.SubtaskCreateEditScreen
 import com.example.projectandroidsuite.ui.createeditscreens.task.TaskCreateEditScreen
 import com.example.projectandroidsuite.ui.loginpage.LoginPage
-import com.example.projectandroidsuite.ui.loginpage.LoginViewModel
 import com.example.projectandroidsuite.ui.mainscreen.MainScreen
 import com.example.projectandroidsuite.ui.navigation.ArgumentLists.messageList
 import com.example.projectandroidsuite.ui.navigation.ArgumentLists.milestoneList
@@ -33,18 +32,18 @@ import com.example.projectandroidsuite.ui.navigation.ArgumentStrings.taskId
 import com.example.projectandroidsuite.ui.projectdetailpage.ProjectDetailPage
 import com.example.projectandroidsuite.ui.search.SearchScreen
 import com.example.projectandroidsuite.ui.taskdetailpage.TaskDetailPage
+import com.example.projectandroidsuite.ui.utils.LocalGlobalUiState
 
 
 @Composable
 fun ProjectNavHost(
-    loginViewModel: LoginViewModel,
     navController: NavHostController,
     setShowScaffold: (Boolean) -> Unit,
 ) {
 
     NavHost(
         navController = navController,
-        startDestination = if (loginViewModel.checkAuthentication()) ProjectsScreens.Main.name
+        startDestination = if (LocalGlobalUiState.current.authenticated) ProjectsScreens.Main.name
         else ProjectsScreens.Login.name
     ) {
 

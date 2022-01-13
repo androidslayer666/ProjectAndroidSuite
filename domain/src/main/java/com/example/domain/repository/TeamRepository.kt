@@ -13,4 +13,6 @@ interface TeamRepository {
 
     suspend fun getSelfProfile(): Flow<User?>
 
+    suspend fun clearLocalCache()
+
 }

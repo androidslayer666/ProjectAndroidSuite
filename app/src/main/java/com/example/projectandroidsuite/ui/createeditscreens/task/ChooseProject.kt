@@ -9,11 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.domain.model.Project
+import com.example.projectandroidsuite.ui.parts.inputs.ErrorMessage
 
 @Composable
 fun ChooseProject(
     onClick: ()->Unit,
-    project: Project?
+    project: Project?,
+    projectIsEmpty: Boolean? = null
 ) {
     Row(Modifier.padding(vertical = 12.dp)) {
         Text(
@@ -28,6 +30,9 @@ fun ChooseProject(
                 text = it1, Modifier
                     .weight(4F)
             )
+        }
+        if (projectIsEmpty == true) {
+            ErrorMessage(condition = projectIsEmpty, text = "please choose project")
         }
 
     }

@@ -16,4 +16,6 @@ interface FileRepository {
     fun getFilesWithProjectId(projectId: Int): Flow<List<File>>
 
     fun getAllFiles(): Flow<List<File>>
+
+    suspend fun clearLocalCache()
 }

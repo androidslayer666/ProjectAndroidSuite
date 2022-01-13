@@ -28,4 +28,6 @@ interface MilestoneRepository {
         projectId: Int,
         milestone: Milestone
     ): Result<String, Throwable>
+
+    suspend fun clearLocalCache()
 }

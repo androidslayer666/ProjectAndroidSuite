@@ -33,12 +33,6 @@ fun SubtaskCreateEditScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     when {
-        uiState.subtaskInputState.isTitleEmpty == true -> LaunchedEffect(key1 = uiState.subtaskInputState) {
-            makeToast("Please enter title", context)
-        }
-        uiState.subtaskInputState.isResponsibleEmpty == true -> LaunchedEffect(key1 = uiState.subtaskInputState) {
-            makeToast("Please choose responsible", context)
-        }
         uiState.subtaskInputState.serverResponse is Success -> {
             makeToast((uiState.subtaskInputState.serverResponse as Success<String>).value, context)
             viewModel.clearInput()
@@ -65,6 +59,7 @@ fun SubtaskCreateEditScreen(
         ButtonRow(
             onSubmit = { viewModel.createSubtask() },
             onDismiss = navigateBack,
+            showDeleteOption = false
         )
     }
 

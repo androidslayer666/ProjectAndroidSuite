@@ -16,15 +16,19 @@
     <string name="responsible">Responsible</string>
     <string name="team">Team</string>
     <string name="project">Project</string>
+    <string name="projects">Projects</string>
     <string name="milestone">Milestone</string>
     <string name="comfirm">Confirm</string>
     <string name="choose_responsible">Choose responsible</string>
     <string name="choose_team">Choose team</string>
     <string name="comment_has_been_deleted">Comment has been deleted</string>
     <string name="do_you_want_to_delete_the_comment">Do you want to delete the comment?</string>
-    <string name="do_you_want_to_delete_the_project">Do you want to delete the project?</string>
     <string name="title">Title</string>
     <string name="description">Description</string>
     <string name="end_date">End date</string>
+    <string name="do_you_want_to_delete_the_project">Do you want to delete the project?</string>
+    <string name="do_you_want_to_delete_the_task">Do you want to delete the task?</string>
+    <string name="do_you_want_to_delete_the_milestone">Do you want to delete the milestone?</string>
+    <string name="do_you_want_to_delete_the_message">Do you want to delete the message?</string>
 
 </resources>
